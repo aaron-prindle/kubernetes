@@ -17,6 +17,7 @@ limitations under the License.
 package kuberuntime
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -34,7 +35,9 @@ import (
 	kubetypes "k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/kubernetes/pkg/api/v1"
+	"k8s.io/kubernetes/pkg/features"
 	runtimeapi "k8s.io/kubernetes/pkg/kubelet/apis/cri/v1alpha1"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	"k8s.io/kubernetes/pkg/kubelet/events"
@@ -51,7 +54,7 @@ import (
 // * create the container
 // * start the container
 // * run the post start lifecycle hooks (if applicable)
-func (m *kubeGenericRuntimeManager) startContainer(podSandboxID string, podSandboxConfig *runtimeapi.PodSandboxConfig, container *v1.Container, pod *v1.Pod, podStatus *kubecontainer.PodStatus, pullSecrets []v1.Secret, podIP string) (string, error) {
+func (m *kubeGenericRuntimeManager) startContainer(podSandboxID string, podSandboxConfig *runtimeapi.PodSandboxConfig, container *v1.Container, pod *v1.Pod, podStatus *kubecontainer.PodStatus, pullSecrets []v1.Secret, podIP string, containerType kubecontainer.ContainerType) (string, error) {
 	// Step 1: pull the image.
 	imageRef, msg, err := m.imagePuller.EnsureImageExists(pod, container, pullSecrets)
 	if err != nil {
@@ -72,7 +75,7 @@ func (m *kubeGenericRuntimeManager) startContainer(podSandboxID string, podSandb
 		restartCount = containerStatus.RestartCount + 1
 	}
 
-	containerConfig, err := m.generateContainerConfig(container, pod, restartCount, podIP, imageRef)
+	containerConfig, err := m.generateContainerConfig(container, pod, restartCount, podIP, imageRef, containerType)
 	if err != nil {
 		m.recorder.Eventf(ref, v1.EventTypeWarning, events.FailedToCreateContainer, "Failed to create container with error: %v", err)
 		return "Generate Container Config Failed", err
@@ -131,7 +134,7 @@ func (m *kubeGenericRuntimeManager) startContainer(podSandboxID string, podSandb
 }
 
 // generateContainerConfig generates container config for kubelet runtime v1.
-func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Container, pod *v1.Pod, restartCount int, podIP, imageRef string) (*runtimeapi.ContainerConfig, error) {
+func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Container, pod *v1.Pod, restartCount int, podIP, imageRef string, containerType kubecontainer.ContainerType) (*runtimeapi.ContainerConfig, error) {
 	opts, _, err := m.runtimeHelper.GenerateRunContainerOptions(pod, container, podIP)
 	if err != nil {
 		return nil, err
@@ -162,7 +165,7 @@ func (m *kubeGenericRuntimeManager) generateContainerConfig(container *v1.Contai
 		Command:     command,
 		Args:        args,
 		WorkingDir:  container.WorkingDir,
-		Labels:      newContainerLabels(container, pod),
+		Labels:      newContainerLabels(container, pod, containerType),
 		Annotations: newContainerAnnotations(container, pod, restartCount),
 		Devices:     makeDevices(opts),
 		Mounts:      m.makeMounts(opts, container),
@@ -417,6 +420,7 @@ func toKubeContainerStatus(status *runtimeapi.ContainerStatus, runtimeName strin
 			ID:   status.Id,
 		},
 		Name:         labeledInfo.ContainerName,
+		Type:         labeledInfo.ContainerType,
 		Image:        status.Image.Image,
 		ImageID:      status.ImageRef,
 		Hash:         annotatedInfo.Hash,
@@ -525,15 +529,22 @@ func (m *kubeGenericRuntimeManager) killContainer(pod *v1.Pod, containerID kubec
 	var containerSpec *v1.Container
 	if pod != nil {
 		containerSpec = kubecontainer.GetContainerSpec(pod, containerName)
-	} else {
+	}
+	// Debug Containers can have a pod but no container spec. We could simplify this
+	// logic and ensure containerSpec is never nil by removing this feature gate, but
+	// features.DebugContainers should not change default behavior while in alpha.
+	if pod == nil || (containerSpec == nil && utilfeature.DefaultFeatureGate.Enabled(features.DebugContainers)) {
 		// Restore necessary information if one of the specs is nil.
 		restoredPod, restoredContainer, err := m.restoreSpecsFromContainerLabels(containerID)
 		if err != nil {
 			return err
 		}
-		pod, containerSpec = restoredPod, restoredContainer
+		if pod == nil {
+			pod = restoredPod
+		}
+		containerSpec = restoredContainer
 	}
-	// From this point , pod and container must be non-nil.
+	// From this point, a nil pod or containerSpec will cause a runtime panic
 	gracePeriod := int64(minimumGracePeriodInSeconds)
 	switch {
 	case pod.DeletionGracePeriodSeconds != nil:
@@ -738,6 +749,45 @@ func (m *kubeGenericRuntimeManager) RunInContainer(id kubecontainer.ContainerID,
 	// for logging purposes. A combined output option will need to be added to the ExecSyncRequest
 	// if more precise output ordering is ever required.
 	return append(stdout, stderr...), err
+}
+
+// RunDebugContainer creates a Debug Container described by container in pod if it is not
+// already running. The container configuration does not become part of the pod spec, but its
+// status is reported in PodStatus. Return success if the debug container is already running.
+func (m *kubeGenericRuntimeManager) RunDebugContainer(pod *v1.Pod, container *v1.Container, pullSecrets []v1.Secret) error {
+	if !utilfeature.DefaultFeatureGate.Enabled(features.DebugContainers) {
+		return errors.New("Debug Containers feature disabled")
+	}
+
+	if kubecontainer.GetContainerSpec(pod, container.Name) != nil {
+		return fmt.Errorf("container name %s conflicts with container in pod spec", container.Name)
+	}
+
+	podStatus, err := m.GetPodStatus(pod.UID, pod.Name, pod.Namespace)
+	if err != nil {
+		return err
+	} else if len(podStatus.SandboxStatuses) == 0 {
+		return fmt.Errorf("pod %v/%v not running", pod.Namespace, pod.Name)
+	}
+
+	// We haven't reached consensus yet on how to handle reattaching, so in the mean time RunDebugContainer()
+	// returns success if the container already exists and is running. getDebug() will then implicitly reattach.
+	for _, c := range podStatus.ContainerStatuses {
+		if c.Name == container.Name && c.State == kubecontainer.ContainerStateRunning {
+			return nil
+		}
+	}
+
+	podSandboxConfig, err := m.generatePodSandboxConfig(pod, 0)
+	if err != nil {
+		return err
+	}
+
+	if msg, err := m.startContainer(podStatus.SandboxStatuses[0].Id, podSandboxConfig, container, pod, podStatus, pullSecrets, podStatus.IP, kubecontainer.ContainerTypeDebug); err != nil {
+		return fmt.Errorf("cannot start debug container: %v (%v)", err, msg)
+	}
+
+	return nil
 }
 
 // removeContainer removes the container and the container logs.

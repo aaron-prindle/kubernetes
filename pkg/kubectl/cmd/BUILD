@@ -9,6 +9,7 @@ load(
 go_library(
     name = "go_default_library",
     srcs = [
+        "alpha.go",
         "annotate.go",
         "apiversions.go",
         "apply.go",
@@ -36,6 +37,7 @@ go_library(
         "create_secret.go",
         "create_service.go",
         "create_serviceaccount.go",
+        "debug.go",
         "delete.go",
         "describe.go",
         "drain.go",
@@ -165,6 +167,7 @@ go_test(
         "create_service_test.go",
         "create_serviceaccount_test.go",
         "create_test.go",
+        "debug_test.go",
         "delete_test.go",
         "describe_test.go",
         "drain_test.go",

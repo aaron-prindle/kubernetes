@@ -173,6 +173,7 @@ type HostInterface interface {
 	RunInContainer(name string, uid types.UID, container string, cmd []string) ([]byte, error)
 	ExecInContainer(name string, uid types.UID, container string, cmd []string, in io.Reader, out, err io.WriteCloser, tty bool, resize <-chan remotecommand.TerminalSize, timeout time.Duration) error
 	AttachContainer(name string, uid types.UID, container string, in io.Reader, out, err io.WriteCloser, tty bool, resize <-chan remotecommand.TerminalSize) error
+	RunDebugContainer(pod *v1.Pod, container *v1.Container) error
 	GetKubeletContainerLogs(podFullName, containerName string, logOptions *v1.PodLogOptions, stdout, stderr io.Writer) error
 	ServeLogs(w http.ResponseWriter, req *http.Request)
 	PortForward(name string, uid types.UID, port int32, stream io.ReadWriteCloser) error
@@ -321,6 +322,23 @@ func (s *Server) InstallDebuggingHandlers(criHandler http.Handler) {
 	ws.Route(ws.POST("/{podNamespace}/{podID}/{uid}/{containerName}").
 		To(s.getExec).
 		Operation("getExec"))
+	s.restfulCont.Add(ws)
+
+	ws = new(restful.WebService)
+	ws.
+		Path("/poddebug")
+	ws.Route(ws.GET("/{podNamespace}/{podID}/{containerName}").
+		To(s.getDebug).
+		Operation("getDebug"))
+	ws.Route(ws.POST("/{podNamespace}/{podID}/{containerName}").
+		To(s.getDebug).
+		Operation("getDebug"))
+	ws.Route(ws.GET("/{podNamespace}/{podID}/{uid}/{containerName}").
+		To(s.getDebug).
+		Operation("getDebug"))
+	ws.Route(ws.POST("/{podNamespace}/{podID}/{uid}/{containerName}").
+		To(s.getDebug).
+		Operation("getDebug"))
 	s.restfulCont.Add(ws)
 
 	ws = new(restful.WebService)
@@ -592,7 +610,27 @@ func getExecRequestParams(req *restful.Request) execRequestParams {
 		podName:       req.PathParameter("podID"),
 		podUID:        types.UID(req.PathParameter("uid")),
 		containerName: req.PathParameter("containerName"),
-		cmd:           req.Request.URL.Query()[api.ExecCommandParamm],
+		cmd:           req.Request.URL.Query()[api.ExecCommandParam],
+	}
+}
+
+type debugRequestParams struct {
+	podNamespace  string
+	podName       string
+	podUID        types.UID
+	containerName string
+	imageName     string
+	cmd           []string
+}
+
+func getDebugRequestParams(req *restful.Request) debugRequestParams {
+	return debugRequestParams{
+		podNamespace:  req.PathParameter("podNamespace"),
+		podName:       req.PathParameter("podID"),
+		podUID:        types.UID(req.PathParameter("uid")),
+		containerName: req.PathParameter("containerName"),
+		imageName:     req.Request.URL.Query().Get("image"), // TODO(verb): replace with api.DebugImageParam
+		cmd:           req.Request.URL.Query()[api.ExecCommandParam],
 	}
 }
 
@@ -685,6 +723,52 @@ func (s *Server) getExec(request *restful.Request, response *restful.Response) {
 		s.host.StreamingConnectionIdleTimeout(),
 		remotecommandconsts.DefaultStreamCreationTimeout,
 		remotecommandconsts.SupportedStreamingProtocols)
+}
+
+// getDebug handles requests to add a debug container to a pod
+func (s *Server) getDebug(request *restful.Request, response *restful.Response) {
+	params := getDebugRequestParams(request)
+	streamOpts, err := remotecommandserver.NewOptions(request.Request)
+	if err != nil {
+		utilruntime.HandleError(err)
+		response.WriteError(http.StatusBadRequest, err)
+		return
+	}
+
+	if params.containerName == "" || params.imageName == "" {
+		response.WriteError(http.StatusBadRequest, fmt.Errorf("container and image names required"))
+		return
+	}
+
+	pod, ok := s.host.GetPodByName(params.podNamespace, params.podName)
+	if !ok {
+		response.WriteError(http.StatusNotFound, fmt.Errorf("pod does not exist"))
+		return
+	}
+
+	container := v1.Container{
+		Name:            params.containerName,
+		Command:         params.cmd,
+		Image:           params.imageName,
+		ImagePullPolicy: v1.PullAlways,
+		Stdin:           streamOpts.Stdin,
+		TTY:             streamOpts.TTY,
+		SecurityContext: &v1.SecurityContext{
+			// TODO(verb): Make these configurable once the api settles
+			// These are the capabilities needed for strace and nsenter.
+			Capabilities: &v1.Capabilities{
+				Add: []v1.Capability{"SYS_ADMIN", "SYS_PTRACE"},
+			},
+		},
+	}
+
+	if err := s.host.RunDebugContainer(pod, &container); err != nil {
+		utilruntime.HandleError(err)
+		response.WriteError(http.StatusInternalServerError, err)
+		return
+	}
+
+	s.getAttach(request, response)
 }
 
 // getRun handles requests to run a command inside a container.

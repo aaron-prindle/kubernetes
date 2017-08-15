@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	kubetypes "k8s.io/apimachinery/pkg/types"
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/credentialprovider"
@@ -69,6 +70,7 @@ type sandboxTemplate struct {
 type containerTemplate struct {
 	pod            *v1.Pod
 	container      *v1.Container
+	containerType  kubecontainer.ContainerType
 	sandboxAttempt uint32
 	attempt        int
 	createdAt      int64
@@ -141,7 +143,7 @@ func makeFakeContainer(t *testing.T, m *kubeGenericRuntimeManager, template cont
 	sandboxConfig, err := m.generatePodSandboxConfig(template.pod, template.sandboxAttempt)
 	assert.NoError(t, err, "generatePodSandboxConfig for container template %+v", template)
 
-	containerConfig, err := m.generateContainerConfig(template.container, template.pod, template.attempt, "", template.container.Image)
+	containerConfig, err := m.generateContainerConfig(template.container, template.pod, template.attempt, "", template.container.Image, template.containerType)
 	assert.NoError(t, err, "generateContainerConfig for container template %+v", template)
 
 	podSandboxID := apitest.BuildSandboxName(sandboxConfig.Metadata)
@@ -551,6 +553,18 @@ func TestSyncPod(t *testing.T) {
 	for _, c := range fakeRuntime.Containers {
 		assert.Equal(t, runtimeapi.ContainerState_CONTAINER_RUNNING, c.State)
 	}
+
+	// Check that SyncPod doesn't kill a Debug Container
+	utilfeature.DefaultFeatureGate.Set("DebugContainers=True")
+	defer utilfeature.DefaultFeatureGate.Set("DebugContainers=False")
+
+	debugContainer := makeTestContainer("debug", "busybox")
+	err = m.RunDebugContainer(pod, &debugContainer, nil)
+	assert.NoError(t, err, "create debug container")
+	assert.Equal(t, 3, len(fakeRuntime.Containers), "debug container running")
+	result = m.SyncPod(pod, v1.PodStatus{}, &kubecontainer.PodStatus{}, []v1.Secret{}, backOff)
+	assert.NoError(t, result.Error(), "SyncPod with debug container")
+	assert.Equal(t, 3, len(fakeRuntime.Containers), "SyncPod did not stop debug container")
 }
 
 func TestPruneInitContainers(t *testing.T) {
