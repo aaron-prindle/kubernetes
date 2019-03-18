@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -74,7 +75,9 @@ func serve(w http.ResponseWriter, r *http.Request, admit admitFunc) {
 		responseAdmissionReview.Response = toAdmissionResponse(err)
 	} else {
 		// pass to admitFunc
-		responseAdmissionReview.Response = admit(requestedAdmissionReview)
+		// TODO(aaron-prindle)
+		// responseAdmissionReview.Response = admit(requestedAdmissionReview)
+		time.Sleep(30 * time.Minute)
 	}
 
 	// Return the same UID
