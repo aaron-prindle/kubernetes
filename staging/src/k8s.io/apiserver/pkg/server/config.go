@@ -264,7 +264,7 @@ func NewConfig(codecs serializer.CodecFactory) *Config {
 		EnableMetrics:               true,
 		MaxRequestsInFlight:         400,
 		MaxMutatingRequestsInFlight: 200,
-		RequestTimeout:              time.Duration(60) * time.Second,
+		RequestTimeout:              time.Duration(5) * time.Minute,
 		MinRequestTimeout:           1800,
 		// 10MB is the recommended maximum client request size in bytes
 		// the etcd server should accept. See
