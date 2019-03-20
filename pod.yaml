@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallowed-pod
+  labels:
+    webhook-e2e-test: webhook-disallow
+spec:
+  containers:
+  - name: webhook-disallow
+    image: nginx
+    ports:
+    - containerPort: 80

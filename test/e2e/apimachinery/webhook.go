@@ -24,7 +24,7 @@ import (
 
 	"k8s.io/api/admissionregistration/v1beta1"
 	apps "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	rbacv1beta1 "k8s.io/api/rbac/v1beta1"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	crdclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -118,115 +118,121 @@ var _ = SIGDescribe("AdmissionWebhook", func() {
 		cleanWebhookTest(client, namespaceName)
 	})
 
-	It("Should be able to deny pod and configmap creation", func() {
+	It("Should trigger repro", func() {
 		webhookCleanup := registerWebhook(f, context)
 		defer webhookCleanup()
-		testWebhook(f)
+		testAPIServer500(f)
 	})
 
-	It("Should be able to deny attaching pod", func() {
-		webhookCleanup := registerWebhookForAttachingPod(f, context)
-		defer webhookCleanup()
-		testAttachingPodWebhook(f)
-	})
+	// It("Should be able to deny pod and configmap creation", func() {
+	// 	webhookCleanup := registerWebhook(f, context)
+	// 	defer webhookCleanup()
+	// 	testWebhook(f)
+	// })
 
-	It("Should be able to deny custom resource creation", func() {
-		testcrd, err := crd.CreateTestCRD(f)
-		if err != nil {
-			return
-		}
-		defer testcrd.CleanUp()
-		webhookCleanup := registerWebhookForCustomResource(f, context, testcrd)
-		defer webhookCleanup()
-		testCustomResourceWebhook(f, testcrd.Crd, testcrd.GetV1DynamicClient())
-	})
+	// It("Should be able to deny attaching pod", func() {
+	// 	webhookCleanup := registerWebhookForAttachingPod(f, context)
+	// 	defer webhookCleanup()
+	// 	testAttachingPodWebhook(f)
+	// })
 
-	It("Should unconditionally reject operations on fail closed webhook", func() {
-		webhookCleanup := registerFailClosedWebhook(f, context)
-		defer webhookCleanup()
-		testFailClosedWebhook(f)
-	})
+	// It("Should be able to deny custom resource creation", func() {
+	// 	testcrd, err := crd.CreateTestCRD(f)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	defer testcrd.CleanUp()
+	// 	webhookCleanup := registerWebhookForCustomResource(f, context, testcrd)
+	// 	defer webhookCleanup()
+	// 	testCustomResourceWebhook(f, testcrd.Crd, testcrd.GetV1DynamicClient())
+	// })
 
-	It("Should mutate configmap", func() {
-		webhookCleanup := registerMutatingWebhookForConfigMap(f, context)
-		defer webhookCleanup()
-		testMutatingConfigMapWebhook(f)
-	})
+	// It("Should unconditionally reject operations on fail closed webhook", func() {
+	// 	webhookCleanup := registerFailClosedWebhook(f, context)
+	// 	defer webhookCleanup()
+	// 	testFailClosedWebhook(f)
+	// })
 
-	It("Should mutate pod and apply defaults after mutation", func() {
-		webhookCleanup := registerMutatingWebhookForPod(f, context)
-		defer webhookCleanup()
-		testMutatingPodWebhook(f)
-	})
+	// It("Should mutate configmap", func() {
+	// 	webhookCleanup := registerMutatingWebhookForConfigMap(f, context)
+	// 	defer webhookCleanup()
+	// 	testMutatingConfigMapWebhook(f)
+	// })
 
-	It("Should not be able to mutate or prevent deletion of webhook configuration objects", func() {
-		validatingWebhookCleanup := registerValidatingWebhookForWebhookConfigurations(f, context)
-		defer validatingWebhookCleanup()
-		mutatingWebhookCleanup := registerMutatingWebhookForWebhookConfigurations(f, context)
-		defer mutatingWebhookCleanup()
-		testWebhooksForWebhookConfigurations(f)
-	})
+	// It("Should mutate pod and apply defaults after mutation", func() {
+	// 	webhookCleanup := registerMutatingWebhookForPod(f, context)
+	// 	defer webhookCleanup()
+	// 	testMutatingPodWebhook(f)
+	// })
 
-	It("Should mutate custom resource", func() {
-		testcrd, err := crd.CreateTestCRD(f)
-		if err != nil {
-			return
-		}
-		defer testcrd.CleanUp()
-		webhookCleanup := registerMutatingWebhookForCustomResource(f, context, testcrd)
-		defer webhookCleanup()
-		testMutatingCustomResourceWebhook(f, testcrd.Crd, testcrd.GetV1DynamicClient())
-	})
+	// It("Should not be able to mutate or prevent deletion of webhook configuration objects", func() {
+	// 	validatingWebhookCleanup := registerValidatingWebhookForWebhookConfigurations(f, context)
+	// 	defer validatingWebhookCleanup()
+	// 	mutatingWebhookCleanup := registerMutatingWebhookForWebhookConfigurations(f, context)
+	// 	defer mutatingWebhookCleanup()
+	// 	testWebhooksForWebhookConfigurations(f)
+	// })
 
-	It("Should deny crd creation", func() {
-		crdWebhookCleanup := registerValidatingWebhookForCRD(f, context)
-		defer crdWebhookCleanup()
+	// It("Should mutate custom resource", func() {
+	// 	testcrd, err := crd.CreateTestCRD(f)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	defer testcrd.CleanUp()
+	// 	webhookCleanup := registerMutatingWebhookForCustomResource(f, context, testcrd)
+	// 	defer webhookCleanup()
+	// 	testMutatingCustomResourceWebhook(f, testcrd.Crd, testcrd.GetV1DynamicClient())
+	// })
 
-		testCRDDenyWebhook(f)
-	})
+	// It("Should deny crd creation", func() {
+	// 	crdWebhookCleanup := registerValidatingWebhookForCRD(f, context)
+	// 	defer crdWebhookCleanup()
 
-	It("Should mutate custom resource with different stored version", func() {
-		testcrd, err := crd.CreateMultiVersionTestCRDWithV1Storage(f)
-		if err != nil {
-			return
-		}
-		defer testcrd.CleanUp()
-		webhookCleanup := registerMutatingWebhookForCustomResource(f, context, testcrd)
-		defer webhookCleanup()
-		testMultiVersionCustomResourceWebhook(f, testcrd)
-	})
+	// 	testCRDDenyWebhook(f)
+	// })
 
-	It("Should deny crd creation", func() {
-		crdWebhookCleanup := registerValidatingWebhookForCRD(f, context)
-		defer crdWebhookCleanup()
+	// It("Should mutate custom resource with different stored version", func() {
+	// 	testcrd, err := crd.CreateMultiVersionTestCRDWithV1Storage(f)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	defer testcrd.CleanUp()
+	// 	webhookCleanup := registerMutatingWebhookForCustomResource(f, context, testcrd)
+	// 	defer webhookCleanup()
+	// 	testMultiVersionCustomResourceWebhook(f, testcrd)
+	// })
 
-		testCRDDenyWebhook(f)
-	})
+	// It("Should deny crd creation", func() {
+	// 	crdWebhookCleanup := registerValidatingWebhookForCRD(f, context)
+	// 	defer crdWebhookCleanup()
 
-	It("Should honor timeout", func() {
-		policyFail := v1beta1.Fail
-		policyIgnore := v1beta1.Ignore
+	// 	testCRDDenyWebhook(f)
+	// })
 
-		By("Setting timeout (1s) shorter than webhook latency (5s)")
-		slowWebhookCleanup := registerSlowWebhook(f, context, &policyFail, int32Ptr(1))
-		testSlowWebhookTimeoutFailEarly(f)
-		slowWebhookCleanup()
+	// It("Should honor timeout", func() {
+	// 	policyFail := v1beta1.Fail
+	// 	policyIgnore := v1beta1.Ignore
 
-		By("Having no error when timeout is shorter than webhook latency and failure policy is ignore")
-		slowWebhookCleanup = registerSlowWebhook(f, context, &policyIgnore, int32Ptr(1))
-		testSlowWebhookTimeoutNoError(f)
-		slowWebhookCleanup()
+	// 	By("Setting timeout (1s) shorter than webhook latency (5s)")
+	// 	slowWebhookCleanup := registerSlowWebhook(f, context, &policyFail, int32Ptr(1))
+	// 	testSlowWebhookTimeoutFailEarly(f)
+	// 	slowWebhookCleanup()
 
-		By("Having no error when timeout is longer than webhook latency")
-		slowWebhookCleanup = registerSlowWebhook(f, context, &policyFail, int32Ptr(10))
-		testSlowWebhookTimeoutNoError(f)
-		slowWebhookCleanup()
+	// 	By("Having no error when timeout is shorter than webhook latency and failure policy is ignore")
+	// 	slowWebhookCleanup = registerSlowWebhook(f, context, &policyIgnore, int32Ptr(1))
+	// 	testSlowWebhookTimeoutNoError(f)
+	// 	slowWebhookCleanup()
 
-		By("Having no error when timeout is empty (defaulted to 10s in v1beta1)")
-		slowWebhookCleanup = registerSlowWebhook(f, context, &policyFail, nil)
-		testSlowWebhookTimeoutNoError(f)
-		slowWebhookCleanup()
-	})
+	// 	By("Having no error when timeout is longer than webhook latency")
+	// 	slowWebhookCleanup = registerSlowWebhook(f, context, &policyFail, int32Ptr(10))
+	// 	testSlowWebhookTimeoutNoError(f)
+	// 	slowWebhookCleanup()
+
+	// 	By("Having no error when timeout is empty (defaulted to 10s in v1beta1)")
+	// 	slowWebhookCleanup = registerSlowWebhook(f, context, &policyFail, nil)
+	// 	testSlowWebhookTimeoutNoError(f)
+	// 	slowWebhookCleanup()
+	// })
 
 	// TODO: add more e2e tests for mutating webhooks
 	// 1. mutating webhook that mutates pod
@@ -661,6 +667,26 @@ func toBeMutatedPod(f *framework.Framework) *v1.Pod {
 	}
 }
 
+func testAPIServer500(f *framework.Framework) {
+	By("send a pod create api command that we cancel")
+	By("sleeping for 5 minutes")
+	time.Sleep(5 * time.Minute)
+
+	client := f.ClientSet
+	// Creating the pod, the request should be rejected
+	pod := nonCompliantPod(f)
+	_, err := client.CoreV1().Pods(f.Namespace.Name).Create(pod)
+	Expect(err).To(HaveOccurred(), "create pod %s in namespace %s should have been denied by webhook", pod.Name, f.Namespace.Name)
+	expectedErrMsg1 := "the pod contains unwanted container name"
+	if !strings.Contains(err.Error(), expectedErrMsg1) {
+		framework.Failf("expect error contains %q, got %q", expectedErrMsg1, err.Error())
+	}
+	expectedErrMsg2 := "the pod contains unwanted label"
+	if !strings.Contains(err.Error(), expectedErrMsg2) {
+		framework.Failf("expect error contains %q, got %q", expectedErrMsg2, err.Error())
+	}
+}
+
 func testWebhook(f *framework.Framework) {
 	By("create a pod that should be denied by the webhook")
 	client := f.ClientSet
@@ -677,76 +703,76 @@ func testWebhook(f *framework.Framework) {
 		framework.Failf("expect error contains %q, got %q", expectedErrMsg2, err.Error())
 	}
 
-	By("create a pod that causes the webhook to hang")
-	client = f.ClientSet
-	// Creating the pod, the request should be rejected
-	pod = hangingPod(f)
-	_, err = client.CoreV1().Pods(f.Namespace.Name).Create(pod)
-	Expect(err).To(HaveOccurred(), "create pod %s in namespace %s should have caused webhook to hang", pod.Name, f.Namespace.Name)
-	expectedTimeoutErr := "request did not complete within"
-	if !strings.Contains(err.Error(), expectedTimeoutErr) {
-		framework.Failf("expect timeout error %q, got %q", expectedTimeoutErr, err.Error())
-	}
+	// By("create a pod that causes the webhook to hang")
+	// client = f.ClientSet
+	// // Creating the pod, the request should be rejected
+	// pod = hangingPod(f)
+	// _, err = client.CoreV1().Pods(f.Namespace.Name).Create(pod)
+	// Expect(err).To(HaveOccurred(), "create pod %s in namespace %s should have caused webhook to hang", pod.Name, f.Namespace.Name)
+	// expectedTimeoutErr := "request did not complete within"
+	// if !strings.Contains(err.Error(), expectedTimeoutErr) {
+	// 	framework.Failf("expect timeout error %q, got %q", expectedTimeoutErr, err.Error())
+	// }
 
-	By("create a configmap that should be denied by the webhook")
-	// Creating the configmap, the request should be rejected
-	configmap := nonCompliantConfigMap(f)
-	_, err = client.CoreV1().ConfigMaps(f.Namespace.Name).Create(configmap)
-	Expect(err).To(HaveOccurred(), "create configmap %s in namespace %s should have been denied by the webhook", configmap.Name, f.Namespace.Name)
-	expectedErrMsg := "the configmap contains unwanted key and value"
-	if !strings.Contains(err.Error(), expectedErrMsg) {
-		framework.Failf("expect error contains %q, got %q", expectedErrMsg, err.Error())
-	}
+	// By("create a configmap that should be denied by the webhook")
+	// // Creating the configmap, the request should be rejected
+	// configmap := nonCompliantConfigMap(f)
+	// _, err = client.CoreV1().ConfigMaps(f.Namespace.Name).Create(configmap)
+	// Expect(err).To(HaveOccurred(), "create configmap %s in namespace %s should have been denied by the webhook", configmap.Name, f.Namespace.Name)
+	// expectedErrMsg := "the configmap contains unwanted key and value"
+	// if !strings.Contains(err.Error(), expectedErrMsg) {
+	// 	framework.Failf("expect error contains %q, got %q", expectedErrMsg, err.Error())
+	// }
 
-	By("create a configmap that should be admitted by the webhook")
-	// Creating the configmap, the request should be admitted
-	configmap = &v1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: allowedConfigMapName,
-		},
-		Data: map[string]string{
-			"admit": "this",
-		},
-	}
-	_, err = client.CoreV1().ConfigMaps(f.Namespace.Name).Create(configmap)
-	Expect(err).NotTo(HaveOccurred(), "failed to create configmap %s in namespace: %s", configmap.Name, f.Namespace.Name)
+	// By("create a configmap that should be admitted by the webhook")
+	// // Creating the configmap, the request should be admitted
+	// configmap = &v1.ConfigMap{
+	// 	ObjectMeta: metav1.ObjectMeta{
+	// 		Name: allowedConfigMapName,
+	// 	},
+	// 	Data: map[string]string{
+	// 		"admit": "this",
+	// 	},
+	// }
+	// _, err = client.CoreV1().ConfigMaps(f.Namespace.Name).Create(configmap)
+	// Expect(err).NotTo(HaveOccurred(), "failed to create configmap %s in namespace: %s", configmap.Name, f.Namespace.Name)
 
-	By("update (PUT) the admitted configmap to a non-compliant one should be rejected by the webhook")
-	toNonCompliantFn := func(cm *v1.ConfigMap) {
-		if cm.Data == nil {
-			cm.Data = map[string]string{}
-		}
-		cm.Data["webhook-e2e-test"] = "webhook-disallow"
-	}
-	_, err = updateConfigMap(client, f.Namespace.Name, allowedConfigMapName, toNonCompliantFn)
-	Expect(err).To(HaveOccurred(), "update (PUT) admitted configmap %s in namespace %s to a non-compliant one should be rejected by webhook", allowedConfigMapName, f.Namespace.Name)
-	if !strings.Contains(err.Error(), expectedErrMsg) {
-		framework.Failf("expect error contains %q, got %q", expectedErrMsg, err.Error())
-	}
+	// By("update (PUT) the admitted configmap to a non-compliant one should be rejected by the webhook")
+	// toNonCompliantFn := func(cm *v1.ConfigMap) {
+	// 	if cm.Data == nil {
+	// 		cm.Data = map[string]string{}
+	// 	}
+	// 	cm.Data["webhook-e2e-test"] = "webhook-disallow"
+	// }
+	// _, err = updateConfigMap(client, f.Namespace.Name, allowedConfigMapName, toNonCompliantFn)
+	// Expect(err).To(HaveOccurred(), "update (PUT) admitted configmap %s in namespace %s to a non-compliant one should be rejected by webhook", allowedConfigMapName, f.Namespace.Name)
+	// if !strings.Contains(err.Error(), expectedErrMsg) {
+	// 	framework.Failf("expect error contains %q, got %q", expectedErrMsg, err.Error())
+	// }
 
-	By("update (PATCH) the admitted configmap to a non-compliant one should be rejected by the webhook")
-	patch := nonCompliantConfigMapPatch()
-	_, err = client.CoreV1().ConfigMaps(f.Namespace.Name).Patch(allowedConfigMapName, types.StrategicMergePatchType, []byte(patch))
-	Expect(err).To(HaveOccurred(), "update admitted configmap %s in namespace %s by strategic merge patch to a non-compliant one should be rejected by webhook. Patch: %+v", allowedConfigMapName, f.Namespace.Name, patch)
-	if !strings.Contains(err.Error(), expectedErrMsg) {
-		framework.Failf("expect error contains %q, got %q", expectedErrMsg, err.Error())
-	}
+	// By("update (PATCH) the admitted configmap to a non-compliant one should be rejected by the webhook")
+	// patch := nonCompliantConfigMapPatch()
+	// _, err = client.CoreV1().ConfigMaps(f.Namespace.Name).Patch(allowedConfigMapName, types.StrategicMergePatchType, []byte(patch))
+	// Expect(err).To(HaveOccurred(), "update admitted configmap %s in namespace %s by strategic merge patch to a non-compliant one should be rejected by webhook. Patch: %+v", allowedConfigMapName, f.Namespace.Name, patch)
+	// if !strings.Contains(err.Error(), expectedErrMsg) {
+	// 	framework.Failf("expect error contains %q, got %q", expectedErrMsg, err.Error())
+	// }
 
-	By("create a namespace that bypass the webhook")
-	err = createNamespace(f, &v1.Namespace{ObjectMeta: metav1.ObjectMeta{
-		Name: skippedNamespaceName,
-		Labels: map[string]string{
-			skipNamespaceLabelKey: skipNamespaceLabelValue,
-		},
-	}})
-	framework.ExpectNoError(err, "creating namespace %q", skippedNamespaceName)
-	// clean up the namespace
-	defer client.CoreV1().Namespaces().Delete(skippedNamespaceName, nil)
+	// By("create a namespace that bypass the webhook")
+	// err = createNamespace(f, &v1.Namespace{ObjectMeta: metav1.ObjectMeta{
+	// 	Name: skippedNamespaceName,
+	// 	Labels: map[string]string{
+	// 		skipNamespaceLabelKey: skipNamespaceLabelValue,
+	// 	},
+	// }})
+	// framework.ExpectNoError(err, "creating namespace %q", skippedNamespaceName)
+	// // clean up the namespace
+	// defer client.CoreV1().Namespaces().Delete(skippedNamespaceName, nil)
 
-	By("create a configmap that violates the webhook policy but is in a whitelisted namespace")
-	configmap = nonCompliantConfigMap(f)
-	_, err = client.CoreV1().ConfigMaps(skippedNamespaceName).Create(configmap)
-	Expect(err).NotTo(HaveOccurred(), "failed to create configmap %s in namespace: %s", configmap.Name, skippedNamespaceName)
+	// By("create a configmap that violates the webhook policy but is in a whitelisted namespace")
+	// configmap = nonCompliantConfigMap(f)
+	// _, err = client.CoreV1().ConfigMaps(skippedNamespaceName).Create(configmap)
+	// Expect(err).NotTo(HaveOccurred(), "failed to create configmap %s in namespace: %s", configmap.Name, skippedNamespaceName)
 }
 
 func testAttachingPodWebhook(f *framework.Framework) {

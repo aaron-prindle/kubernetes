@@ -76,8 +76,8 @@ func serve(w http.ResponseWriter, r *http.Request, admit admitFunc) {
 	} else {
 		// pass to admitFunc
 		// TODO(aaron-prindle)
-		// responseAdmissionReview.Response = admit(requestedAdmissionReview)
-		time.Sleep(30 * time.Minute)
+		time.Sleep(10 * time.Second)
+		responseAdmissionReview.Response = admit(requestedAdmissionReview)
 	}
 
 	// Return the same UID
