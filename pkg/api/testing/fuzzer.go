@@ -39,6 +39,7 @@ import (
 	api "k8s.io/kubernetes/pkg/apis/core"
 	corefuzzer "k8s.io/kubernetes/pkg/apis/core/fuzzer"
 	extensionsfuzzer "k8s.io/kubernetes/pkg/apis/extensions/fuzzer"
+	flowregistrationfuzzer "k8s.io/kubernetes/pkg/apis/flowregistration/fuzzer"
 	networkingfuzzer "k8s.io/kubernetes/pkg/apis/networking/fuzzer"
 	policyfuzzer "k8s.io/kubernetes/pkg/apis/policy/fuzzer"
 	rbacfuzzer "k8s.io/kubernetes/pkg/apis/rbac/fuzzer"
@@ -103,6 +104,7 @@ var FuzzerFuncs = fuzzer.MergeFuzzerFuncs(
 	policyfuzzer.Funcs,
 	certificatesfuzzer.Funcs,
 	admissionregistrationfuzzer.Funcs,
+	flowregistrationfuzzer.Funcs,
 	auditregistrationfuzzer.Funcs,
 	storagefuzzer.Funcs,
 	networkingfuzzer.Funcs,
