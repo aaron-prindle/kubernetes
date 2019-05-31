@@ -31,10 +31,10 @@ import (
 	_ "k8s.io/kubernetes/pkg/cloudprovider/providers"
 	// Volume plugins
 	"k8s.io/kubernetes/pkg/volume"
-	"k8s.io/kubernetes/pkg/volume/awsebs"
-	"k8s.io/kubernetes/pkg/volume/azure_dd"
-	"k8s.io/kubernetes/pkg/volume/azure_file"
-	"k8s.io/kubernetes/pkg/volume/cinder"
+	// "k8s.io/kubernetes/pkg/volume/awsebs"
+	// "k8s.io/kubernetes/pkg/volume/azure_dd"
+	// "k8s.io/kubernetes/pkg/volume/azure_file"
+	// "k8s.io/kubernetes/pkg/volume/cinder"
 	"k8s.io/kubernetes/pkg/volume/csi"
 	"k8s.io/kubernetes/pkg/volume/fc"
 	"k8s.io/kubernetes/pkg/volume/flexvolume"
@@ -45,7 +45,8 @@ import (
 	"k8s.io/kubernetes/pkg/volume/iscsi"
 	"k8s.io/kubernetes/pkg/volume/local"
 	"k8s.io/kubernetes/pkg/volume/nfs"
-	"k8s.io/kubernetes/pkg/volume/photon_pd"
+
+	// "k8s.io/kubernetes/pkg/volume/photon_pd"
 	"k8s.io/kubernetes/pkg/volume/portworx"
 	"k8s.io/kubernetes/pkg/volume/quobyte"
 	"k8s.io/kubernetes/pkg/volume/rbd"
@@ -67,13 +68,13 @@ import (
 func ProbeAttachableVolumePlugins() []volume.VolumePlugin {
 	allPlugins := []volume.VolumePlugin{}
 
-	allPlugins = append(allPlugins, awsebs.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, awsebs.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, gcepd.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, cinder.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, cinder.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, portworx.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, vsphere_volume.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, azure_dd.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, photon_pd.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, azure_dd.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, photon_pd.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, scaleio.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, storageos.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, fc.ProbeVolumePlugins()...)
@@ -151,7 +152,7 @@ func ProbeControllerVolumePlugins(cloud cloudprovider.Interface, config persiste
 	// add rbd provisioner
 	allPlugins = append(allPlugins, rbd.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, quobyte.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, azure_file.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, azure_file.ProbeVolumePlugins()...)
 
 	allPlugins = append(allPlugins, flocker.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, portworx.ProbeVolumePlugins()...)
@@ -159,12 +160,12 @@ func ProbeControllerVolumePlugins(cloud cloudprovider.Interface, config persiste
 	allPlugins = append(allPlugins, local.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, storageos.ProbeVolumePlugins()...)
 
-	allPlugins = append(allPlugins, awsebs.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, awsebs.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, gcepd.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, cinder.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, cinder.ProbeVolumePlugins()...)
 	allPlugins = append(allPlugins, vsphere_volume.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, azure_dd.ProbeVolumePlugins()...)
-	allPlugins = append(allPlugins, photon_pd.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, azure_dd.ProbeVolumePlugins()...)
+	// allPlugins = append(allPlugins, photon_pd.ProbeVolumePlugins()...)
 
 	if utilfeature.DefaultFeatureGate.Enabled(features.CSIInlineVolume) {
 		allPlugins = append(allPlugins, csi.ProbeVolumePlugins()...)
