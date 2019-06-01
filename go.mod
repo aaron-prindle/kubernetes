@@ -8,7 +8,6 @@ go 1.12
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
-	github.com/Azure/azure-sdk-for-go v21.4.0+incompatible
 	github.com/Azure/go-autorest v11.1.2+incompatible
 	github.com/GoogleCloudPlatform/k8s-cloud-provider v0.0.0-20181220005116-f8e995905100
 	github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
@@ -43,8 +42,6 @@ require (
 	github.com/coreos/rkt v1.30.0 // indirect
 	github.com/cpuguy83/go-md2man v1.0.4
 	github.com/cyphar/filepath-securejoin v0.0.0-20170720062807-ae69057f2299 // indirect
-	github.com/d2g/dhcp4 v0.0.0-20170904100407-a1d1b6c41b1c
-	github.com/d2g/dhcp4client v0.0.0-20170829104524-6e570ed0a266
 	github.com/davecgh/go-spew v1.1.1
 	github.com/daviddengcn/go-colortext v0.0.0-20160507010035-511bcaf42ccd
 	github.com/docker/distribution v0.0.0-20170726174610-edc3ab29cdff
@@ -76,7 +73,6 @@ require (
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf
 	github.com/googleapis/gnostic v0.0.0-20170729233727-0c5108395e2d
-	github.com/gophercloud/gophercloud v0.0.0-20190126172459-c818fa66e4c8
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.7.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.0
@@ -106,7 +102,6 @@ require (
 	github.com/mindprince/gonvml v0.0.0-20171110221305-fee913ce8fb2 // indirect
 	github.com/mistifyio/go-zfs v0.0.0-20151009155749-1b4ae6fb4e77 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7
-	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mohae/deepcopy v0.0.0-20170603005431-491d3605edfb // indirect
 	github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c // indirect
 	github.com/mrunalp/fileutils v0.0.0-20160930181131-4ee1cc9a8058 // indirect
@@ -148,8 +143,6 @@ require (
 	github.com/vishvananda/netlink v0.0.0-20171020171820-b2de5d10e38e
 	github.com/vishvananda/netns v0.0.0-20171111001504-be1fbeda1936 // indirect
 	github.com/vmware/govmomi v0.20.1
-	github.com/vmware/photon-controller-go-sdk v0.0.0-20170310013346-4a435daef6cc
-	github.com/xanzy/go-cloudstack v0.0.0-20160728180336-1e2cbf647e57
 	github.com/xlab/handysort v0.0.0-20150421192137-fb3537ed64a1 // indirect
 	golang.org/x/crypto v0.0.0-20181025213731-e84da0312774
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1
