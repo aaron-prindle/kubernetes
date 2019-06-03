@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	storage "k8s.io/api/storage/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -39,7 +39,6 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	cloudprovider "k8s.io/cloud-provider"
 	volerr "k8s.io/cloud-provider/volume/errors"
-	csitranslation "k8s.io/csi-translation-lib"
 	v1helper "k8s.io/kubernetes/pkg/apis/core/v1/helper"
 	"k8s.io/kubernetes/pkg/controller/volume/events"
 	"k8s.io/kubernetes/pkg/controller/volume/persistentvolume/metrics"
@@ -1319,12 +1318,12 @@ func (ctrl *PersistentVolumeController) provisionClaim(claim *v1.PersistentVolum
 	return nil
 }
 
-func (ctrl *PersistentVolumeController) getCSINameFromIntreeName(pluginName string) (string, error) {
-	if ctrl.csiNameFromIntreeNameHook != nil {
-		return ctrl.csiNameFromIntreeNameHook(pluginName)
-	}
-	return csitranslation.GetCSINameFromInTreeName(pluginName)
-}
+// func (ctrl *PersistentVolumeController) getCSINameFromIntreeName(pluginName string) (string, error) {
+// 	if ctrl.csiNameFromIntreeNameHook != nil {
+// 		return ctrl.csiNameFromIntreeNameHook(pluginName)
+// 	}
+// 	return csitranslation.GetCSINameFromInTreeName(pluginName)
+// }
 
 // provisionClaimOperation provisions a volume. This method is running in
 // standalone goroutine and already has all necessary locks.
@@ -1344,20 +1343,22 @@ func (ctrl *PersistentVolumeController) provisionClaimOperation(claim *v1.Persis
 	var pluginName string
 	provisionerName := storageClass.Provisioner
 	if plugin != nil {
-		if plugin.IsMigratedToCSI() {
-			// pluginName is not set here to align with existing behavior
-			// of not setting pluginName for external provisioners (including CSI)
-			// Set provisionerName to CSI plugin name for setClaimProvisioner
-			provisionerName, err = ctrl.getCSINameFromIntreeName(storageClass.Provisioner)
-			if err != nil {
-				strerr := fmt.Sprintf("error getting CSI name for In tree plugin %s: %v", storageClass.Provisioner, err)
-				klog.V(2).Infof("%s", strerr)
-				ctrl.eventRecorder.Event(claim, v1.EventTypeWarning, events.ProvisioningFailed, strerr)
-				return "", err
-			}
-		} else {
-			pluginName = plugin.GetPluginName()
-		}
+		// if plugin.IsMigratedToCSI() {
+		// 	// pluginName is not set here to align with existing behavior
+		// 	// of not setting pluginName for external provisioners (including CSI)
+		// 	// Set provisionerName to CSI plugin name for setClaimProvisioner
+		// 	provisionerName, err = ctrl.getCSINameFromIntreeName(storageClass.Provisioner)
+		// 	if err != nil {
+		// 		strerr := fmt.Sprintf("error getting CSI name for In tree plugin %s: %v", storageClass.Provisioner, err)
+		// 		klog.V(2).Infof("%s", strerr)
+		// 		ctrl.eventRecorder.Event(claim, v1.EventTypeWarning, events.ProvisioningFailed, strerr)
+		// 		return "", err
+		// 	}
+		// } else {
+		// 	pluginName = plugin.GetPluginName()
+		// }
+		pluginName = plugin.GetPluginName()
+
 	}
 
 	// Add provisioner annotation so external provisioners know when to start

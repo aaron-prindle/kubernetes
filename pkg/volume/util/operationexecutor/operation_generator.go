@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -482,25 +482,29 @@ func (og *operationGenerator) GenerateDetachVolumeFunc(
 			return volumetypes.GeneratedOperations{}, volumeToDetach.GenerateErrorDetailed("DetachVolume.SplitUniqueName failed", err)
 		}
 
-		// TODO(dyzz): This case can't distinguish between PV and In-line which is necessary because
-		// if it was PV it may have been migrated, but the same plugin with in-line may not have been.
-		// Suggestions welcome...
-		if csilib.IsMigratableIntreePluginByName(pluginName) && utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
-			// The volume represented by this spec is CSI and thus should be migrated
-			attachableVolumePlugin, err = og.volumePluginMgr.FindAttachablePluginByName(csi.CSIPluginName)
-			if err != nil || attachableVolumePlugin == nil {
-				return volumetypes.GeneratedOperations{}, volumeToDetach.GenerateErrorDetailed("AttachVolume.FindAttachablePluginBySpec failed", err)
-			}
-			// volumeToDetach.VolumeName here is always the in-tree volume name
-			// therefore a workaround is required. volumeToDetach.DevicePath
-			// is the attachID which happens to be what volumeName is needed for in Detach.
-			// Therefore we set volumeName to the attachID. And CSI Detach can detect and use that.
-			volumeName = volumeToDetach.DevicePath
-		} else {
-			attachableVolumePlugin, err = og.volumePluginMgr.FindAttachablePluginByName(pluginName)
-			if err != nil || attachableVolumePlugin == nil {
-				return volumetypes.GeneratedOperations{}, volumeToDetach.GenerateErrorDetailed("DetachVolume.FindAttachablePluginByName failed", err)
-			}
+		// // TODO(dyzz): This case can't distinguish between PV and In-line which is necessary because
+		// // if it was PV it may have been migrated, but the same plugin with in-line may not have been.
+		// // Suggestions welcome...
+		// if csilib.IsMigratableIntreePluginByName(pluginName) && utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
+		// 	// The volume represented by this spec is CSI and thus should be migrated
+		// 	attachableVolumePlugin, err = og.volumePluginMgr.FindAttachablePluginByName(csi.CSIPluginName)
+		// 	if err != nil || attachableVolumePlugin == nil {
+		// 		return volumetypes.GeneratedOperations{}, volumeToDetach.GenerateErrorDetailed("AttachVolume.FindAttachablePluginBySpec failed", err)
+		// 	}
+		// 	// volumeToDetach.VolumeName here is always the in-tree volume name
+		// 	// therefore a workaround is required. volumeToDetach.DevicePath
+		// 	// is the attachID which happens to be what volumeName is needed for in Detach.
+		// 	// Therefore we set volumeName to the attachID. And CSI Detach can detect and use that.
+		// 	volumeName = volumeToDetach.DevicePath
+		// } else {
+		// 	attachableVolumePlugin, err = og.volumePluginMgr.FindAttachablePluginByName(pluginName)
+		// 	if err != nil || attachableVolumePlugin == nil {
+		// 		return volumetypes.GeneratedOperations{}, volumeToDetach.GenerateErrorDetailed("DetachVolume.FindAttachablePluginByName failed", err)
+		// 	}
+		// }
+		attachableVolumePlugin, err = og.volumePluginMgr.FindAttachablePluginByName(pluginName)
+		if err != nil || attachableVolumePlugin == nil {
+			return volumetypes.GeneratedOperations{}, volumeToDetach.GenerateErrorDetailed("DetachVolume.FindAttachablePluginByName failed", err)
 		}
 
 	}
@@ -1762,12 +1766,12 @@ func useCSIPlugin(vpm *volume.VolumePluginMgr, spec *volume.Spec) bool {
 	if !utilfeature.DefaultFeatureGate.Enabled(features.CSIMigration) {
 		return false
 	}
-	if csilib.IsPVMigratable(spec.PersistentVolume) || csilib.IsInlineMigratable(spec.Volume) {
-		migratable, err := vpm.IsPluginMigratableBySpec(spec)
-		if err == nil && migratable {
-			return true
-		}
-	}
+	// if csilib.IsPVMigratable(spec.PersistentVolume) || csilib.IsInlineMigratable(spec.Volume) {
+	// 	migratable, err := vpm.IsPluginMigratableBySpec(spec)
+	// 	if err == nil && migratable {
+	// 		return true
+	// 	}
+	// }
 	return false
 }
 
@@ -1825,10 +1829,11 @@ func nodeUsingCSIPlugin(og *operationGenerator, spec *volume.Spec, nodeName type
 		mpaSet = sets.NewString(tok...)
 	}
 
-	pluginName, err := csilib.GetInTreePluginNameFromSpec(spec.PersistentVolume, spec.Volume)
-	if err != nil {
-		return false, err
-	}
+	// pluginName, err := csilib.GetInTreePluginNameFromSpec(spec.PersistentVolume, spec.Volume)
+	// if err != nil {
+	// 	return false, err
+	// }
+	pluginName := ""
 
 	if len(pluginName) == 0 {
 		// Could not find a plugin name from translation directory, assume not translated
@@ -1839,10 +1844,11 @@ func nodeUsingCSIPlugin(og *operationGenerator, spec *volume.Spec, nodeName type
 
 	if isMigratedOnNode {
 		installed := false
-		driverName, err := csilib.GetCSINameFromInTreeName(pluginName)
-		if err != nil {
-			return isMigratedOnNode, err
-		}
+		// driverName, err := csilib.GetCSINameFromInTreeName(pluginName)
+		// if err != nil {
+		// 	return isMigratedOnNode, err
+		// }
+		driverName := ""
 		for _, driver := range csiNode.Spec.Drivers {
 			if driver.Name == driverName {
 				installed = true
@@ -1864,10 +1870,12 @@ func translateSpec(spec *volume.Spec) (*volume.Spec, error) {
 	inlineVolume := false
 	if spec.PersistentVolume != nil {
 		// TranslateInTreePVToCSI will create a new PV
-		csiPV, err = csilib.TranslateInTreePVToCSI(spec.PersistentVolume)
-		if err != nil {
-			return nil, fmt.Errorf("failed to translate in tree pv to CSI: %v", err)
-		}
+		return nil, fmt.Errorf("failed to translate in tree pv to CSI: %v", err)
+		// csiPV, err = csilib.TranslateInTreePVToCSI(spec.PersistentVolume)
+		// if err != nil {
+		// 	return nil, fmt.Errorf("failed to translate in tree pv to CSI: %v", err)
+		// }
+
 	} else if spec.Volume != nil {
 		// TranslateInTreeInlineVolumeToCSI will create a new PV
 		csiPV, err = csilib.TranslateInTreeInlineVolumeToCSI(spec.Volume)

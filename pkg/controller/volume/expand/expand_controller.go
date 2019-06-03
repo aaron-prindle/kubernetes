@@ -24,7 +24,7 @@ import (
 	"k8s.io/klog"
 
 	authenticationv1 "k8s.io/api/authentication/v1"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -41,7 +41,6 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	cloudprovider "k8s.io/cloud-provider"
-	csitranslation "k8s.io/csi-translation-lib"
 	v1helper "k8s.io/kubernetes/pkg/apis/core/v1/helper"
 	"k8s.io/kubernetes/pkg/controller"
 	"k8s.io/kubernetes/pkg/controller/volume/events"
@@ -252,24 +251,24 @@ func (expc *expandController) syncHandler(key string) error {
 		return nil
 	}
 
-	if volumePlugin.IsMigratedToCSI() {
-		msg := fmt.Sprintf("CSI migration enabled for %s; waiting for external resizer to expand the pvc", volumeResizerName)
-		expc.recorder.Event(pvc, v1.EventTypeNormal, events.ExternalExpanding, msg)
-		csiResizerName, err := csitranslation.GetCSINameFromInTreeName(class.Provisioner)
-		if err != nil {
-			errorMsg := fmt.Sprintf("error getting CSI driver name for pvc %s, with error %v", util.ClaimToClaimKey(pvc), err)
-			expc.recorder.Event(pvc, v1.EventTypeWarning, events.ExternalExpanding, errorMsg)
-			return fmt.Errorf(errorMsg)
-		}
+	// if volumePlugin.IsMigratedToCSI() {
+	// 	msg := fmt.Sprintf("CSI migration enabled for %s; waiting for external resizer to expand the pvc", volumeResizerName)
+	// 	expc.recorder.Event(pvc, v1.EventTypeNormal, events.ExternalExpanding, msg)
+	// 	csiResizerName, err := csitranslation.GetCSINameFromInTreeName(class.Provisioner)
+	// 	if err != nil {
+	// 		errorMsg := fmt.Sprintf("error getting CSI driver name for pvc %s, with error %v", util.ClaimToClaimKey(pvc), err)
+	// 		expc.recorder.Event(pvc, v1.EventTypeWarning, events.ExternalExpanding, errorMsg)
+	// 		return fmt.Errorf(errorMsg)
+	// 	}
 
-		pvc, err := util.SetClaimResizer(pvc, csiResizerName, expc.kubeClient)
-		if err != nil {
-			errorMsg := fmt.Sprintf("error setting resizer annotation to pvc %s, with error %v", util.ClaimToClaimKey(pvc), err)
-			expc.recorder.Event(pvc, v1.EventTypeWarning, events.ExternalExpanding, errorMsg)
-			return fmt.Errorf(errorMsg)
-		}
-		return nil
-	}
+	// 	pvc, err := util.SetClaimResizer(pvc, csiResizerName, expc.kubeClient)
+	// 	if err != nil {
+	// 		errorMsg := fmt.Sprintf("error setting resizer annotation to pvc %s, with error %v", util.ClaimToClaimKey(pvc), err)
+	// 		expc.recorder.Event(pvc, v1.EventTypeWarning, events.ExternalExpanding, errorMsg)
+	// 		return fmt.Errorf(errorMsg)
+	// 	}
+	// 	return nil
+	// }
 
 	return expc.expand(pvc, pv, volumeResizerName)
 }
