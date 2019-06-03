@@ -8,7 +8,6 @@ go 1.12
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
-	github.com/Azure/go-autorest v11.1.2+incompatible
 	github.com/GoogleCloudPlatform/k8s-cloud-provider v0.0.0-20181220005116-f8e995905100
 	github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
@@ -56,10 +55,7 @@ require (
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d
 	github.com/fatih/camelcase v0.0.0-20160318181535-f6a740d52f96
 	github.com/fsnotify/fsnotify v1.4.7
-	github.com/go-openapi/loads v0.17.2
 	github.com/go-openapi/spec v0.17.2
-	github.com/go-openapi/strfmt v0.17.0
-	github.com/go-openapi/validate v0.18.0
 	github.com/go-ozzo/ozzo-validation v3.5.0+incompatible // indirect
 	github.com/godbus/dbus v0.0.0-20151105175453-c7fdd8b5cd55
 	github.com/gogo/protobuf v0.0.0-20171007142547-342cbe0a0415
@@ -82,7 +78,6 @@ require (
 	github.com/heketi/tests v0.0.0-20151005000721-f3775cbcefd6 // indirect
 	github.com/heketi/utils v0.0.0-20170317161834-435bc5bdfa64 // indirect
 	github.com/jonboulle/clockwork v0.0.0-20141017032234-72f9bd7c4e0c
-	github.com/json-iterator/go v0.0.0-20180701071628-ab8a2e0c74be
 	github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024
 	github.com/jteeuwen/go-bindata v0.0.0-20151023091102-a0ff2567cfb7
 	github.com/kardianos/osext v0.0.0-20150410034420-8fef92e41e22
