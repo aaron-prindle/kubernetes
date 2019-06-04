@@ -11,8 +11,6 @@ require (
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/Microsoft/hcsshim v0.8.6
-	github.com/PuerkitoBio/purell v1.1.0
-	github.com/Rican7/retry v0.1.0 // indirect
 	github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
 	github.com/auth0/go-jwt-middleware v0.0.0-20170425171159-5493cabe49f7 // indirect
 	github.com/bazelbuild/bazel-gazelle v0.0.0-20181012220611-c728ce9f663e
@@ -25,22 +23,16 @@ require (
 	github.com/cloudflare/cfssl v0.0.0-20180726162950-56268a613adf
 	github.com/clusterhq/flocker-go v0.0.0-20160920122132-2b8b7259d313
 	github.com/codegangsta/negroni v1.0.0 // indirect
-	github.com/containerd/console v0.0.0-20170925154832-84eeaae905fa // indirect
-	github.com/containerd/containerd v1.0.2 // indirect
-	github.com/containerd/typeurl v0.0.0-20190228175220-2a93cfde8c20 // indirect
-	github.com/containernetworking/cni v0.6.0
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-semver v0.0.0-20180108230905-e214231b295a
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7
 	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
-	github.com/coreos/rkt v1.30.0 // indirect
 	github.com/cpuguy83/go-md2man v1.0.4
-	github.com/cyphar/filepath-securejoin v0.0.0-20170720062807-ae69057f2299 // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/daviddengcn/go-colortext v0.0.0-20160507010035-511bcaf42ccd
 	github.com/docker/distribution v0.0.0-20170726174610-edc3ab29cdff
 	github.com/docker/docker v0.7.3-0.20190327010347-be7ac8be2ae0
-	github.com/docker/go-connections v0.3.0
+	github.com/docker/go-connections v0.3.0 // indirect
 	github.com/docker/go-units v0.3.3
 	github.com/docker/libnetwork v0.0.0-20180830151422-a9cd636e3789
 	github.com/emicklei/go-restful v0.0.0-20170410110728-ff4f55a20633
@@ -73,23 +65,15 @@ require (
 	github.com/jonboulle/clockwork v0.0.0-20141017032234-72f9bd7c4e0c
 	github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024
 	github.com/jteeuwen/go-bindata v0.0.0-20151023091102-a0ff2567cfb7
-	github.com/karrick/godirwalk v1.7.5 // indirect
 	github.com/kr/fs v0.0.0-20131111012553-2788f0dbd169 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
 	github.com/lithammer/dedent v1.1.0
 	github.com/lpabon/godbc v0.1.1 // indirect
-	github.com/mattn/go-shellwords v0.0.0-20180605041737-f8471b0a71de // indirect
-	github.com/mesos/mesos-go v0.0.9 // indirect
-	github.com/mholt/caddy v0.0.0-20180213163048-2de495001514
 	github.com/miekg/dns v0.0.0-20160614162101-5d001d020961
-	github.com/mindprince/gonvml v0.0.0-20171110221305-fee913ce8fb2 // indirect
 	github.com/mistifyio/go-zfs v0.0.0-20151009155749-1b4ae6fb4e77 // indirect
-	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
-	github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c // indirect
-	github.com/mrunalp/fileutils v0.0.0-20160930181131-4ee1cc9a8058 // indirect
 	github.com/mvdan/xurls v0.0.0-20160110113200-1b768d7c393a
 	github.com/onsi/ginkgo v1.6.0
-	github.com/opencontainers/go-digest v0.0.0-20170106003457-a6d0ee40d420
+	github.com/opencontainers/go-digest v0.0.0-20170106003457-a6d0ee40d420 // indirect
 	github.com/opencontainers/image-spec v0.0.0-20170604055404-372ad780f634 // indirect
 	github.com/opencontainers/runc v0.0.0-20181113202123-f000fe11ece1
 	github.com/opencontainers/runtime-spec v1.0.0 // indirect
@@ -97,14 +81,11 @@ require (
 	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pkg/errors v0.8.0
 	github.com/pkg/sftp v0.0.0-20160930220758-4d0e916071f6 // indirect
-	github.com/pmezard/go-difflib v1.0.0
-	github.com/pquerna/ffjson v0.0.0-20180717144149-af8b230fcd20 // indirect
 	github.com/prometheus/client_golang v0.9.2
 	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910
 	github.com/prometheus/common v0.0.0-20181126121408-4724e9255275
 	github.com/robfig/cron v0.0.0-20170309132418-df38d32658d8
 	github.com/russross/blackfriday v0.0.0-20151117072312-300106c228d5
-	github.com/seccomp/libseccomp-golang v0.0.0-20150813023252-1b506fc7c24e // indirect
 	github.com/shurcooL/sanitized_anchor_name v0.0.0-20151028001915-10ef21a441db // indirect
 	github.com/sigma/go-inotify v0.0.0-20181102212354-c87b6cf5033d
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
@@ -112,7 +93,6 @@ require (
 	github.com/spf13/cobra v0.0.0-20180319062004-c439c4fa0937
 	github.com/spf13/pflag v1.0.1
 	github.com/stretchr/testify v1.2.2
-	github.com/syndtr/gocapability v0.0.0-20160928074757-e7cb7fa329f4 // indirect
 	github.com/urfave/negroni v1.0.0 // indirect
 	github.com/vishvananda/netlink v0.0.0-20171020171820-b2de5d10e38e
 	github.com/vishvananda/netns v0.0.0-20171111001504-be1fbeda1936 // indirect

@@ -23,12 +23,8 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
-        "//vendor/github.com/google/cadvisor/utils/cloudinfo:all-srcs",
-        "//vendor/github.com/google/cadvisor/utils/cpuload:all-srcs",
         "//vendor/github.com/google/cadvisor/utils/docker:all-srcs",
         "//vendor/github.com/google/cadvisor/utils/oomparser:all-srcs",
-        "//vendor/github.com/google/cadvisor/utils/sysfs:all-srcs",
-        "//vendor/github.com/google/cadvisor/utils/sysinfo:all-srcs",
     ],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],

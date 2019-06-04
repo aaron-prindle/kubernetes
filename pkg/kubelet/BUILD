@@ -161,7 +161,6 @@ filegroup(
     srcs = [
         ":package-srcs",
         "//pkg/kubelet/apis:all-srcs",
-        "//pkg/kubelet/cadvisor:all-srcs",
         "//pkg/kubelet/certificate:all-srcs",
         "//pkg/kubelet/checkpoint:all-srcs",
         "//pkg/kubelet/checkpointmanager:all-srcs",
@@ -172,7 +171,6 @@ filegroup(
         "//pkg/kubelet/configmap:all-srcs",
         "//pkg/kubelet/container:all-srcs",
         "//pkg/kubelet/custommetrics:all-srcs",
-        "//pkg/kubelet/dockershim:all-srcs",
         "//pkg/kubelet/envvars:all-srcs",
         "//pkg/kubelet/events:all-srcs",
         "//pkg/kubelet/eviction:all-srcs",

@@ -12,7 +12,6 @@ filegroup(
     srcs = [
         ":package-srcs",
         "//cmd/clicheck:all-srcs",
-        "//cmd/cloud-controller-manager:all-srcs",
         "//cmd/controller-manager/app:all-srcs",
         "//cmd/gendocs:all-srcs",
         "//cmd/genkubedocs:all-srcs",
@@ -23,10 +22,7 @@ filegroup(
         "//cmd/hyperkube:all-srcs",
         "//cmd/importverifier:all-srcs",
         "//cmd/kube-apiserver:all-srcs",
-        "//cmd/kube-controller-manager:all-srcs",
         "//cmd/kube-proxy:all-srcs",
-        "//cmd/kube-scheduler:all-srcs",
-        "//cmd/kubeadm:all-srcs",
         "//cmd/kubectl:all-srcs",
         "//cmd/kubelet:all-srcs",
         "//cmd/kubemark:all-srcs",

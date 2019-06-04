@@ -78,7 +78,6 @@ filegroup(
         "//pkg/kubectl/util/slice:all-srcs",
         "//pkg/kubectl/util/storage:all-srcs",
         "//pkg/kubectl/util/templates:all-srcs",
-        "//pkg/kubectl/util/term:all-srcs",
     ],
     tags = ["automanaged"],
     visibility = ["//build/visible_to:pkg_kubectl_util_CONSUMERS"],

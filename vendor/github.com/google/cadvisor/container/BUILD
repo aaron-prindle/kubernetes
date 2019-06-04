@@ -26,13 +26,7 @@ filegroup(
 
 filegroup(
     name = "all-srcs",
-    srcs = [
-        ":package-srcs",
-        "//vendor/github.com/google/cadvisor/container/common:all-srcs",
-        "//vendor/github.com/google/cadvisor/container/docker:all-srcs",
-        "//vendor/github.com/google/cadvisor/container/libcontainer:all-srcs",
-        "//vendor/github.com/google/cadvisor/container/raw:all-srcs",
-    ],
+    srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
 )
