@@ -84,7 +84,7 @@ require (
 	github.com/miekg/dns v0.0.0-20160614162101-5d001d020961
 	github.com/mindprince/gonvml v0.0.0-20171110221305-fee913ce8fb2 // indirect
 	github.com/mistifyio/go-zfs v0.0.0-20151009155749-1b4ae6fb4e77 // indirect
-	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7
+	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/morikuni/aec v0.0.0-20170113033406-39771216ff4c // indirect
 	github.com/mrunalp/fileutils v0.0.0-20160930181131-4ee1cc9a8058 // indirect
 	github.com/mvdan/xurls v0.0.0-20160110113200-1b768d7c393a

@@ -91,7 +91,6 @@ filegroup(
         "//pkg/kubectl/cmd/diff:all-srcs",
         "//pkg/kubectl/cmd/drain:all-srcs",
         "//pkg/kubectl/cmd/edit:all-srcs",
-        "//pkg/kubectl/cmd/exec:all-srcs",
         "//pkg/kubectl/cmd/explain:all-srcs",
         "//pkg/kubectl/cmd/expose:all-srcs",
         "//pkg/kubectl/cmd/get:all-srcs",

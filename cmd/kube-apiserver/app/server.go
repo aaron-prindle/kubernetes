@@ -49,7 +49,6 @@ import (
 	serveroptions "k8s.io/apiserver/pkg/server/options"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	"k8s.io/apiserver/pkg/storage/etcd3/preflight"
-	"k8s.io/apiserver/pkg/util/term"
 	"k8s.io/apiserver/pkg/util/webhook"
 	clientgoinformers "k8s.io/client-go/informers"
 	clientgoclientset "k8s.io/client-go/kubernetes"
@@ -127,12 +126,12 @@ cluster's shared state through which all other components interact.`,
 	}
 
 	usageFmt := "Usage:\n  %s\n"
-	cols, _, _ := term.TerminalSize(cmd.OutOrStdout())
-	cmd.SetUsageFunc(func(cmd *cobra.Command) error {
-		fmt.Fprintf(cmd.OutOrStderr(), usageFmt, cmd.UseLine())
-		cliflag.PrintSections(cmd.OutOrStderr(), namedFlagSets, cols)
-		return nil
-	})
+	// cols, _, _ := term.TerminalSize(cmd.OutOrStdout())
+	// cmd.SetUsageFunc(func(cmd *cobra.Command) error {
+	// 	fmt.Fprintf(cmd.OutOrStderr(), usageFmt, cmd.UseLine())
+	// 	cliflag.PrintSections(cmd.OutOrStderr(), namedFlagSets, cols)
+	// 	return nil
+	// })
 	cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 		fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n"+usageFmt, cmd.Long, cmd.UseLine())
 		cliflag.PrintSections(cmd.OutOrStdout(), namedFlagSets, cols)
