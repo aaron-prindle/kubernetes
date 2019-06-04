@@ -27,10 +27,10 @@ import (
 	"time"
 
 	// Register supported container handlers.
-	_ "github.com/google/cadvisor/container/containerd/install"
-	_ "github.com/google/cadvisor/container/crio/install"
-	_ "github.com/google/cadvisor/container/docker/install"
-	_ "github.com/google/cadvisor/container/systemd/install"
+	// _ "github.com/google/cadvisor/container/containerd/install"
+	// _ "github.com/google/cadvisor/container/crio/install"
+	// _ "github.com/google/cadvisor/container/docker/install"
+	// _ "github.com/google/cadvisor/container/systemd/install"
 
 	// Register cloud info providers.
 	// TODO(#76660): Remove this once the cAdvisor endpoints are removed.
