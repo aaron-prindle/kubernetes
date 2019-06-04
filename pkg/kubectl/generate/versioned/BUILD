@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -49,50 +49,6 @@ go_library(
         "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/util/validation:go_default_library",
         "//staging/src/k8s.io/client-go/discovery:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "autoscale_test.go",
-        "clusterrolebinding_test.go",
-        "configmap_test.go",
-        "deployment_test.go",
-        "env_file_test.go",
-        "namespace_test.go",
-        "pdb_test.go",
-        "priorityclass_test.go",
-        "quota_test.go",
-        "rolebinding_test.go",
-        "run_test.go",
-        "secret_for_docker_registry_test.go",
-        "secret_for_tls_test.go",
-        "secret_test.go",
-        "service_basic_test.go",
-        "service_test.go",
-        "serviceaccount_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubectl/generate:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/autoscaling/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v2alpha1:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/api/extensions/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/policy/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/rbac/v1:go_default_library",
-        "//staging/src/k8s.io/api/rbac/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/scheduling/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/intstr:go_default_library",
-        "//staging/src/k8s.io/client-go/util/testing:go_default_library",
-        "//vendor/k8s.io/utils/pointer:go_default_library",
     ],
 )
 

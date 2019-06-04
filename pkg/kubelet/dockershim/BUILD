@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -75,54 +75,6 @@ go_library(
         "@io_bazel_rules_go//go/platform:windows": [
             "//pkg/kubelet/apis:go_default_library",
             "//pkg/kubelet/winstats:go_default_library",
-            "//vendor/golang.org/x/sys/windows/registry:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "convert_test.go",
-        "docker_checkpoint_test.go",
-        "docker_container_test.go",
-        "docker_container_windows_test.go",
-        "docker_image_test.go",
-        "docker_sandbox_test.go",
-        "docker_service_test.go",
-        "helpers_linux_test.go",
-        "helpers_test.go",
-        "naming_test.go",
-        "security_context_test.go",
-        "selinux_util_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/checkpointmanager:go_default_library",
-        "//pkg/kubelet/container:go_default_library",
-        "//pkg/kubelet/container/testing:go_default_library",
-        "//pkg/kubelet/dockershim/libdocker:go_default_library",
-        "//pkg/kubelet/dockershim/network:go_default_library",
-        "//pkg/kubelet/dockershim/network/testing:go_default_library",
-        "//pkg/kubelet/types:go_default_library",
-        "//pkg/kubelet/util/cache:go_default_library",
-        "//pkg/security/apparmor:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library",
-        "//staging/src/k8s.io/cri-api/pkg/apis/runtime/v1alpha2:go_default_library",
-        "//vendor/github.com/blang/semver:go_default_library",
-        "//vendor/github.com/docker/docker/api/types:go_default_library",
-        "//vendor/github.com/docker/docker/api/types/container:go_default_library",
-        "//vendor/github.com/docker/docker/pkg/jsonmessage:go_default_library",
-        "//vendor/github.com/docker/go-connections/nat:go_default_library",
-        "//vendor/github.com/golang/mock/gomock:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-    ] + select({
-        "@io_bazel_rules_go//go/platform:linux": [
-            "//staging/src/k8s.io/api/core/v1:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:windows": [
             "//vendor/golang.org/x/sys/windows/registry:go_default_library",
         ],
         "//conditions:default": [],

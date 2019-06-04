@@ -1,47 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "history_test.go",
-        "rollback_test.go",
-        "rolling_updater_test.go",
-        "rollout_status_test.go",
-        "scale_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubectl/scheme:go_default_library",
-        "//pkg/kubectl/util:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1:go_default_library",
-        "//staging/src/k8s.io/api/autoscaling/v1:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/errors:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/unstructured:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/testapigroup/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/intstr:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/scale:go_default_library",
-        "//staging/src/k8s.io/client-go/scale/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/testing:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

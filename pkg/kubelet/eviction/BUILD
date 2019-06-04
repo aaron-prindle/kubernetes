@@ -1,38 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "eviction_manager_test.go",
-        "helpers_test.go",
-        "memory_threshold_notifier_test.go",
-        "mock_threshold_notifier_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/apis/core:go_default_library",
-        "//pkg/features:go_default_library",
-        "//pkg/kubelet/apis/stats/v1alpha1:go_default_library",
-        "//pkg/kubelet/eviction/api:go_default_library",
-        "//pkg/kubelet/lifecycle:go_default_library",
-        "//pkg/kubelet/types:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/util/feature:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/record:go_default_library",
-        "//staging/src/k8s.io/component-base/featuregate/testing:go_default_library",
-        "//vendor/github.com/stretchr/testify/mock:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

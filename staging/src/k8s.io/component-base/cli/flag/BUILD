@@ -1,24 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "ciphersuites_flag_test.go",
-        "colon_separated_multimap_string_string_test.go",
-        "langle_separated_map_string_string_test.go",
-        "map_string_bool_test.go",
-        "map_string_string_test.go",
-        "namedcertkey_flag_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = ["//vendor/github.com/spf13/pflag:go_default_library"],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

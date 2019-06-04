@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -45,42 +45,6 @@ go_library(
         "//staging/src/k8s.io/client-go/kubernetes/typed/core/v1:go_default_library",
         "//staging/src/k8s.io/client-go/rest:go_default_library",
         "//staging/src/k8s.io/client-go/tools/watch:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "canbeexposed_test.go",
-        "helpers_test.go",
-        "logsforobject_test.go",
-        "mapbasedselectorforobject_test.go",
-        "objectpauser_test.go",
-        "objectresumer_test.go",
-        "portsforobject_test.go",
-        "protocolsforobject_test.go",
-        "updatepodspec_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubectl/util/podutils:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1beta2:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v2alpha1:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/api/extensions/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/labels:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/watch:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/testing:go_default_library",
     ],
 )
 

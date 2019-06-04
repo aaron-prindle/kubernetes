@@ -1,18 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
-
-go_test(
-    name = "go_default_test",
-    srcs = ["main_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/wait:go_default_library",
-        "//staging/src/k8s.io/client-go/informers:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/cache:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 filegroup(
     name = "package-srcs",

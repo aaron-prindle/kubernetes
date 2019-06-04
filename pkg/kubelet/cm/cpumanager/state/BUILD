@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -17,21 +17,6 @@ go_library(
         "//pkg/kubelet/checkpointmanager/errors:go_default_library",
         "//pkg/kubelet/cm/cpuset:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "state_checkpoint_test.go",
-        "state_compatibility_test.go",
-        "state_file_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/checkpointmanager:go_default_library",
-        "//pkg/kubelet/cm/cpumanager/state/testing:go_default_library",
-        "//pkg/kubelet/cm/cpuset:go_default_library",
     ],
 )
 

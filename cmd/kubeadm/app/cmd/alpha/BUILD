@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -53,24 +53,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "certs_test.go",
-        "kubeconfig_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//cmd/kubeadm/app/constants:go_default_library",
-        "//cmd/kubeadm/app/phases/certs:go_default_library",
-        "//cmd/kubeadm/app/phases/kubeconfig:go_default_library",
-        "//cmd/kubeadm/app/util/pkiutil:go_default_library",
-        "//cmd/kubeadm/test:go_default_library",
-        "//cmd/kubeadm/test/cmd:go_default_library",
-        "//cmd/kubeadm/test/kubeconfig:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/clientcmd:go_default_library",
-        "//vendor/github.com/spf13/cobra:go_default_library",
-    ],
 )

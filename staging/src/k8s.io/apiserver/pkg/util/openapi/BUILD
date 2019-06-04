@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -27,14 +27,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["proto_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//vendor/github.com/go-openapi/spec:go_default_library",
-        "//vendor/k8s.io/kube-openapi/pkg/util/proto:go_default_library",
-    ],
 )

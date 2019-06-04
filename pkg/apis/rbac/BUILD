@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -43,17 +39,4 @@ filegroup(
         "//pkg/apis/rbac/validation:all-srcs",
     ],
     tags = ["automanaged"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["helpers_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/api/legacyscheme:go_default_library",
-        "//pkg/apis/rbac/install:go_default_library",
-        "//pkg/apis/rbac/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-    ],
 )

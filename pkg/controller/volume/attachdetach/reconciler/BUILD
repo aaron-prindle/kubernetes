@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -23,27 +19,6 @@ go_library(
         "//staging/src/k8s.io/apimachinery/pkg/util/wait:go_default_library",
         "//staging/src/k8s.io/client-go/tools/record:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["reconciler_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/controller:go_default_library",
-        "//pkg/controller/volume/attachdetach/cache:go_default_library",
-        "//pkg/controller/volume/attachdetach/statusupdater:go_default_library",
-        "//pkg/controller/volume/attachdetach/testing:go_default_library",
-        "//pkg/volume/testing:go_default_library",
-        "//pkg/volume/util/operationexecutor:go_default_library",
-        "//pkg/volume/util/types:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/wait:go_default_library",
-        "//staging/src/k8s.io/client-go/informers:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/record:go_default_library",
-        "//vendor/k8s.io/utils/strings:go_default_library",
     ],
 )
 

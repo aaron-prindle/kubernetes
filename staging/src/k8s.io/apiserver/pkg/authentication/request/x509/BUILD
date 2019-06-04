@@ -1,27 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["x509_test.go"],
-    data = [
-        "testdata/client-expired.pem",
-        "testdata/client-valid.pem",
-        "testdata/intermediate.pem",
-        "testdata/root.pem",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/authentication/authenticator:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/authentication/user:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

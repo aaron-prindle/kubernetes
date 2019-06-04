@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -29,13 +29,6 @@ go_library(
         "//staging/src/k8s.io/cluster-bootstrap/token/util:go_default_library",
         "//vendor/github.com/pkg/errors:go_default_library",
     ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["bootstraptokenstring_test.go"],
-    embed = [":go_default_library"],
-    deps = ["//vendor/github.com/pkg/errors:go_default_library"],
 )
 
 filegroup(

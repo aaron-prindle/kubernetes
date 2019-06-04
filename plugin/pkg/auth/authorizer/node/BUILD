@@ -1,34 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "graph_test.go",
-        "intset_test.go",
-        "node_authorizer_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/auth/nodeidentifier:go_default_library",
-        "//pkg/features:go_default_library",
-        "//plugin/pkg/auth/authorizer/rbac/bootstrappolicy:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/api/storage/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/authentication/user:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/authorization/authorizer:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/util/feature:go_default_library",
-        "//staging/src/k8s.io/component-base/featuregate:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

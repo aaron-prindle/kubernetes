@@ -1,30 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "server_bootstrap_test.go",
-        "server_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/api/certificates/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
-        "//staging/src/k8s.io/client-go/util/cert:go_default_library",
-        "//vendor/github.com/cloudflare/cfssl/config:go_default_library",
-        "//vendor/github.com/cloudflare/cfssl/signer:go_default_library",
-        "//vendor/github.com/cloudflare/cfssl/signer/local:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -45,7 +21,6 @@ go_library(
         "//pkg/capabilities:go_default_library",
         "//pkg/cloudprovider/providers:go_default_library",
         "//pkg/credentialprovider:go_default_library",
-        "//pkg/credentialprovider/aws:go_default_library",
         "//pkg/credentialprovider/azure:go_default_library",
         "//pkg/credentialprovider/gcp:go_default_library",
         "//pkg/features:go_default_library",
@@ -80,11 +55,7 @@ go_library(
         "//pkg/version:go_default_library",
         "//pkg/version/verflag:go_default_library",
         "//pkg/volume:go_default_library",
-        "//pkg/volume/awsebs:go_default_library",
-        "//pkg/volume/azure_dd:go_default_library",
-        "//pkg/volume/azure_file:go_default_library",
         "//pkg/volume/cephfs:go_default_library",
-        "//pkg/volume/cinder:go_default_library",
         "//pkg/volume/configmap:go_default_library",
         "//pkg/volume/csi:go_default_library",
         "//pkg/volume/downwardapi:go_default_library",
@@ -99,7 +70,6 @@ go_library(
         "//pkg/volume/iscsi:go_default_library",
         "//pkg/volume/local:go_default_library",
         "//pkg/volume/nfs:go_default_library",
-        "//pkg/volume/photon_pd:go_default_library",
         "//pkg/volume/portworx:go_default_library",
         "//pkg/volume/projected:go_default_library",
         "//pkg/volume/quobyte:go_default_library",

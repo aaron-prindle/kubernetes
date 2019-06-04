@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -41,53 +41,6 @@ go_library(
         "//staging/src/k8s.io/client-go/tools/record:go_default_library",
         "//staging/src/k8s.io/client-go/util/workqueue:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "horizontal_test.go",
-        "legacy_horizontal_test.go",
-        "legacy_replica_calculator_test.go",
-        "replica_calculator_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/api/legacyscheme:go_default_library",
-        "//pkg/apis/apps/install:go_default_library",
-        "//pkg/apis/autoscaling:go_default_library",
-        "//pkg/apis/autoscaling/install:go_default_library",
-        "//pkg/apis/core/install:go_default_library",
-        "//pkg/controller:go_default_library",
-        "//pkg/controller/podautoscaler/metrics:go_default_library",
-        "//staging/src/k8s.io/api/autoscaling/v1:go_default_library",
-        "//staging/src/k8s.io/api/autoscaling/v2beta1:go_default_library",
-        "//staging/src/k8s.io/api/autoscaling/v2beta2:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/meta/testrestmapper:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/labels:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/watch:go_default_library",
-        "//staging/src/k8s.io/client-go/informers:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
-        "//staging/src/k8s.io/client-go/scale/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/testing:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/apis/custom_metrics/v1beta2:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/apis/external_metrics/v1beta1:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/apis/metrics/v1alpha1:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/apis/metrics/v1beta1:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/client/clientset/versioned/fake:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/client/custom_metrics/fake:go_default_library",
-        "//staging/src/k8s.io/metrics/pkg/client/external_metrics/fake:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-        "//vendor/k8s.io/heapster/metrics/api/v1/types:go_default_library",
     ],
 )
 

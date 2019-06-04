@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -10,20 +10,6 @@ go_library(
     importpath = "k8s.io/kubernetes/pkg/kubelet/util/store",
     visibility = ["//visibility:public"],
     deps = ["//pkg/util/filesystem:go_default_library"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "filestore_test.go",
-        "store_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/util/filesystem:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-    ],
 )
 
 filegroup(

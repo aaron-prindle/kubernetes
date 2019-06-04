@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -37,30 +33,11 @@ go_library(
             "//vendor/github.com/google/cadvisor/container/systemd/install:go_default_library",
             "//vendor/github.com/google/cadvisor/fs:go_default_library",
             "//vendor/github.com/google/cadvisor/manager:go_default_library",
-            "//vendor/github.com/google/cadvisor/utils/cloudinfo/aws:go_default_library",
-            "//vendor/github.com/google/cadvisor/utils/cloudinfo/azure:go_default_library",
-            "//vendor/github.com/google/cadvisor/utils/cloudinfo/gce:go_default_library",
             "//vendor/github.com/google/cadvisor/utils/sysfs:go_default_library",
             "//vendor/k8s.io/klog:go_default_library",
         ],
         "@io_bazel_rules_go//go/platform:windows": [
             "//pkg/kubelet/winstats:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["util_test.go"],
-    embed = [":go_default_library"],
-    deps = select({
-        "@io_bazel_rules_go//go/platform:linux": [
-            "//staging/src/k8s.io/api/core/v1:go_default_library",
-            "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-            "//vendor/github.com/google/cadvisor/container/crio:go_default_library",
-            "//vendor/github.com/google/cadvisor/info/v1:go_default_library",
-            "//vendor/github.com/stretchr/testify/assert:go_default_library",
         ],
         "//conditions:default": [],
     }),

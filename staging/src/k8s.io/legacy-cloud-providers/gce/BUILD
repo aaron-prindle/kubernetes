@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -82,44 +82,6 @@ go_library(
         "//vendor/google.golang.org/api/tpu/v1:go_default_library",
         "//vendor/gopkg.in/gcfg.v1:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-        "//vendor/k8s.io/utils/net:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "gce_address_manager_test.go",
-        "gce_annotations_test.go",
-        "gce_disks_test.go",
-        "gce_healthchecks_test.go",
-        "gce_loadbalancer_external_test.go",
-        "gce_loadbalancer_internal_test.go",
-        "gce_loadbalancer_test.go",
-        "gce_loadbalancer_utils_test.go",
-        "gce_test.go",
-        "gce_util_test.go",
-        "metrics_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/record:go_default_library",
-        "//staging/src/k8s.io/cloud-provider:go_default_library",
-        "//staging/src/k8s.io/cloud-provider/service/helpers:go_default_library",
-        "//vendor/github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud:go_default_library",
-        "//vendor/github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/meta:go_default_library",
-        "//vendor/github.com/GoogleCloudPlatform/k8s-cloud-provider/pkg/cloud/mock:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-        "//vendor/golang.org/x/oauth2/google:go_default_library",
-        "//vendor/google.golang.org/api/compute/v0.alpha:go_default_library",
-        "//vendor/google.golang.org/api/compute/v0.beta:go_default_library",
-        "//vendor/google.golang.org/api/compute/v1:go_default_library",
-        "//vendor/google.golang.org/api/googleapi:go_default_library",
         "//vendor/k8s.io/utils/net:go_default_library",
     ],
 )

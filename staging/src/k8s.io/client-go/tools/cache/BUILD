@@ -1,42 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "controller_test.go",
-        "delta_fifo_test.go",
-        "expiration_cache_test.go",
-        "fifo_test.go",
-        "heap_test.go",
-        "index_test.go",
-        "mutation_detector_test.go",
-        "processor_listener_test.go",
-        "reflector_test.go",
-        "shared_informer_test.go",
-        "store_test.go",
-        "undelta_store_test.go",
-    ],
-    embed = [":go_default_library"],
-    race = "off",
-    deps = [
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/meta:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/wait:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/watch:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/cache/testing:go_default_library",
-        "//vendor/github.com/google/gofuzz:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

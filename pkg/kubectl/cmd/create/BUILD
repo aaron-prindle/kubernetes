@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -52,53 +52,6 @@ go_library(
         "//staging/src/k8s.io/component-base/cli/flag:go_default_library",
         "//vendor/github.com/spf13/cobra:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "create_clusterrole_test.go",
-        "create_clusterrolebinding_test.go",
-        "create_configmap_test.go",
-        "create_cronjob_test.go",
-        "create_deployment_test.go",
-        "create_job_test.go",
-        "create_namespace_test.go",
-        "create_pdb_test.go",
-        "create_priorityclass_test.go",
-        "create_quota_test.go",
-        "create_role_test.go",
-        "create_rolebinding_test.go",
-        "create_secret_test.go",
-        "create_service_test.go",
-        "create_serviceaccount_test.go",
-        "create_test.go",
-    ],
-    data = [
-        "//test/e2e/testing-manifests:all-srcs",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubectl/cmd/testing:go_default_library",
-        "//pkg/kubectl/generate/versioned:go_default_library",
-        "//pkg/kubectl/scheme:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/api/rbac/v1:go_default_library",
-        "//staging/src/k8s.io/api/rbac/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/cli-runtime/pkg/genericclioptions:go_default_library",
-        "//staging/src/k8s.io/cli-runtime/pkg/resource:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/fake:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
     ],
 )
 

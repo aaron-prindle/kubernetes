@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -24,19 +20,6 @@ go_library(
         "//staging/src/k8s.io/apiserver/pkg/server/httplog:go_default_library",
         "//staging/src/k8s.io/apiserver/pkg/util/wsstream:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "httpstream_test.go",
-        "websocket_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/apis/core:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/httpstream:go_default_library",
     ],
 )
 

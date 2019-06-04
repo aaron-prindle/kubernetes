@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -62,38 +62,4 @@ filegroup(
     ],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["node_lifecycle_controller_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/controller:go_default_library",
-        "//pkg/controller/nodelifecycle/scheduler:go_default_library",
-        "//pkg/controller/testutil:go_default_library",
-        "//pkg/controller/util/node:go_default_library",
-        "//pkg/features:go_default_library",
-        "//pkg/kubelet/apis:go_default_library",
-        "//pkg/scheduler/api:go_default_library",
-        "//pkg/util/node:go_default_library",
-        "//pkg/util/taints:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1:go_default_library",
-        "//staging/src/k8s.io/api/coordination/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/util/feature:go_default_library",
-        "//staging/src/k8s.io/client-go/informers:go_default_library",
-        "//staging/src/k8s.io/client-go/informers/apps/v1:go_default_library",
-        "//staging/src/k8s.io/client-go/informers/coordination/v1beta1:go_default_library",
-        "//staging/src/k8s.io/client-go/informers/core/v1:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/testing:go_default_library",
-        "//staging/src/k8s.io/component-base/featuregate/testing:go_default_library",
-        "//vendor/k8s.io/utils/pointer:go_default_library",
-    ],
 )

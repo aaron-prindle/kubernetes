@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -24,29 +24,6 @@ go_library(
         "//staging/src/k8s.io/cri-api/pkg/apis/runtime/v1alpha2:go_default_library",
         "//vendor/github.com/google/cadvisor/info/v1:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "cpu_assignment_test.go",
-        "cpu_manager_test.go",
-        "policy_none_test.go",
-        "policy_static_test.go",
-        "policy_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/cm/cpumanager/state:go_default_library",
-        "//pkg/kubelet/cm/cpumanager/topology:go_default_library",
-        "//pkg/kubelet/cm/cpuset:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/cri-api/pkg/apis/runtime/v1alpha2:go_default_library",
-        "//vendor/github.com/google/cadvisor/info/v1:go_default_library",
     ],
 )
 

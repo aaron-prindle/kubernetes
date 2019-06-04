@@ -92,7 +92,6 @@ filegroup(
         "//pkg:all-srcs",
         "//plugin:all-srcs",
         "//staging:all-srcs",
-        "//test:all-srcs",
         "//third_party:all-srcs",
         "//translations:all-srcs",
         "//vendor:all-srcs",

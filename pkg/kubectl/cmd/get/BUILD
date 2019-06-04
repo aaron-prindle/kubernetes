@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 filegroup(
     name = "package-srcs",
@@ -61,52 +61,5 @@ go_library(
         "//vendor/k8s.io/klog:go_default_library",
         "//vendor/k8s.io/utils/integer:go_default_library",
         "//vendor/vbom.ml/util/sortorder:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "customcolumn_flags_test.go",
-        "customcolumn_test.go",
-        "get_test.go",
-        "humanreadable_flags_test.go",
-        "sorter_test.go",
-    ],
-    data = [
-        "//api/openapi-spec",
-        "//test/e2e/testing-manifests:all-srcs",
-        "//test/fixtures",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/apis/core:go_default_library",
-        "//pkg/kubectl/cmd/testing:go_default_library",
-        "//pkg/kubectl/cmd/util/openapi:go_default_library",
-        "//pkg/kubectl/cmd/util/openapi/testing:go_default_library",
-        "//pkg/kubectl/scheme:go_default_library",
-        "//pkg/kubectl/util/printers:go_default_library",
-        "//staging/src/k8s.io/api/apps/v1:go_default_library",
-        "//staging/src/k8s.io/api/autoscaling/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1:go_default_library",
-        "//staging/src/k8s.io/api/batch/v1beta1:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/api/extensions/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/meta:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/unstructured:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/serializer/json:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/serializer/streaming:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/watch:go_default_library",
-        "//staging/src/k8s.io/cli-runtime/pkg/genericclioptions:go_default_library",
-        "//staging/src/k8s.io/cli-runtime/pkg/resource:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/watch:go_default_library",
-        "//vendor/k8s.io/kube-openapi/pkg/util/proto:go_default_library",
     ],
 )

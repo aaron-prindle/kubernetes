@@ -1,30 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "certlist_test.go",
-        "certs_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//cmd/kubeadm/app/apis/kubeadm:go_default_library",
-        "//cmd/kubeadm/app/constants:go_default_library",
-        "//cmd/kubeadm/app/util/certs:go_default_library",
-        "//cmd/kubeadm/app/util/pkiutil:go_default_library",
-        "//cmd/kubeadm/test:go_default_library",
-        "//staging/src/k8s.io/client-go/util/cert:go_default_library",
-        "//staging/src/k8s.io/client-go/util/keyutil:go_default_library",
-        "//vendor/github.com/pkg/errors:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-    ],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -56,24 +56,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "deprecated_test.go",
-        "insecure_serving_test.go",
-        "options_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//cmd/kube-scheduler/app/config:go_default_library",
-        "//pkg/scheduler/apis/config:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/rand:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/server/options:go_default_library",
-        "//staging/src/k8s.io/component-base/config:go_default_library",
-    ],
 )

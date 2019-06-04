@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -86,10 +86,6 @@ go_library(
         "//pkg/version:go_default_library",
         "//pkg/version/verflag:go_default_library",
         "//pkg/volume:go_default_library",
-        "//pkg/volume/awsebs:go_default_library",
-        "//pkg/volume/azure_dd:go_default_library",
-        "//pkg/volume/azure_file:go_default_library",
-        "//pkg/volume/cinder:go_default_library",
         "//pkg/volume/csi:go_default_library",
         "//pkg/volume/fc:go_default_library",
         "//pkg/volume/flexvolume:go_default_library",
@@ -100,7 +96,6 @@ go_library(
         "//pkg/volume/iscsi:go_default_library",
         "//pkg/volume/local:go_default_library",
         "//pkg/volume/nfs:go_default_library",
-        "//pkg/volume/photon_pd:go_default_library",
         "//pkg/volume/portworx:go_default_library",
         "//pkg/volume/quobyte:go_default_library",
         "//pkg/volume/rbd:go_default_library",
@@ -142,21 +137,6 @@ go_library(
         "//vendor/github.com/spf13/cobra:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
         "//vendor/k8s.io/utils/exec:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["core_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/client-go/discovery:go_default_library",
-        "//staging/src/k8s.io/client-go/discovery/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/informers:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
     ],
 )
 

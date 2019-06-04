@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -14,18 +10,6 @@ go_library(
         "//pkg/kubelet/checkpointmanager/errors:go_default_library",
         "//pkg/kubelet/util/store:go_default_library",
         "//pkg/util/filesystem:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["checkpoint_manager_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/checkpointmanager/checksum:go_default_library",
-        "//pkg/kubelet/checkpointmanager/testing:go_default_library",
-        "//pkg/kubelet/checkpointmanager/testing/example_checkpoint_formats/v1:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
     ],
 )
 

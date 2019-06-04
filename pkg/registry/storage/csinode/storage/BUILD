@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -26,21 +26,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["storage_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/apis/storage:go_default_library",
-        "//pkg/registry/registrytest:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/fields:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/labels:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/registry/generic:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/registry/generic/testing:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/storage/etcd/testing:go_default_library",
-    ],
 )

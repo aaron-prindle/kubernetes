@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -28,15 +28,4 @@ filegroup(
     ],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["runtimeclass_manager_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/runtimeclass/testing:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/k8s.io/utils/pointer:go_default_library",
-    ],
 )

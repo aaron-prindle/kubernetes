@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -40,17 +36,4 @@ filegroup(
         "//pkg/kubelet/remote/fake:all-srcs",
     ],
     tags = ["automanaged"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["remote_runtime_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/remote/fake:go_default_library",
-        "//staging/src/k8s.io/cri-api/pkg/apis:go_default_library",
-        "//staging/src/k8s.io/cri-api/pkg/apis/testing:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-    ],
 )

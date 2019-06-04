@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -41,18 +41,6 @@ go_library(
             "//pkg/util/mount:go_default_library",
         ],
         "@io_bazel_rules_go//go/platform:windows": [
-            "//pkg/util/mount:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["exec_mount_test.go"],
-    embed = [":go_default_library"],
-    deps = select({
-        "@io_bazel_rules_go//go/platform:linux": [
             "//pkg/util/mount:go_default_library",
         ],
         "//conditions:default": [],

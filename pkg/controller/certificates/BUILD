@@ -1,8 +1,4 @@
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -49,23 +45,5 @@ filegroup(
     tags = ["automanaged"],
     visibility = [
         "//pkg/controller:__pkg__",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "certificate_controller_test.go",
-        "certificate_controller_utils_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/controller:go_default_library",
-        "//staging/src/k8s.io/api/certificates/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/wait:go_default_library",
-        "//staging/src/k8s.io/client-go/informers:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
     ],
 )

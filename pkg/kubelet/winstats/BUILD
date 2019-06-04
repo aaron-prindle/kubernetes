@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -21,20 +21,6 @@ go_library(
             "//vendor/github.com/google/cadvisor/info/v2:go_default_library",
             "//vendor/golang.org/x/sys/windows:go_default_library",
             "//vendor/k8s.io/klog:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["winstats_test.go"],
-    embed = [":go_default_library"],
-    deps = select({
-        "@io_bazel_rules_go//go/platform:windows": [
-            "//vendor/github.com/google/cadvisor/info/v1:go_default_library",
-            "//vendor/github.com/google/cadvisor/info/v2:go_default_library",
-            "//vendor/github.com/stretchr/testify/assert:go_default_library",
         ],
         "//conditions:default": [],
     }),

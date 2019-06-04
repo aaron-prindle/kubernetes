@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -119,34 +119,6 @@ go_library(
             "//pkg/kubelet/cadvisor:go_default_library",
             "//pkg/util/mount:go_default_library",
             "//staging/src/k8s.io/client-go/tools/record:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "cgroup_manager_linux_test.go",
-        "cgroup_manager_test.go",
-        "container_manager_linux_test.go",
-        "helpers_linux_test.go",
-        "node_container_manager_linux_test.go",
-        "pod_container_manager_linux_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = select({
-        "@io_bazel_rules_go//go/platform:linux": [
-            "//pkg/features:go_default_library",
-            "//pkg/kubelet/eviction/api:go_default_library",
-            "//pkg/util/mount:go_default_library",
-            "//staging/src/k8s.io/api/core/v1:go_default_library",
-            "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-            "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-            "//staging/src/k8s.io/apiserver/pkg/util/feature:go_default_library",
-            "//staging/src/k8s.io/component-base/featuregate/testing:go_default_library",
-            "//vendor/github.com/stretchr/testify/assert:go_default_library",
-            "//vendor/github.com/stretchr/testify/require:go_default_library",
         ],
         "//conditions:default": [],
     }),

@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -29,24 +25,6 @@ go_library(
         "//vendor/github.com/docker/docker/client:go_default_library",
         "//vendor/github.com/pkg/errors:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "cgroup_validator_test.go",
-        "docker_validator_test.go",
-        "kernel_validator_test.go",
-        "os_validator_test.go",
-        "package_validator_test.go",
-    ],
-    embed = [":go_default_library"],
-    tags = ["e2e"],
-    deps = [
-        "//vendor/github.com/docker/docker/api/types:go_default_library",
-        "//vendor/github.com/pkg/errors:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
     ],
 )
 

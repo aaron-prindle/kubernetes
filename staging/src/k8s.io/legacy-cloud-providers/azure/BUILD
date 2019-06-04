@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -72,44 +68,6 @@ go_library(
         "//vendor/k8s.io/klog:go_default_library",
         "//vendor/k8s.io/utils/keymutex:go_default_library",
         "//vendor/sigs.k8s.io/yaml:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "azure_backoff_test.go",
-        "azure_cache_test.go",
-        "azure_controller_common_test.go",
-        "azure_instances_test.go",
-        "azure_loadbalancer_test.go",
-        "azure_metrics_test.go",
-        "azure_routes_test.go",
-        "azure_standard_test.go",
-        "azure_storage_test.go",
-        "azure_storageaccount_test.go",
-        "azure_test.go",
-        "azure_vmss_cache_test.go",
-        "azure_vmss_test.go",
-        "azure_wrap_test.go",
-        "azure_zones_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/record:go_default_library",
-        "//staging/src/k8s.io/cloud-provider:go_default_library",
-        "//staging/src/k8s.io/cloud-provider/service/helpers:go_default_library",
-        "//staging/src/k8s.io/legacy-cloud-providers/azure/auth:go_default_library",
-        "//vendor/github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-03-01/compute:go_default_library",
-        "//vendor/github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network:go_default_library",
-        "//vendor/github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-07-01/storage:go_default_library",
-        "//vendor/github.com/Azure/go-autorest/autorest:go_default_library",
-        "//vendor/github.com/Azure/go-autorest/autorest/to:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
     ],
 )
 

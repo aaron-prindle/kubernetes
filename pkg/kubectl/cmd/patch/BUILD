@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -24,22 +24,6 @@ go_library(
         "//vendor/github.com/evanphx/json-patch:go_default_library",
         "//vendor/github.com/spf13/cobra:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["patch_test.go"],
-    data = [
-        "//test/e2e/testing-manifests:all-srcs",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubectl/cmd/testing:go_default_library",
-        "//pkg/kubectl/scheme:go_default_library",
-        "//staging/src/k8s.io/cli-runtime/pkg/genericclioptions:go_default_library",
-        "//staging/src/k8s.io/cli-runtime/pkg/resource:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/fake:go_default_library",
     ],
 )
 

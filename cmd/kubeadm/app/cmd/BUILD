@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -64,43 +60,6 @@ go_library(
         "//vendor/github.com/spf13/pflag:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
         "//vendor/k8s.io/utils/exec:go_default_library",
-        "//vendor/sigs.k8s.io/yaml:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "completion_test.go",
-        "config_test.go",
-        "init_test.go",
-        "join_test.go",
-        "token_test.go",
-        "version_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//cmd/kubeadm/app/apis/kubeadm/v1beta2:go_default_library",
-        "//cmd/kubeadm/app/cmd/options:go_default_library",
-        "//cmd/kubeadm/app/componentconfigs:go_default_library",
-        "//cmd/kubeadm/app/constants:go_default_library",
-        "//cmd/kubeadm/app/features:go_default_library",
-        "//cmd/kubeadm/app/util:go_default_library",
-        "//cmd/kubeadm/app/util/config:go_default_library",
-        "//cmd/kubeadm/app/util/runtime:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/errors:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/testing:go_default_library",
-        "//staging/src/k8s.io/client-go/tools/clientcmd:go_default_library",
-        "//vendor/github.com/lithammer/dedent:go_default_library",
-        "//vendor/github.com/pkg/errors:go_default_library",
-        "//vendor/github.com/spf13/cobra:go_default_library",
-        "//vendor/k8s.io/utils/exec:go_default_library",
-        "//vendor/k8s.io/utils/exec/testing:go_default_library",
         "//vendor/sigs.k8s.io/yaml:go_default_library",
     ],
 )

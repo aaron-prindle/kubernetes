@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -39,27 +39,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "conversion_test.go",
-        "webhook_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/api/admissionregistration/v1beta1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/unstructured:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/admission:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/admission/plugin/webhook/namespace:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/apis/example:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/apis/example/v1:go_default_library",
-        "//staging/src/k8s.io/apiserver/pkg/apis/example2/v1:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-    ],
 )

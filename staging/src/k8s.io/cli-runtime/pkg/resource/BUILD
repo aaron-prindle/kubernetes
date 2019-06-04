@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -43,44 +43,6 @@ go_library(
         "//vendor/golang.org/x/text/encoding/unicode:go_default_library",
         "//vendor/golang.org/x/text/transform:go_default_library",
         "//vendor/sigs.k8s.io/kustomize/pkg/fs:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "builder_test.go",
-        "helper_test.go",
-        "scheme_test.go",
-        "visitor_test.go",
-    ],
-    data = [
-        "//staging/src/k8s.io/cli-runtime/artifacts:all-srcs",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/meta:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/meta/testrestmapper:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/unstructured:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/labels:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/runtime/serializer/streaming:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/errors:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/watch:go_default_library",
-        "//staging/src/k8s.io/client-go/kubernetes/scheme:go_default_library",
-        "//staging/src/k8s.io/client-go/rest:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/fake:go_default_library",
-        "//staging/src/k8s.io/client-go/rest/watch:go_default_library",
-        "//staging/src/k8s.io/client-go/restmapper:go_default_library",
-        "//staging/src/k8s.io/client-go/util/testing:go_default_library",
-        "//vendor/github.com/davecgh/go-spew/spew:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/sigs.k8s.io/yaml:go_default_library",
     ],
 )
 

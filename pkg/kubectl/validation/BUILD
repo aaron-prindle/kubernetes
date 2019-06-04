@@ -1,23 +1,10 @@
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 exports_files(
     srcs = [
         "testdata/v1/validPod.yaml",
     ],
     visibility = ["//build/visible_to:COMMON_testing"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["schema_test.go"],
-    data = [
-        ":testdata",
-    ],
-    embed = [":go_default_library"],
 )
 
 go_library(

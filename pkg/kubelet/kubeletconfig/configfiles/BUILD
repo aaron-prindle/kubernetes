@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -30,19 +26,4 @@ filegroup(
     name = "all-srcs",
     srcs = [":package-srcs"],
     tags = ["automanaged"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["configfiles_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/apis/config:go_default_library",
-        "//pkg/kubelet/apis/config/scheme:go_default_library",
-        "//pkg/kubelet/kubeletconfig/util/files:go_default_library",
-        "//pkg/kubelet/kubeletconfig/util/test:go_default_library",
-        "//pkg/util/filesystem:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/kubelet/config/v1beta1:go_default_library",
-    ],
 )

@@ -13,7 +13,7 @@ require (
 	github.com/coreos/go-oidc v0.0.0-20180117170138-065b426bd416
 	github.com/coreos/go-semver v0.0.0-20180108230905-e214231b295a // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7
-	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea
+	github.com/coreos/pkg v0.0.0-20180108230652-97fdf19511ea // indirect
 	github.com/docker/docker v0.7.3-0.20190327010347-be7ac8be2ae0
 	github.com/emicklei/go-restful v0.0.0-20170410110728-ff4f55a20633
 	github.com/evanphx/json-patch v0.0.0-20190203023257-5858425f7550
@@ -38,11 +38,9 @@ require (
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20171018203845-0dec1b30a021 // indirect
 	github.com/prometheus/client_golang v0.9.2
-	github.com/prometheus/client_model v0.0.0-20180712105110-5c3871d89910
 	github.com/sirupsen/logrus v1.2.0 // indirect
 	github.com/soheilhy/cmux v0.1.3 // indirect
 	github.com/spf13/pflag v1.0.1
-	github.com/stretchr/testify v1.2.2
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8 // indirect
 	github.com/xiang90/probing v0.0.0-20160813154853-07dd2e8dfe18 // indirect
 	go.uber.org/atomic v0.0.0-20181018215023-8dc6146f7569 // indirect
@@ -53,7 +51,7 @@ require (
 	google.golang.org/genproto v0.0.0-20170731182057-09f6ed296fc6 // indirect
 	google.golang.org/grpc v1.13.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0-20150622162204-20b71e5b60d7
-	gopkg.in/square/go-jose.v2 v2.0.0-20180411045311-89060dee6a84
+	gopkg.in/square/go-jose.v2 v2.0.0-20180411045311-89060dee6a84 // indirect
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0 // indirect
 	gopkg.in/yaml.v2 v2.2.1
 	gotest.tools v2.2.0+incompatible // indirect

@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -27,29 +23,6 @@ go_library(
         "//vendor/k8s.io/klog:go_default_library",
         "//vendor/k8s.io/utils/exec:go_default_library",
         "//vendor/k8s.io/utils/net:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["proxier_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/proxy:go_default_library",
-        "//pkg/proxy/util:go_default_library",
-        "//pkg/proxy/util/testing:go_default_library",
-        "//pkg/util/async:go_default_library",
-        "//pkg/util/conntrack:go_default_library",
-        "//pkg/util/iptables:go_default_library",
-        "//pkg/util/iptables/testing:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/intstr:go_default_library",
-        "//vendor/k8s.io/klog:go_default_library",
-        "//vendor/k8s.io/utils/exec:go_default_library",
-        "//vendor/k8s.io/utils/exec/testing:go_default_library",
-        "//vendor/k8s.io/utils/pointer:go_default_library",
     ],
 )
 

@@ -1,25 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "ipvs_linux_test.go",
-        "ipvs_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = select({
-        "@io_bazel_rules_go//go/platform:linux": [
-            "//vendor/github.com/docker/libnetwork/ipvs:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",

@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -39,31 +39,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["setters_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/kubelet/cm:go_default_library",
-        "//pkg/kubelet/container:go_default_library",
-        "//pkg/kubelet/container/testing:go_default_library",
-        "//pkg/kubelet/events:go_default_library",
-        "//pkg/kubelet/util/sliceutils:go_default_library",
-        "//pkg/version:go_default_library",
-        "//pkg/volume:go_default_library",
-        "//pkg/volume/testing:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/equality:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/api/resource:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/rand:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/uuid:go_default_library",
-        "//staging/src/k8s.io/cloud-provider/fake:go_default_library",
-        "//vendor/github.com/google/cadvisor/info/v1:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/github.com/stretchr/testify/require:go_default_library",
-    ],
 )

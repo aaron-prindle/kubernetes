@@ -15,8 +15,6 @@ require (
 	github.com/prometheus/client_golang v0.9.2
 	github.com/rubiojr/go-vhd v0.0.0-20160810183302-0bfd3b39853c
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/stretchr/objx v0.1.1 // indirect
-	github.com/stretchr/testify v1.2.2
 	github.com/vmware/govmomi v0.20.1
 	golang.org/x/crypto v0.0.0-20181025213731-e84da0312774
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a

@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -150,66 +146,6 @@ go_library(
             "//pkg/windows/service:go_default_library",
             "//staging/src/k8s.io/apimachinery/pkg/types:go_default_library",
             "//staging/src/k8s.io/apimachinery/pkg/util/net:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "server_others_test.go",
-        "server_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/proxy/apis/config:go_default_library",
-        "//pkg/util/configz:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
-        "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
-        "//staging/src/k8s.io/component-base/config:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/k8s.io/utils/pointer:go_default_library",
-    ] + select({
-        "@io_bazel_rules_go//go/platform:android": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:darwin": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:dragonfly": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:freebsd": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:linux": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:nacl": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:netbsd": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:openbsd": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:plan9": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
-        ],
-        "@io_bazel_rules_go//go/platform:solaris": [
-            "//pkg/proxy/ipvs:go_default_library",
-            "//pkg/util/iptables:go_default_library",
         ],
         "//conditions:default": [],
     }),

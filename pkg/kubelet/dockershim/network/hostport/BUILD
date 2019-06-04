@@ -1,10 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -25,23 +21,6 @@ go_library(
         "//vendor/k8s.io/klog:go_default_library",
         "//vendor/k8s.io/utils/exec:go_default_library",
         "//vendor/k8s.io/utils/net:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "fake_iptables_test.go",
-        "hostport_manager_test.go",
-        "hostport_syncer_test.go",
-        "hostport_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/util/iptables:go_default_library",
-        "//staging/src/k8s.io/api/core/v1:go_default_library",
-        "//vendor/github.com/stretchr/testify/assert:go_default_library",
-        "//vendor/k8s.io/utils/exec:go_default_library",
     ],
 )
 

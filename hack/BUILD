@@ -1,11 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_binary",
-    "go_library",
-    "go_test",
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 
 filegroup(
     name = "package-srcs",
@@ -57,13 +52,6 @@ test_suite(
 
 go_binary(
     name = "hack",
-    embed = [":go_default_library"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["e2e_test.go"],
-    data = glob(["testdata/**"]),
     embed = [":go_default_library"],
 )
 

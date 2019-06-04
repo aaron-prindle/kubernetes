@@ -1,22 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(
-    "@io_bazel_rules_go//go:def.bzl",
-    "go_library",
-    "go_test",
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = [
-        "cache_test.go",
-        "round_trippers_test.go",
-        "token_source_test.go",
-        "transport_test.go",
-    ],
-    embed = [":go_default_library"],
-    deps = ["//vendor/golang.org/x/oauth2:go_default_library"],
-)
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
