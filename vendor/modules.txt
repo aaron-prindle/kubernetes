@@ -1,15 +1,6 @@
-# cloud.google.com/go v0.34.0 => cloud.google.com/go v0.34.0
-cloud.google.com/go/compute/metadata
 # github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 => github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78
 github.com/Azure/go-ansiterm
 github.com/Azure/go-ansiterm/winterm
-# github.com/Azure/go-autorest v11.1.2+incompatible => github.com/Azure/go-autorest v11.1.2+incompatible
-github.com/Azure/go-autorest/autorest
-github.com/Azure/go-autorest/autorest/adal
-github.com/Azure/go-autorest/autorest/azure
-github.com/Azure/go-autorest/autorest/date
-github.com/Azure/go-autorest/logger
-github.com/Azure/go-autorest/version
 # github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab => github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
 github.com/JeffAshton/win_pdh
 # github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd => github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd
@@ -407,14 +398,6 @@ github.com/google/uuid
 github.com/googleapis/gnostic/OpenAPIv2
 github.com/googleapis/gnostic/compiler
 github.com/googleapis/gnostic/extensions
-# github.com/gophercloud/gophercloud v0.0.0-20190126172459-c818fa66e4c8 => github.com/gophercloud/gophercloud v0.0.0-20190126172459-c818fa66e4c8
-github.com/gophercloud/gophercloud
-github.com/gophercloud/gophercloud/openstack
-github.com/gophercloud/gophercloud/openstack/identity/v2/tenants
-github.com/gophercloud/gophercloud/openstack/identity/v2/tokens
-github.com/gophercloud/gophercloud/openstack/identity/v3/tokens
-github.com/gophercloud/gophercloud/openstack/utils
-github.com/gophercloud/gophercloud/pagination
 # github.com/gorilla/websocket v0.0.0-20170926233335-4201258b820c => github.com/gorilla/websocket v0.0.0-20170926233335-4201258b820c
 github.com/gorilla/websocket
 # github.com/gregjones/httpcache v0.0.0-20170728041850-787624de3eb7 => github.com/gregjones/httpcache v0.0.0-20170728041850-787624de3eb7
@@ -666,10 +649,7 @@ golang.org/x/net/trace
 golang.org/x/net/websocket
 # golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a => golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
 golang.org/x/oauth2
-golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
-golang.org/x/oauth2/jws
-golang.org/x/oauth2/jwt
 # golang.org/x/sys v0.0.0-20190312061237-fead79001313 => golang.org/x/sys v0.0.0-20190209173611-3b5209105503
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -739,13 +719,10 @@ gonum.org/v1/gonum/lapack/gonum
 gonum.org/v1/gonum/lapack/lapack64
 gonum.org/v1/gonum/mat
 # google.golang.org/appengine v1.5.0 => google.golang.org/appengine v1.5.0
-google.golang.org/appengine
 google.golang.org/appengine/internal
-google.golang.org/appengine/internal/app_identity
 google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
-google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
@@ -1239,12 +1216,7 @@ k8s.io/client-go/pkg/apis/clientauthentication
 k8s.io/client-go/pkg/apis/clientauthentication/v1alpha1
 k8s.io/client-go/pkg/apis/clientauthentication/v1beta1
 k8s.io/client-go/pkg/version
-k8s.io/client-go/plugin/pkg/client/auth
-k8s.io/client-go/plugin/pkg/client/auth/azure
 k8s.io/client-go/plugin/pkg/client/auth/exec
-k8s.io/client-go/plugin/pkg/client/auth/gcp
-k8s.io/client-go/plugin/pkg/client/auth/oidc
-k8s.io/client-go/plugin/pkg/client/auth/openstack
 k8s.io/client-go/rest
 k8s.io/client-go/rest/fake
 k8s.io/client-go/rest/watch

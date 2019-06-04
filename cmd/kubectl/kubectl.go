@@ -30,7 +30,7 @@ import (
 	"k8s.io/kubernetes/pkg/kubectl/util/logs"
 
 	// Import to initialize client auth plugins.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	// _ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 func main() {

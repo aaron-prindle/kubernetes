@@ -39,11 +39,9 @@ filegroup(
     name = "all-srcs",
     srcs = [
         ":package-srcs",
-        "//vendor/google.golang.org/appengine/internal/app_identity:all-srcs",
         "//vendor/google.golang.org/appengine/internal/base:all-srcs",
         "//vendor/google.golang.org/appengine/internal/datastore:all-srcs",
         "//vendor/google.golang.org/appengine/internal/log:all-srcs",
-        "//vendor/google.golang.org/appengine/internal/modules:all-srcs",
         "//vendor/google.golang.org/appengine/internal/remote_api:all-srcs",
         "//vendor/google.golang.org/appengine/internal/urlfetch:all-srcs",
     ],
