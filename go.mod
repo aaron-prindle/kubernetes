@@ -391,7 +391,6 @@ replace (
 	k8s.io/kube-proxy => ./staging/src/k8s.io/kube-proxy
 	k8s.io/kube-scheduler => ./staging/src/k8s.io/kube-scheduler
 	k8s.io/kubelet => ./staging/src/k8s.io/kubelet
-	// k8s.io/legacy-cloud-providers => ./staging/src/k8s.io/legacy-cloud-providers
 	k8s.io/metrics => ./staging/src/k8s.io/metrics
 	k8s.io/node-api => ./staging/src/k8s.io/node-api
 	k8s.io/repo-infra => k8s.io/repo-infra v0.0.0-20181204233714-00fe14e3d1a3
