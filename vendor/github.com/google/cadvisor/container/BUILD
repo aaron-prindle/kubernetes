@@ -29,12 +29,9 @@ filegroup(
     srcs = [
         ":package-srcs",
         "//vendor/github.com/google/cadvisor/container/common:all-srcs",
-        "//vendor/github.com/google/cadvisor/container/containerd:all-srcs",
-        "//vendor/github.com/google/cadvisor/container/crio:all-srcs",
         "//vendor/github.com/google/cadvisor/container/docker:all-srcs",
         "//vendor/github.com/google/cadvisor/container/libcontainer:all-srcs",
         "//vendor/github.com/google/cadvisor/container/raw:all-srcs",
-        "//vendor/github.com/google/cadvisor/container/systemd:all-srcs",
     ],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],

@@ -16,7 +16,6 @@ go_library(
     importpath = "k8s.io/kubernetes/cmd/kubelet/app/options",
     deps = [
         "//pkg/apis/core:go_default_library",
-        "//pkg/credentialprovider/gcp:go_default_library",
         "//pkg/features:go_default_library",
         "//pkg/kubelet/apis:go_default_library",
         "//pkg/kubelet/apis/config:go_default_library",
@@ -36,18 +35,7 @@ go_library(
         "//staging/src/k8s.io/kubelet/config/v1beta1:go_default_library",
         "//vendor/github.com/spf13/pflag:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
-    ] + select({
-        "@io_bazel_rules_go//go/platform:linux": [
-            "//vendor/github.com/google/cadvisor/container/common:go_default_library",
-            "//vendor/github.com/google/cadvisor/container/containerd:go_default_library",
-            "//vendor/github.com/google/cadvisor/container/docker:go_default_library",
-            "//vendor/github.com/google/cadvisor/container/raw:go_default_library",
-            "//vendor/github.com/google/cadvisor/machine:go_default_library",
-            "//vendor/github.com/google/cadvisor/manager:go_default_library",
-            "//vendor/github.com/google/cadvisor/storage:go_default_library",
-        ],
-        "//conditions:default": [],
-    }),
+    ],
 )
 
 filegroup(

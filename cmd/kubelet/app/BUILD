@@ -21,8 +21,6 @@ go_library(
         "//pkg/capabilities:go_default_library",
         "//pkg/cloudprovider/providers:go_default_library",
         "//pkg/credentialprovider:go_default_library",
-        "//pkg/credentialprovider/azure:go_default_library",
-        "//pkg/credentialprovider/gcp:go_default_library",
         "//pkg/features:go_default_library",
         "//pkg/kubelet:go_default_library",
         "//pkg/kubelet/apis/config:go_default_library",

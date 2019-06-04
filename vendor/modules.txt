@@ -95,16 +95,6 @@ github.com/cloudflare/cfssl/signer/local
 github.com/clusterhq/flocker-go
 # github.com/containerd/console v0.0.0-20170925154832-84eeaae905fa => github.com/containerd/console v0.0.0-20170925154832-84eeaae905fa
 github.com/containerd/console
-# github.com/containerd/containerd v1.0.2 => github.com/containerd/containerd v1.0.2
-github.com/containerd/containerd/api/services/containers/v1
-github.com/containerd/containerd/api/services/tasks/v1
-github.com/containerd/containerd/api/services/version/v1
-github.com/containerd/containerd/api/types
-github.com/containerd/containerd/api/types/task
-github.com/containerd/containerd/containers
-github.com/containerd/containerd/dialer
-github.com/containerd/containerd/errdefs
-github.com/containerd/containerd/namespaces
 # github.com/containernetworking/cni v0.6.0 => github.com/containernetworking/cni v0.6.0
 github.com/containernetworking/cni/libcni
 github.com/containernetworking/cni/pkg/invoke
@@ -321,7 +311,6 @@ github.com/gogo/protobuf/protoc-gen-gogo/generator
 github.com/gogo/protobuf/protoc-gen-gogo/grpc
 github.com/gogo/protobuf/protoc-gen-gogo/plugin
 github.com/gogo/protobuf/sortkeys
-github.com/gogo/protobuf/types
 github.com/gogo/protobuf/vanity
 github.com/gogo/protobuf/vanity/command
 # github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903 => github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903
@@ -344,16 +333,9 @@ github.com/google/cadvisor/cache/memory
 github.com/google/cadvisor/collector
 github.com/google/cadvisor/container
 github.com/google/cadvisor/container/common
-github.com/google/cadvisor/container/containerd
-github.com/google/cadvisor/container/containerd/install
-github.com/google/cadvisor/container/crio
-github.com/google/cadvisor/container/crio/install
 github.com/google/cadvisor/container/docker
-github.com/google/cadvisor/container/docker/install
 github.com/google/cadvisor/container/libcontainer
 github.com/google/cadvisor/container/raw
-github.com/google/cadvisor/container/systemd
-github.com/google/cadvisor/container/systemd/install
 github.com/google/cadvisor/devicemapper
 github.com/google/cadvisor/events
 github.com/google/cadvisor/fs
