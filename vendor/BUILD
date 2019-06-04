@@ -307,7 +307,6 @@ filegroup(
         "//vendor/github.com/spf13/afero:all-srcs",
         "//vendor/github.com/spf13/cobra:all-srcs",
         "//vendor/github.com/spf13/pflag:all-srcs",
-        "//vendor/github.com/storageos/go-api:all-srcs",
         "//vendor/github.com/stretchr/objx:all-srcs",
         "//vendor/github.com/stretchr/testify/assert:all-srcs",
         "//vendor/github.com/stretchr/testify/mock:all-srcs",

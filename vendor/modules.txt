@@ -602,11 +602,6 @@ github.com/spf13/cobra
 github.com/spf13/cobra/doc
 # github.com/spf13/pflag v1.0.1 => github.com/spf13/pflag v1.0.1
 github.com/spf13/pflag
-# github.com/storageos/go-api v0.0.0-20180912212459-343b3eff91fc => github.com/storageos/go-api v0.0.0-20180912212459-343b3eff91fc
-github.com/storageos/go-api
-github.com/storageos/go-api/netutil
-github.com/storageos/go-api/serror
-github.com/storageos/go-api/types
 # github.com/stretchr/objx v0.1.1 => github.com/stretchr/objx v0.1.1
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.2.2 => github.com/stretchr/testify v1.2.2

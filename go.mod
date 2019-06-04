@@ -111,7 +111,6 @@ require (
 	github.com/spf13/afero v0.0.0-20160816080757-b28a7effac97
 	github.com/spf13/cobra v0.0.0-20180319062004-c439c4fa0937
 	github.com/spf13/pflag v1.0.1
-	github.com/storageos/go-api v0.0.0-20180912212459-343b3eff91fc
 	github.com/stretchr/testify v1.2.2
 	github.com/syndtr/gocapability v0.0.0-20160928074757-e7cb7fa329f4 // indirect
 	github.com/urfave/negroni v1.0.0 // indirect
