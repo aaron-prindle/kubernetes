@@ -44,6 +44,17 @@ const (
 	NonResourceAll = "*"
 )
 
+// System preset priority level names
+const (
+	SystemPriorityLevelConfigurationNameTop = "system-top"
+	SystemPriorityLevelConfigurationNameLow = "system-low"
+)
+
+// Default matching precedence for flow schemas
+const (
+	FlowSchemaDefaultMatchingPrecedence int32 = 1000
+)
+
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
