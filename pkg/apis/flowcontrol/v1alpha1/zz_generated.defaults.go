@@ -21,6 +21,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	v1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -28,5 +29,18 @@ import (
 // Public to allow building arbitrary schemes.
 // All generated defaulters are covering - they call all nested defaulters.
 func RegisterDefaults(scheme *runtime.Scheme) error {
+	scheme.AddTypeDefaultingFunc(&v1alpha1.FlowSchema{}, func(obj interface{}) { SetObjectDefaults_FlowSchema(obj.(*v1alpha1.FlowSchema)) })
+	scheme.AddTypeDefaultingFunc(&v1alpha1.FlowSchemaList{}, func(obj interface{}) { SetObjectDefaults_FlowSchemaList(obj.(*v1alpha1.FlowSchemaList)) })
 	return nil
+}
+
+func SetObjectDefaults_FlowSchema(in *v1alpha1.FlowSchema) {
+	SetDefaults_FlowSchema(in)
+}
+
+func SetObjectDefaults_FlowSchemaList(in *v1alpha1.FlowSchemaList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_FlowSchema(a)
+	}
 }
