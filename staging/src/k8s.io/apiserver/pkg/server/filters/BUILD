@@ -37,6 +37,7 @@ go_library(
         "longrunning.go",
         "maxinflight.go",
         "reqmgmt.go",
+        "reqmgmt-config.go",
         "timeout.go",
         "waitgroup.go",
         "wrap.go",
@@ -45,6 +46,11 @@ go_library(
     importpath = "k8s.io/apiserver/pkg/server/filters",
     deps = [
         "//staging/src/k8s.io/apimachinery/pkg/api/errors:go_default_library",
+<<<<<<< HEAD
+=======
+        "//staging/src/k8s.io/apimachinery/pkg/labels:go_default_library",
+        "//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library",
+>>>>>>> Initial logic for consuming config objects in prioritization and faireness filter
         "//staging/src/k8s.io/apimachinery/pkg/util/runtime:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/util/wait:go_default_library",
