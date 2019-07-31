@@ -17,12 +17,14 @@ limitations under the License.
 package filters
 
 import (
+	"fmt"
 	"math"
 	"sort"
 	"sync"
 	"time"
 
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
 	cache "k8s.io/client-go/tools/cache"
 	"k8s.io/klog"
@@ -32,9 +34,10 @@ import (
 
 // initialSync does the initial setup of the configuration of the
 // reqmgmt filter.  It either succeeds and returns `true` or logs an
-// error and returns `false.
+// erro	r and returns `false.
 func (reqMgmt *requestManagement) initialSync() bool {
 	rms := &RMState{
+		// TODO(aaron-prindle) ERROR - this is nil and is erroring
 		flowSchemas:         make(FlowSchemaSeq, 0),
 		priorityLevelStates: make(map[string]*PriorityLevelState),
 	}
@@ -64,6 +67,7 @@ func (reqMgmt *requestManagement) OnAdd(obj interface{}) {
 // OnUpdate handles notification from an informer of object update
 func (reqMgmt *requestManagement) OnUpdate(oldObj, newObj interface{}) {
 	reqMgmt.OnAdd(newObj)
+	// if numQue
 }
 
 // OnDelete handles notification from an informer of object deletion
@@ -82,6 +86,7 @@ func (reqMgmt *requestManagement) Run(stopCh <-chan struct{}) {
 
 func (reqMgmt *requestManagement) runWorker() {
 	for reqMgmt.processNextWorkItem() {
+		fmt.Println("processing...")
 	}
 }
 
@@ -107,6 +112,14 @@ func (reqMgmt *requestManagement) processNextWorkItem() bool {
 // either succeeds and returns `true` or logs an error and returns
 // `false`.
 func (reqMgmt *requestManagement) syncOne() bool {
+	// TODO(aaron-prindle) verify if this is correct...
+	//--
+	reqMgmt.fairQueuingFactory = &FairQueuingFactoryImpl{}
+	// TODO(aaron-prindle) clk is not fully plumbed through rn which is why
+	// this is required
+	reqMgmt.clk = clock.RealClock{}
+	//--
+
 	all := labels.Everything()
 	newPLs, err := reqMgmt.plLister.List(all)
 	if err != nil {
@@ -151,6 +164,7 @@ func (reqMgmt *requestManagement) syncOne() bool {
 		}
 		newRMS.priorityLevelStates[pl.Name] = state
 	}
+
 	fsSeq := make(FlowSchemaSeq, len(newFSs))
 	for _, fs := range newFSs {
 		if !warnFlowSchemaSpec(fs.Name, &fs.Spec, newRMS.priorityLevelStates, oldRMS.priorityLevelStates) {
@@ -158,6 +172,7 @@ func (reqMgmt *requestManagement) syncOne() bool {
 		}
 		fsSeq = append(fsSeq, fs)
 	}
+	// TODO(aaron-prindle) ADD LINE BELOW BACK - DEBUG
 	sort.Sort(fsSeq)
 	newRMS.flowSchemas = fsSeq
 	// TODO: https://github.com/kubernetes/enhancements/blob/735aef1c6158bb30dd17321994d53edb25fbe7c0/keps/sig-api-machinery/20190228-priority-and-fairness.md#default-behavior
@@ -246,5 +261,15 @@ func (a FlowSchemaSeq) Swap(i, j int) {
 }
 
 func (a FlowSchemaSeq) Less(i, j int) bool {
+	// TODO(aaron-prindle) REMOVE,FIX - DEBUG
+	// --
+	if a[i] == nil {
+		return true
+	}
+	if a[j] == nil {
+		return false
+	}
+	// --
+
 	return a[i].Spec.MatchingPrecedence < a[j].Spec.MatchingPrecedence
 }
