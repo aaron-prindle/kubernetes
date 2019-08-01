@@ -1,5 +1,5 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
-
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = [
@@ -7,11 +7,20 @@ go_library(
         "integrator.go",
         "interface.go",
         "no-restraint.go",
+        "fairqueuing.go",
+        "types.go",
     ],
     importmap = "k8s.io/kubernetes/vendor/k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing",
     importpath = "k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing",
     visibility = ["//visibility:public"],
     deps = ["//staging/src/k8s.io/apiserver/pkg/util/clock:go_default_library"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["fairqueuing_test.go"],
+    embed = [":go_default_library"],
+    deps = ["//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library"],
 )
 
 filegroup(

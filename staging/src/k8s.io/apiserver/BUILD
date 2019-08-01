@@ -42,7 +42,11 @@ filegroup(
         "//staging/src/k8s.io/apiserver/pkg/util/clock:all-srcs",
         "//staging/src/k8s.io/apiserver/pkg/util/dryrun:all-srcs",
         "//staging/src/k8s.io/apiserver/pkg/util/feature:all-srcs",
+<<<<<<< HEAD
         "//staging/src/k8s.io/apiserver/pkg/util/flowcontrol:all-srcs",
+=======
+        "//staging/src/k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing:all-srcs",
+>>>>>>> add fair queuing implementation and passing test suite
         "//staging/src/k8s.io/apiserver/pkg/util/flushwriter:all-srcs",
         "//staging/src/k8s.io/apiserver/pkg/util/openapi:all-srcs",
         "//staging/src/k8s.io/apiserver/pkg/util/proxy:all-srcs",
