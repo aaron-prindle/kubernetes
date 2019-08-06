@@ -32,33 +32,29 @@ import (
 // implementation of:
 // https://github.com/kubernetes/enhancements/blob/master/keps/sig-api-machinery/20190228-priority-and-fairness.md
 type FQScheduler struct {
-	lock                 sync.Mutex
+	Lock                 sync.Mutex
 	Queues               []FQQueue
 	clock                clock.Clock
 	vt                   float64
 	estimatedServiceTime float64
 	lastRealTime         time.Time
-	robinidx             int
-	numPackets           int
-	concurrencyLimit     int
-	desiredNumQueues     int
-	queueLengthLimit     int
-	requestWaitLimit     time.Duration
-	Quiescent            bool
+	robinIdx             int
+	// NumPacketsEnqueued is the number of packets currently enqueued
+	// (eg: incremeneted on Enqueue, decremented on Dequue)
+	NumPacketsEnqueued int
+	concurrencyLimit   int
+	desiredNumQueues   int
+	queueLengthLimit   int
+	requestWaitLimit   time.Duration
+	Quiescent          bool // emptyHandler
 }
 
 // initQueues is a helper method for initializing an array of n queues
 func initQueues(numQueues int) []FQQueue {
-	queues := make([]*Queue, 0, numQueues)
 	fqqueues := make([]FQQueue, numQueues, numQueues)
-
 	for i := 0; i < numQueues; i++ {
-		queues = append(queues, &Queue{Index: i})
-		packets := []*Packet{}
-		fqpackets := make([]FQPacket, len(packets), len(packets))
-		queues[i].Packets = fqpackets
+		fqqueues[i] = &Queue{Index: i, Packets: make([]FQPacket, 0)}
 
-		fqqueues[i] = queues[i]
 	}
 
 	return fqqueues
@@ -80,6 +76,13 @@ func NewFQScheduler(concurrencyLimit, desiredNumQueues, queueLengthLimit int,
 	return fq
 }
 
+// LockAndSyncTime is used to ensure that the virtual time of a FQScheduler
+// is synced everytime its fields are accessed
+func (fqs *FQScheduler) LockAndSyncTime() {
+	fqs.Lock.Lock()
+	fqs.synctime()
+}
+
 // SetConfiguration is used to set the configuration for a FQScheduler
 // update handling for when fields are updated is handled here as well -
 // eg: if desiredNumQueues is increased, SetConfiguration reconciles by
@@ -89,14 +92,14 @@ func (fqs *FQScheduler) SetConfiguration(concurrencyLimit, desiredNumQueues, que
 
 	// lock required as method can change Queues which has its indexes and length used
 	// concurrently
-	fqs.lock.Lock()
-	defer fqs.lock.Unlock()
+	fqs.Lock.Lock()
+	defer fqs.Lock.Unlock()
 
 	// Adding queues is the only thing that requires immediate action
 	// Removing queues is handled by omitting indexes >desiredNumQueues from
 	// chooseQueueIdx
 
-	numQueues := len(fqs.GetQueues())
+	numQueues := len(fqs.Queues)
 	if desiredNumQueues > numQueues {
 		fqs.addQueues(desiredNumQueues - numQueues)
 	}
@@ -111,19 +114,20 @@ func (fqs *FQScheduler) SetConfiguration(concurrencyLimit, desiredNumQueues, que
 // to validated and enqueue a request for the FQScheduler/FairQueueingSystem:
 // 1) Start with shuffle sharding, to pick a queue.
 // 2) Reject old requests that have been waiting too long
-// 3) Reject current request if there is not enough concurrency shares or
+// 3) Reject current request if there is not enough concurrency shares and
 // we are at max queue length
 // 4) If not rejected, create a packet and enqueue
 // returns true on a successful enqueue
 // returns false in the case that there is no available concurrency or
 // the queuelengthlimit has been reached
 func (fqs *FQScheduler) TimeoutOldRequestsAndRejectOrEnqueue(hashValue uint64, handSize int32) FQPacket {
-	fqs.lock.Lock()
-	defer fqs.lock.Unlock()
+	// TODO(aaron-prindle) removing locking now and doing it all in Wait()
+	// fqs.Lock.Lock()
+	// defer fqs.Lock.Unlock()
 
 	//	Start with the shuffle sharding, to pick a queue.
 	queueIdx := fqs.ChooseQueueIdx(hashValue, int(handSize))
-	queue := fqs.GetQueues()[queueIdx]
+	queue := fqs.Queues[queueIdx]
 	// The next step is the logic to reject requests that have been waiting too long
 	fqs.removeTimedOutPacketsFromQueue(queue)
 	// NOTE: currently timeout is only checked for each new request.  This means that there can be
@@ -131,11 +135,11 @@ func (fqs *FQScheduler) TimeoutOldRequestsAndRejectOrEnqueue(hashValue uint64, h
 	// We think this is a fine tradeoff
 
 	// Create a packet and enqueue
-	pkt := FQPacket(&Packet{
+	pkt := &Packet{
 		DequeueChannel: make(chan bool, 1),
-		EnqueueTime:    time.Now(),
+		EnqueueTime:    fqs.clock.Now(),
 		Queue:          queue,
-	})
+	}
 	if ok := fqs.rejectOrEnqueue(pkt); !ok {
 		return nil
 	}
@@ -147,15 +151,17 @@ func (fqs *FQScheduler) TimeoutOldRequestsAndRejectOrEnqueue(hashValue uint64, h
 // past the requestWaitLimit
 func (fqs *FQScheduler) removeTimedOutPacketsFromQueue(queue FQQueue) {
 	timeoutIdx := -1
-	now := time.Now()
+	now := fqs.clock.Now()
 	pkts := queue.GetPackets()
 	// pkts are sorted oldest -> newest
 	// can short circuit loop (break) if oldest packets are not timing out
 	// as newer packets also will not have timed out
+
+	// now - requestWaitLimit = waitLimit
+	waitLimit := now.Add(-fqs.requestWaitLimit)
 	for i, pkt := range pkts {
 		channelPkt := pkt.(*Packet)
-		limit := channelPkt.EnqueueTime.Add(fqs.requestWaitLimit)
-		if now.After(limit) {
+		if waitLimit.After(channelPkt.EnqueueTime) {
 			channelPkt.DequeueChannel <- false
 			close(channelPkt.DequeueChannel)
 			// // TODO(aaron-prindle) verify this makes sense here
@@ -167,7 +173,6 @@ func (fqs *FQScheduler) removeTimedOutPacketsFromQueue(queue FQQueue) {
 		}
 	}
 	// remove timed out packets from queue
-	// TODO(aaron-prindle) BAD/IMPROVE, currently copies slice for deletion
 	if timeoutIdx != -1 {
 		// timeoutIdx + 1 to remove the last timeout pkt
 		removeIdx := timeoutIdx + 1
@@ -180,13 +185,13 @@ func (fqs *FQScheduler) removeTimedOutPacketsFromQueue(queue FQQueue) {
 
 // DecrementPackets decreases the # of packets for the FQScheduler w/ lock
 func (fqs *FQScheduler) DecrementPackets(i int) {
-	fqs.numPackets -= i
+	fqs.NumPacketsEnqueued -= i
 }
 
 // GetRequestsExecuting gets the # of requests which are "executing":
 // this is the# of requests/packets which have been dequeued but have not had
 // finished (via the FinishPacket method invoked after service)
-func (fqs *FQScheduler) getRequestsExecuting() int {
+func (fqs *FQScheduler) GetRequestsExecuting() int {
 	total := 0
 	for _, queue := range fqs.Queues {
 		total += queue.GetRequestsExecuting()
@@ -194,17 +199,8 @@ func (fqs *FQScheduler) getRequestsExecuting() int {
 	return total
 }
 
-//GetQueues returns the queues of the FQScheduler
-func (fqs *FQScheduler) GetQueues() []FQQueue {
-	return fqs.Queues
-}
-
-func (fqs *FQScheduler) lengthOfQueue(i int) int {
-	return len(fqs.Queues[i].GetPackets())
-}
-
-// shuffleDealAndPick uses shuffle sharding to select an index from a set of queues
-func (fqs *FQScheduler) shuffleDealAndPick(v, nq uint64,
+func shuffleDealAndPick(v, nq uint64,
+	lengthOfQueue func(int) int,
 	mr func(int /*in [0, nq-1]*/) int, /*in [0, numQueues-1] and excluding previously determined members of I*/
 	nRem, minLen, bestIdx int) int {
 	if nRem < 1 {
@@ -219,13 +215,37 @@ func (fqs *FQScheduler) shuffleDealAndPick(v, nq uint64,
 		}
 		return mr(a + 1)
 	}
-	lenI := fqs.lengthOfQueue(ii)
+	lenI := lengthOfQueue(ii)
 	if lenI < minLen {
 		minLen = lenI
 		bestIdx = ii
 	}
-	return fqs.shuffleDealAndPick(vNext, nq-1, mrNext, nRem-1, minLen, bestIdx)
+	return shuffleDealAndPick(vNext, nq-1, lengthOfQueue, mrNext, nRem-1, minLen, bestIdx)
 }
+
+// // shuffleDealAndPick uses shuffle sharding to select an index from a set of queues
+// func (fqs *FQScheduler) shuffleDealAndPick(v, nq uint64,
+// 	mr func(int /*in [0, nq-1]*/) int, /*in [0, numQueues-1] and excluding previously determined members of I*/
+// 	nRem, minLen, bestIdx int) int {
+// 	if nRem < 1 {
+// 		return bestIdx
+// 	}
+// 	vNext := v / nq
+// 	ai := int(v - nq*vNext)
+// 	ii := mr(ai)
+// 	mrNext := func(a int /*in [0, nq-2]*/) int /*in [0, numQueues-1] and excluding I[0], I[1], ... ii*/ {
+// 		if a < ai {
+// 			return mr(a)
+// 		}
+// 		return mr(a + 1)
+// 	}
+// 	lenI := fqs.lengthOfQueue(ii)
+// 	if lenI < minLen {
+// 		minLen = lenI
+// 		bestIdx = ii
+// 	}
+// 	return fqs.shuffleDealAndPick(vNext, nq-1, mrNext, nRem-1, minLen, bestIdx)
+// }
 
 // ChooseQueueIdx uses shuffle sharding to select an queue index
 // using a 'hashValue'.  The 'hashValue' derives a hand from a set range of
@@ -236,7 +256,9 @@ func (fqs *FQScheduler) ChooseQueueIdx(hashValue uint64, handSize int) int {
 	// verify that makes sense...
 
 	// desiredNumQueues is used here instead of numQueues to omit quiesce queues
-	return fqs.shuffleDealAndPick(hashValue, uint64(fqs.desiredNumQueues), func(i int) int { return i }, handSize, math.MaxInt32, -1)
+	return shuffleDealAndPick(hashValue, uint64(fqs.desiredNumQueues),
+		func(idx int) int { return len(fqs.Queues[idx].GetPackets()) },
+		func(i int) int { return i }, handSize, math.MaxInt32, -1)
 }
 
 // rejectOrEnqueue rejects or enqueues the newly arrived request if
@@ -245,33 +267,31 @@ func (fqs *FQScheduler) rejectOrEnqueue(packet FQPacket) bool {
 	queue := packet.GetQueue()
 	curQueueLength := len(queue.GetPackets())
 	// rejects the newly arrived request if resource criteria not met
-	if fqs.getRequestsExecuting() >= fqs.concurrencyLimit &&
+	if fqs.GetRequestsExecuting() >= fqs.concurrencyLimit &&
 		curQueueLength >= fqs.queueLengthLimit {
 		return false
 	}
 
-	fqs.synctime()
-
-	return fqs.enqueue(packet)
+	fqs.enqueue(packet)
+	return true
 }
 
 // enqueues a packet into an FQScheduler
-func (fqs *FQScheduler) enqueue(packet FQPacket) bool {
-	fqs.synctime()
+func (fqs *FQScheduler) enqueue(packet FQPacket) {
 
 	queue := packet.GetQueue()
 	queue.Enqueue(packet)
 	fqs.updateQueueVirStartTime(packet, queue)
-	fqs.numPackets++
-	return true
+	fqs.NumPacketsEnqueued++
 }
 
 // Enqueue enqueues a packet directly into an FQScheduler w/ no restriction
 func (fqs *FQScheduler) Enqueue(packet FQPacket) bool {
-	fqs.lock.Lock()
-	defer fqs.lock.Unlock()
+	fqs.LockAndSyncTime()
+	defer fqs.Lock.Unlock()
 
-	return fqs.enqueue(packet)
+	fqs.enqueue(packet)
+	return true
 }
 
 // synctime is used to sync the time of the FQScheduler by looking at the elapsed
@@ -318,7 +338,17 @@ func (fqs *FQScheduler) updateQueueVirStartTime(packet FQPacket, queue FQQueue) 
 	}
 }
 
-// RemoveIndex uses reslicing to remove an index from a slice
+// removeQueueAndUpdateIndexes uses reslicing to remove an index from a slice
+//  and then updates the 'Index' field of the queues to be correct
+func removeQueueAndUpdateIndexes(queues []FQQueue, index int) []FQQueue {
+	removedQueues := removeIndex(queues, index)
+	for i := index; i < len(removedQueues); i++ {
+		removedQueues[i].SetIndex(removedQueues[i].GetIndex() - 1)
+	}
+	return removedQueues
+}
+
+// removeIndex uses reslicing to remove an index from a slice
 func removeIndex(s []FQQueue, index int) []FQQueue {
 	return append(s[:index], s[index+1:]...)
 }
@@ -328,8 +358,8 @@ func removeIndex(s []FQQueue, index int) []FQQueue {
 // signifying it is is dequeued
 // this is a callback used for the FairQueuingSystem the FQScheduler supports
 func (fqs *FQScheduler) FinishPacketAndDequeueNextPacket(pkt FQPacket) {
-	fqs.lock.Lock()
-	defer fqs.lock.Unlock()
+	fqs.LockAndSyncTime()
+	defer fqs.Lock.Unlock()
 
 	fqs.finishPacket(pkt)
 	fqs.dequeueWithChannel()
@@ -339,7 +369,7 @@ func (fqs *FQScheduler) FinishPacketAndDequeueNextPacket(pkt FQPacket) {
 // has completed it's service.  This callback updates imporatnt state in the
 // FQScheduler
 func (fqs *FQScheduler) finishPacket(p FQPacket) {
-	fqs.synctime()
+
 	S := fqs.clock.Since(p.GetStartTime()).Seconds()
 
 	// When a request finishes being served, and the actual service time was S,
@@ -354,18 +384,27 @@ func (fqs *FQScheduler) finishPacket(p FQPacket) {
 	p.GetQueue().SetRequestsExecuting(requestsExecuting)
 
 	// Logic to remove quiesced queues
-	// TODO(aaron-prindle) verify the index for removal is correct
 	// >= as QueueIdx=25 is out of bounds for desiredNumQueues=25 [0...24]
 	if p.GetQueue().GetIndex() >= fqs.desiredNumQueues &&
 		len(p.GetQueue().GetPackets()) == 0 &&
 		p.GetQueue().GetRequestsExecuting() == 0 {
-		fqs.Queues = removeIndex(fqs.Queues, p.GetQueue().GetIndex())
+		fqs.Queues = removeQueueAndUpdateIndexes(fqs.Queues, p.GetQueue().GetIndex())
+		// At this point, if the fqs is quiescing,
+		// has zero requests executing, and has zero requests enqueued
+		// then a call to the EmptyHandler should be forked.
+		if fqs.Quiescent && fqs.NumPacketsEnqueued == 0 &&
+			fqs.GetRequestsExecuting() == 0 {
+			// then a call to the EmptyHandler should be forked.
+			go func() {
+				// TODO(aaron-prindle) store the emptyHandler to call it here?
+			}()
+		}
 	}
 }
 
 // dequeue dequeues a packet from the FQScheduler
 func (fqs *FQScheduler) dequeue() (FQPacket, bool) {
-	fqs.synctime()
+
 	queue := fqs.selectQueue()
 
 	if queue == nil {
@@ -386,21 +425,21 @@ func (fqs *FQScheduler) dequeue() (FQPacket, bool) {
 		// TODO(aaron-prindle) verify this statement is needed...
 		return nil, false
 	}
-	fqs.numPackets--
+	fqs.NumPacketsEnqueued--
 	return packet, ok
 }
 
 // Dequeue dequeues a packet from the FQScheduler
 func (fqs *FQScheduler) Dequeue() (FQPacket, bool) {
-	fqs.lock.Lock()
-	defer fqs.lock.Unlock()
+	fqs.LockAndSyncTime()
+	defer fqs.Lock.Unlock()
 	return fqs.dequeue()
 }
 
 // isEmpty is a convenience method that returns 'true' when all of the queues
 // in an FQScheduler have no packets (and is "empty")
 func (fqs *FQScheduler) isEmpty() bool {
-	return fqs.numPackets == 0
+	return fqs.NumPacketsEnqueued == 0
 }
 
 // DequeueWithChannelAsMuchAsPossible runs a loop, as long as there
@@ -410,10 +449,7 @@ func (fqs *FQScheduler) isEmpty() bool {
 // queue, increment the count of the number executing, and send `{true,
 // handleCompletion(that dequeued request)}` to the request's channel.
 func (fqs *FQScheduler) DequeueWithChannelAsMuchAsPossible() {
-	fqs.lock.Lock()
-	defer fqs.lock.Unlock()
-
-	for !fqs.isEmpty() && fqs.getRequestsExecuting() < fqs.concurrencyLimit {
+	for !fqs.isEmpty() && fqs.GetRequestsExecuting() < fqs.concurrencyLimit {
 		_, ok := fqs.dequeueWithChannel()
 		// TODO(aaron-prindle) verify checking ok makes senes
 		if !ok {
@@ -440,8 +476,8 @@ func (fqs *FQScheduler) dequeueWithChannel() (FQPacket, bool) {
 }
 
 func (fqs *FQScheduler) roundrobinqueue() int {
-	fqs.robinidx = (fqs.robinidx + 1) % len(fqs.Queues)
-	return fqs.robinidx
+	fqs.robinIdx = (fqs.robinIdx + 1) % len(fqs.Queues)
+	return fqs.robinIdx
 }
 
 // selectQueue selects the minimum virtualfinish time from the set of queues
@@ -465,7 +501,7 @@ func (fqs *FQScheduler) selectQueue() FQQueue {
 			}
 		}
 	}
-	fqs.robinidx = minidx
+	fqs.robinIdx = minidx
 	return minqueue
 }
 

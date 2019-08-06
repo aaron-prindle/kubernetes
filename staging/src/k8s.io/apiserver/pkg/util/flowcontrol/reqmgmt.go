@@ -17,6 +17,9 @@ limitations under the License.
 package flowcontrol
 
 import (
+	"fmt"
+	"hash/fnv"
+	"strconv"
 	"sync/atomic"
 	"time"
 
@@ -176,8 +179,21 @@ func (reqMgmt *requestManagementSystem) Wait(requestDigest RequestDigest) (execu
 }
 
 func (rmState *requestManagementState) pickFlowSchema(rd RequestDigest) *rmtypesv1alpha1.FlowSchema {
-	return nil
-	// TODO: implement
+
+	// TODO(aaron-prindle) DEBUG/REMOVE
+	fmt.Printf("flowschemas: %v\n", rmState.flowSchemas)
+	fmt.Printf("idx %v\n", rd.User.GetGroups())
+
+	// TODO(aaron-prindle) CHANGE replace w/ proper implementation
+	fIdx := rd.User.GetGroups()
+	// priority := r.Header.Get("FLOWSCHEMA_INDEX")
+	idx, err := strconv.Atoi(fIdx[0])
+	if err != nil {
+		panic("strconv.Atoi(priority) errored")
+	}
+	// TODO(aaron-prindle) can also use MatchingPrecedence for dummy method
+	return rmState.flowSchemas[idx]
+
 }
 
 // ComputeFlowDistinguisher extracts the flow distinguisher according to the given method
@@ -186,8 +202,33 @@ func (rd RequestDigest) ComputeFlowDistinguisher(method *rmtypesv1alpha1.FlowDis
 	return ""
 }
 
+func hash(s string) uint64 {
+	h := fnv.New64a()
+	h.Write([]byte(s))
+	return h.Sum64()
+}
+
 // HashFlowID hashes the inputs into 64-bits
 func hashFlowID(fsName, fDistinguisher string) uint64 {
-	// TODO: implement
-	return 0
+	// TODO(aaron-prindle) - Since hash.Hash has a Write method that can be
+	// invoked multiple times, we do not need to pay to construct a string here.
+	return hash(fmt.Sprintf("%s,%s", fsName, fDistinguisher))
 }
+
+// --
+// func (rmState *requestManagementState) pickFlowSchema(rd RequestDigest) *rmtypesv1alpha1.FlowSchema {
+// 	return nil
+// 	// TODO: implement
+// }
+
+// // ComputeFlowDistinguisher extracts the flow distinguisher according to the given method
+// func (rd RequestDigest) ComputeFlowDistinguisher(method *rmtypesv1alpha1.FlowDistinguisherMethod) string {
+// 	// TODO: implement
+// 	return ""
+// }
+
+// // HashFlowID hashes the inputs into 64-bits
+// func hashFlowID(fsName, fDistinguisher string) uint64 {
+// 	// TODO: implement
+// 	return 0
+// }
