@@ -24,42 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/apiserver/pkg/util/clock"
 )
-
-// testPacket is a temporary container for "requests" with additional tracking fields
-// required for the functionality FQScheduler
-type testPacket struct {
-	item        interface{}
-	servicetime float64
-	QueueIdx    int
-	Queue       FQQueue
-	seq         int
-	startTime   time.Time
-}
-
-func (p *testPacket) GetServiceTime() float64 {
-	return p.servicetime
-}
-func (p *testPacket) GetQueueIdx() int {
-	return p.QueueIdx
-}
-
-func (p *testPacket) SetQueue(queue FQQueue) {
-	p.Queue = queue
-}
-
-func (p *testPacket) GetQueue() FQQueue {
-	return p.Queue
-}
-
-func (p *testPacket) GetStartTime() time.Time {
-	return p.startTime
-}
-func (p *testPacket) SetStartTime(starttime time.Time) {
-	p.startTime = starttime
-
-}
 
 // adapted from https://github.com/tadglines/wfq/blob/master/wfq_test.go
 
@@ -74,11 +40,11 @@ type flowDesc struct {
 	actualPercent float64
 }
 
-func genFlow(fq *FQScheduler, desc *flowDesc, key int) {
+func genFlow(fq *QueueSetImpl, desc *flowDesc, key int) {
 	for i, t := 1, float64(0); t < desc.ftotal; i++ {
-		it := new(testPacket)
+		it := new(Packet)
 		it.QueueIdx = key
-		it.SetQueue(fq.Queues[key])
+		it.Queue = fq.queues[key]
 		if desc.imin == desc.imax {
 			it.servicetime = desc.imax
 		} else {
@@ -94,18 +60,17 @@ func genFlow(fq *FQScheduler, desc *flowDesc, key int) {
 	}
 }
 
-func consumeQueue(t *testing.T, fq *FQScheduler, descs []flowDesc) (float64, error) {
+func consumeQueue(t *testing.T, fq *QueueSetImpl, descs []flowDesc) (float64, error) {
 	active := make(map[int]bool)
 	var total float64
 	acnt := make(map[int]float64)
 	cnt := make(map[int]float64)
 	seqs := make(map[int]int)
 
-	for i, ok := fq.Dequeue(); ok; i, ok = fq.Dequeue() {
+	for it, ok := fq.Dequeue(); ok; it, ok = fq.Dequeue() {
 		// callback to update virtualtime w/ correct service time for request
-		fq.finishPacket(i)
+		fq.finishPacket(it)
 
-		it := i.(*testPacket)
 		seq := seqs[it.QueueIdx]
 		if seq+1 != it.seq {
 			return 0, fmt.Errorf("testPacket for flow %d came out of queue out-of-order: expected %d, got %d", it.QueueIdx, seq+1, it.seq)
@@ -198,11 +163,11 @@ func flowStdDevTest(t *testing.T, flows []flowDesc, expectedStdDev float64) {
 	now := time.Now()
 	fc := clock.NewFakeClock(now)
 
-	// fqqueues := make([]FQQueue, len(queues), len(queues))
+	// fqqueues := make([]*Queue, len(queues), len(queues))
 	// for i := range queues {
 	// 	fqqueues[i] = queues[i]
 	// }
-	fq := NewFQScheduler(20000, len(flows), 20000, 5*time.Second, fc)
+	fq := NewQueueSetImpl(20000, len(flows), 20000, 5*time.Second, fc, nil)
 	for n := 0; n < len(flows); n++ {
 		genFlow(fq, &flows[n], n)
 	}
@@ -213,7 +178,7 @@ func flowStdDevTest(t *testing.T, flows []flowDesc, expectedStdDev float64) {
 		Time:     now,
 		Duration: time.Millisecond,
 	}
-	fq.clock = ic
+	fq.clk = ic
 
 	stdDev, err := consumeQueue(t, fq, flows)
 

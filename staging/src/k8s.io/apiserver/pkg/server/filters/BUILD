@@ -12,19 +12,24 @@ go_test(
         "content_type_test.go",
         "cors_test.go",
         "maxinflight_test.go",
+        "reqmgmt_test.go",
         "timeout_test.go",
     ],
     embed = [":go_default_library"],
     deps = [
+        "//staging/src/k8s.io/api/flowcontrol/v1alpha1:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/api/errors:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/runtime/schema:go_default_library",
+        "//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/util/diff:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/util/runtime:go_default_library",
         "//staging/src/k8s.io/apimachinery/pkg/util/sets:go_default_library",
         "//staging/src/k8s.io/apiserver/pkg/authentication/user:go_default_library",
         "//staging/src/k8s.io/apiserver/pkg/endpoints/filters:go_default_library",
         "//staging/src/k8s.io/apiserver/pkg/endpoints/request:go_default_library",
+        "//staging/src/k8s.io/client-go/kubernetes:go_default_library",
+        "//staging/src/k8s.io/client-go/kubernetes/fake:go_default_library",
     ],
 )
 
@@ -37,6 +42,11 @@ go_library(
         "longrunning.go",
         "maxinflight.go",
         "reqmgmt.go",
+<<<<<<< HEAD
+=======
+        "reqmgmt-config.go",
+        "requestor.go",
+>>>>>>> d62a0cd0bfd... SPLIT-OUT: integrate fair queuing into test skeleton, mock out flowschema logic, add WIP passing test suite
         "timeout.go",
         "waitgroup.go",
         "wrap.go",
@@ -55,6 +65,14 @@ go_library(
         "//staging/src/k8s.io/apiserver/pkg/endpoints/request:go_default_library",
         "//staging/src/k8s.io/apiserver/pkg/server/httplog:go_default_library",
         "//staging/src/k8s.io/apiserver/pkg/util/flowcontrol:go_default_library",
+        "//staging/src/k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing:go_default_library",
+        "//staging/src/k8s.io/client-go/informers:go_default_library",
+        "//staging/src/k8s.io/client-go/kubernetes:go_default_library",
+        "//staging/src/k8s.io/client-go/listers/flowcontrol/v1alpha1:go_default_library",
+        "//staging/src/k8s.io/client-go/rest:go_default_library",
+        "//staging/src/k8s.io/client-go/tools/cache:go_default_library",
+        "//staging/src/k8s.io/client-go/util/workqueue:go_default_library",
+        "//vendor/golang.org/x/net/http2:go_default_library",
         "//vendor/k8s.io/klog:go_default_library",
     ],
 )
