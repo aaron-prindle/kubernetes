@@ -17,7 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	apiv1a1 "k8s.io/api/flowcontrol/v1alpha1"
+	flowcontrolv1alpha1 "k8s.io/api/flowcontrol/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -33,7 +33,7 @@ func Resource(resource string) schema.GroupResource {
 }
 
 var (
-	localSchemeBuilder = &apiv1a1.SchemeBuilder
+	localSchemeBuilder = &flowcontrolv1alpha1.SchemeBuilder
 	// AddToScheme adds api to a scheme
 	AddToScheme = localSchemeBuilder.AddToScheme
 )
