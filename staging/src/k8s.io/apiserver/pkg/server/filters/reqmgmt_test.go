@@ -34,6 +34,7 @@ import (
 	apifilters "k8s.io/apiserver/pkg/endpoints/filters"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	utilflowcontrol "k8s.io/apiserver/pkg/util/flowcontrol"
+	fq "k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing"
 	kubeinformers "k8s.io/client-go/informers"
 
 	"k8s.io/client-go/kubernetes/fake"
@@ -46,12 +47,10 @@ func createRequestManagementServerAndClient(
 
 	// TODO(aaron-prindle) HACK/BAD - interval clock had data race issue,
 	// using regular clock for now
-
 	clk := clock.RealClock{}
 
-	// TODO(aaron-prindle) verify interval fake clock setup is correct...
+	// TODO(aaron-prindle) would use interval clock but has data race issues??
 	// now := time.Now()
-	// TODO(aaron-prindle) interval clock had data race issue??
 	// clk := &clock.IntervalClock{
 	// 	Time:     now,
 	// 	Duration: time.Millisecond,
@@ -74,13 +73,14 @@ func createRequestManagementServerAndClient(
 
 	requestInfoFactory := &apirequest.RequestInfoFactory{APIPrefixes: sets.NewString("apis", "api"), GrouplessAPIPrefixes: sets.NewString("api")}
 
-	// reqmgmt := NewRequestManagement()
-	// var reqmgmt utilflowcontrol.Interface
+	// TODO(aaron-prindle) initialize queueSetFactory
+	queueSetFactory := fq.NewQueueSetFactory(clk, nil)
 	reqMgmt := utilflowcontrol.NewRequestManagementSystem(
 		kubeinformers.NewSharedInformerFactory(clientSet, 0),
+		queueSetFactory,
 		serverConcurrencyLimit,
 		requestWaitLimit,
-		clk)
+	)
 
 	handler := WithRequestManagement(
 		delegate,

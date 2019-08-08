@@ -28,7 +28,7 @@ import (
 )
 
 // testPacket is a temporary container for "requests" with additional tracking fields
-// required for the functionality FQScheduler
+// required for the functionality QueueSetImpl
 type testPacket struct {
 	item        interface{}
 	servicetime float64
@@ -74,11 +74,11 @@ type flowDesc struct {
 	actualPercent float64
 }
 
-func genFlow(fq *FQScheduler, desc *flowDesc, key int) {
+func genFlow(fq *QueueSetImpl, desc *flowDesc, key int) {
 	for i, t := 1, float64(0); t < desc.ftotal; i++ {
 		it := new(testPacket)
 		it.QueueIdx = key
-		it.SetQueue(fq.Queues[key])
+		it.SetQueue(fq.queues[key])
 		if desc.imin == desc.imax {
 			it.servicetime = desc.imax
 		} else {
@@ -94,7 +94,7 @@ func genFlow(fq *FQScheduler, desc *flowDesc, key int) {
 	}
 }
 
-func consumeQueue(t *testing.T, fq *FQScheduler, descs []flowDesc) (float64, error) {
+func consumeQueue(t *testing.T, fq *QueueSetImpl, descs []flowDesc) (float64, error) {
 	active := make(map[int]bool)
 	var total float64
 	acnt := make(map[int]float64)
@@ -202,7 +202,7 @@ func flowStdDevTest(t *testing.T, flows []flowDesc, expectedStdDev float64) {
 	// for i := range queues {
 	// 	fqqueues[i] = queues[i]
 	// }
-	fq := NewFQScheduler(20000, len(flows), 20000, 5*time.Second, fc)
+	fq := NewQueueSetImpl(20000, len(flows), 20000, 5*time.Second, fc)
 	for n := 0; n < len(flows); n++ {
 		genFlow(fq, &flows[n], n)
 	}

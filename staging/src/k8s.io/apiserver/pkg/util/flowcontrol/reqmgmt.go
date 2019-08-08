@@ -181,7 +181,7 @@ func (reqMgmt *requestManagementSystem) Wait(requestDigest RequestDigest) (execu
 func (rmState *requestManagementState) pickFlowSchema(rd RequestDigest) *rmtypesv1alpha1.FlowSchema {
 
 	// TODO(aaron-prindle) DEBUG/REMOVE
-	fmt.Printf("flowschemas: %v\n", rmState.flowSchemas)
+	// fmt.Printf("flowschemas: %v\n", rmState.flowSchemas)
 	fmt.Printf("idx %v\n", rd.User.GetGroups())
 
 	// TODO(aaron-prindle) CHANGE replace w/ proper implementation

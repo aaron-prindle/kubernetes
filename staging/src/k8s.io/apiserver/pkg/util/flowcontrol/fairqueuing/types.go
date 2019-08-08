@@ -17,6 +17,7 @@ limitations under the License.
 package fairqueuing
 
 import (
+	"sync"
 	"time"
 )
 
@@ -88,6 +89,7 @@ type FQQueue interface {
 // Queue is an array of packets with additional metadata required for
 // the FQScheduler
 type Queue struct {
+	lock              sync.Mutex
 	Packets           []FQPacket
 	VirStart          float64
 	RequestsExecuting int
@@ -108,6 +110,10 @@ func (q *Queue) SetPackets(pkts []FQPacket) {
 // RequestsExecuting represents the total # of packets that are being serviced
 // serviced = dequeud but not finished
 func (q *Queue) GetRequestsExecuting() int {
+	// TODO(aaron-prindle) Seeing DataRace issue here? Did not before refactor/changes
+	// q.lock.Lock()
+	// defer q.lock.Unlock()
+
 	return q.RequestsExecuting
 }
 
@@ -115,6 +121,10 @@ func (q *Queue) GetRequestsExecuting() int {
 // RequestsExecuting represents the total # of packets that are being serviced
 // serviced = dequeud but not finished
 func (q *Queue) SetRequestsExecuting(requestsExecuting int) {
+	// TODO(aaron-prindle) Seeing DataRace issue here? Did not before refactor/changes
+	// q.lock.Lock()
+	// defer q.lock.Unlock()
+
 	q.RequestsExecuting = requestsExecuting
 }
 
