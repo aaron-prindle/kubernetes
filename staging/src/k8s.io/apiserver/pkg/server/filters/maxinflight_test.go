@@ -60,10 +60,19 @@ func createMaxInflightServer(callsWg, blockWg *sync.WaitGroup, disableCallsWg *b
 
 func withFakeUser(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		usr := &user.DefaultInfo{}
+		modified := false
 		if len(r.Header["Groups"]) > 0 {
-			r = r.WithContext(apirequest.WithUser(r.Context(), &user.DefaultInfo{
-				Groups: r.Header["Groups"],
-			}))
+			modified = true
+			usr.Groups = r.Header["Groups"]
+		}
+		if len(r.Header["Username"]) > 0 {
+			modified = true
+			usr.Name = r.Header["Username"][0]
+		}
+
+		if modified {
+			r = r.WithContext(apirequest.WithUser(r.Context(), usr))
 		}
 		handler.ServeHTTP(w, r)
 	})

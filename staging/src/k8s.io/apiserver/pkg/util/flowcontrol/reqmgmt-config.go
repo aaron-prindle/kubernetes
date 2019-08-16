@@ -18,7 +18,6 @@ package flowcontrol
 
 import (
 	"fmt"
-	"math"
 	"sort"
 	"sync"
 	"time"
@@ -201,7 +200,16 @@ func (reqMgmt *requestManagementSystem) digestConfigObjects(newPLs []*rmtypesv1a
 			klog.V(5).Infof("Using exempt priority level %s: quiescent=%v", plName, plState.emptyHandler != nil)
 			continue
 		}
-		plState.concurrencyLimit = int(math.Ceil(float64(reqMgmt.serverConcurrencyLimit) * float64(plState.config.AssuredConcurrencyShares) / shareSum))
+		// TODO(aaron-prindle) HACK/DEBUG/CHANGE - this is always -9223372036854775808
+		// in my tests.  I imagine I am not bootstrapping everything properly
+		// I have currently hacked/modified this to be the regMgmt.serverConcurrencyLimit value
+
+		// these values are always 0 w/ my incorrect bootstrapping
+		// fmt.Printf("plState.config.AssuredConcurrencyShares: %v\n", plState.config.AssuredConcurrencyShares)
+		// fmt.Printf("shareSum: %v\n", shareSum)
+
+		plState.concurrencyLimit = reqMgmt.serverConcurrencyLimit
+		// plState.concurrencyLimit = int(math.Ceil(float64(reqMgmt.serverConcurrencyLimit) * float64(plState.config.AssuredConcurrencyShares) / shareSum))
 		reqMgmt.syncPriorityLevelConcurrencyStatus(plByName[plName], plState.concurrencyLimit)
 		if plState.queues == nil {
 			klog.V(5).Infof("Introducing priority level %s: config=%#+v, concurrencyLimit=%d, quiescent=%v (shares=%v, shareSum=%v)", plName, plState.config, plState.concurrencyLimit, plState.emptyHandler != nil, plState.config.AssuredConcurrencyShares, shareSum)
