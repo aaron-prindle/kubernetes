@@ -21,9 +21,12 @@ go_library(
 
 go_test(
     name = "go_default_test",
-    srcs = ["fairqueuing_test.go"],
+    srcs = [
+        "fairqueuing_test.go",
+        "fq_test.go",
+    ],
     embed = [":go_default_library"],
-    deps = ["//staging/src/k8s.io/apimachinery/pkg/util/clock:go_default_library"],
+    deps = ["//staging/src/k8s.io/apiserver/pkg/util/clock:go_default_library"],
 )
 
 filegroup(
@@ -38,11 +41,4 @@ filegroup(
     srcs = [":package-srcs"],
     tags = ["automanaged"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["fq_test.go"],
-    embed = [":go_default_library"],
-    deps = ["//staging/src/k8s.io/apiserver/pkg/util/clock:go_default_library"],
 )

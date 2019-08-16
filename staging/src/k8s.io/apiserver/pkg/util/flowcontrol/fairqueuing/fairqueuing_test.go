@@ -40,7 +40,7 @@ type flowDesc struct {
 	actualPercent float64
 }
 
-func genFlow(fq *QueueSetImpl, desc *flowDesc, key int) {
+func genFlow(fq *queueSetImpl, desc *flowDesc, key int) {
 	for i, t := 1, float64(0); t < desc.ftotal; i++ {
 		it := new(Request)
 		it.QueueIdx = key
@@ -60,7 +60,7 @@ func genFlow(fq *QueueSetImpl, desc *flowDesc, key int) {
 	}
 }
 
-func consumeQueue(t *testing.T, fq *QueueSetImpl, descs []flowDesc) (float64, error) {
+func consumeQueue(t *testing.T, fq *queueSetImpl, descs []flowDesc) (float64, error) {
 	active := make(map[int]bool)
 	var total float64
 	acnt := make(map[int]float64)
