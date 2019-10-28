@@ -19,8 +19,11 @@ package fairqueuing
 import (
 	"math"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
+
+	"k8s.io/apimachinery/pkg/util/waitgroup"
 )
 
 type uniformScenario []uniformClient
@@ -36,12 +39,14 @@ type uniformClient struct {
 // exerciseQueueSetUniformScenario.  Simple logic, only works if each
 // client's offered load is at least as large as its fair share of
 // capacity.
-func exerciseQueueSetUniformScenario(t *testing.T, qs QueueSet, sc uniformScenario, handSize int32, totalDuration time.Duration, expectPass bool) {
-	wg := new(sync.WaitGroup)
+func exerciseQueueSetUniformScenario(t *testing.T, qs QueueSet, sc uniformScenario,
+	handSize int32, totalDuration time.Duration, expectPass bool, expectedExecuteCount uint64,
+	clk *FakeEventClock, wg *sync.WaitGroup) {
+
 	now := time.Now()
-	clk := NewFakeEventClock(now, wg, 0, nil)
 	t.Logf("%s: Start", clk.Now().Format("2006-01-02 15:04:05.000000000"))
 	integrators := make([]Integrator, len(sc))
+	var executeCount uint64
 	for i, uc := range sc {
 		integrators[i] = NewIntegrator(clk)
 		for j := 0; j < uc.nThreads; j++ {
@@ -50,7 +55,7 @@ func exerciseQueueSetUniformScenario(t *testing.T, qs QueueSet, sc uniformScenar
 				for k := 0; k < uc.nCalls; k++ {
 					ClockWait(clk, wg, uc.thinkDuration)
 					for {
-						quiescent, execute, _ := qs.Wait(uc.hash, handSize)
+						quiescent, execute, afterExecute := qs.Wait(uc.hash, handSize)
 						t.Logf("%s: %d, %d, %d got q=%v, e=%v", clk.Now().Format("2006-01-02 15:04:05.000000000"), i, j, k, quiescent, execute)
 						if quiescent {
 							continue
@@ -59,7 +64,9 @@ func exerciseQueueSetUniformScenario(t *testing.T, qs QueueSet, sc uniformScenar
 							break
 						}
 						igr.Add(1)
+						atomic.AddUint64(&executeCount, 1)
 						ClockWait(clk, wg, uc.execDuration)
+						afterExecute()
 						igr.Add(-1)
 						break
 					}
@@ -93,15 +100,54 @@ func exerciseQueueSetUniformScenario(t *testing.T, qs QueueSet, sc uniformScenar
 			t.Logf("Class %d got an average of %v and the ideal was %v", i, results[i].average, idealAverage)
 		}
 	}
+
+	if executeCount != expectedExecuteCount {
+		t.Errorf("Expected %v requests to be successful but was %v", expectedExecuteCount, executeCount)
+	}
 	clk.Run(nil)
 }
 
 // TestDummy should fail because the dummy QueueSet exercises no control
 func TestDummy(t *testing.T) {
+	now := time.Now()
+	var wg sync.WaitGroup
+	clk := NewFakeEventClock(now, &wg, 0, nil)
+
 	exerciseQueueSetUniformScenario(t, NewDummyQueueSet(), []uniformClient{
 		{1001001001, 5, 10, time.Second, time.Second},
 		{2002002002, 2, 10, time.Second, time.Second / 2},
-	}, 1, time.Second*10, false)
+	}, 1, time.Second*10, false, 70, clk, &wg)
+}
+
+func TestTwoFlowsDiffThink(t *testing.T) {
+	now := time.Now()
+	var wg sync.WaitGroup
+	owg := waitgroup.WrapWaitGroupPointer(&wg)
+
+	clk := NewFakeEventClock(now, &wg, 0, nil)
+	qsf := NewQueueSetFactory(clk, owg)
+
+	qs := qsf.NewQueueSet("TestTwoFlowsDiffThink", 1, 128, 128, 10*time.Minute)
+	exerciseQueueSetUniformScenario(t, qs, []uniformClient{
+		{1001001001, 5, 10, time.Second, time.Second},
+		{2002002002, 2, 5, time.Second, time.Second / 2},
+	}, 1, time.Second*10, true, 60, clk, &wg)
+}
+
+func TestTimeout(t *testing.T) {
+	now := time.Now()
+	var wg sync.WaitGroup
+	owg := waitgroup.WrapWaitGroupPointer(&wg)
+
+	clk := NewFakeEventClock(now, &wg, 0, nil)
+	qsf := NewQueueSetFactory(clk, owg)
+
+	qs := qsf.NewQueueSet("TestTimeout", 1, 128, 128, 0)
+
+	//214 requests expected, not 500 due to timeout
+	exerciseQueueSetUniformScenario(t, qs, []uniformClient{
+		{1001001001, 5, 100, time.Second, time.Second},
+	}, 1, time.Second*10, true, 214, clk, &wg)
 }
 
 func ClockWait(clk *FakeEventClock, wg *sync.WaitGroup, duration time.Duration) {
