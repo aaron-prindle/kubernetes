@@ -1,0 +1,273 @@
+2024/08/26 23:28:46 example.go:32: In init function
+2024/08/26 23:28:47 example.go:43: Starting run function
+2024/08/26 23:28:47 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/client_adapter.go
+2024/08/26 23:28:47 example.go:79: Checking for feature gate import
+2024/08/26 23:28:47 example.go:82: Feature gate import found
+2024/08/26 23:28:47 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/kube_features.go
+2024/08/26 23:28:47 example.go:79: Checking for feature gate import
+2024/08/26 23:28:47 example.go:82: Feature gate import found
+2024/08/26 23:28:47 example.go:53: Found const declaration
+2024/08/26 23:28:47 example.go:56: Processing value spec: CrossNamespaceVolumeDataSource
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CrossNamespaceVolumeDataSource
+2024/08/26 23:28:47 example.go:56: Processing value spec: AllowDNSOnlyNodeCSR
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AllowDNSOnlyNodeCSR
+2024/08/26 23:28:47 example.go:56: Processing value spec: AllowServiceLBStatusOnNonLB
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AllowServiceLBStatusOnNonLB
+2024/08/26 23:28:47 example.go:56: Processing value spec: AnyVolumeDataSource
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AnyVolumeDataSource
+2024/08/26 23:28:47 example.go:56: Processing value spec: AppArmor
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AppArmor
+2024/08/26 23:28:47 example.go:56: Processing value spec: AppArmorFields
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AppArmorFields
+2024/08/26 23:28:47 example.go:56: Processing value spec: AuthorizeNodeWithSelectors
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AuthorizeNodeWithSelectors
+2024/08/26 23:28:47 example.go:56: Processing value spec: ClusterTrustBundle
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ClusterTrustBundle
+2024/08/26 23:28:47 example.go:56: Processing value spec: ClusterTrustBundleProjection
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ClusterTrustBundleProjection
+2024/08/26 23:28:47 example.go:56: Processing value spec: CPUCFSQuotaPeriod
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CPUCFSQuotaPeriod
+2024/08/26 23:28:47 example.go:56: Processing value spec: CPUManager
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CPUManager
+2024/08/26 23:28:47 example.go:56: Processing value spec: CPUManagerPolicyAlphaOptions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CPUManagerPolicyAlphaOptions
+2024/08/26 23:28:47 example.go:56: Processing value spec: CPUManagerPolicyBetaOptions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CPUManagerPolicyBetaOptions
+2024/08/26 23:28:47 example.go:56: Processing value spec: CPUManagerPolicyOptions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CPUManagerPolicyOptions
+2024/08/26 23:28:47 example.go:56: Processing value spec: CoordinatedLeaderElection
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CoordinatedLeaderElection
+2024/08/26 23:28:47 example.go:56: Processing value spec: CSIMigrationPortworx
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CSIMigrationPortworx
+2024/08/26 23:28:47 example.go:56: Processing value spec: CSIVolumeHealth
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CSIVolumeHealth
+2024/08/26 23:28:47 example.go:56: Processing value spec: CloudControllerManagerWebhook
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CloudControllerManagerWebhook
+2024/08/26 23:28:47 example.go:56: Processing value spec: ContainerCheckpoint
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ContainerCheckpoint
+2024/08/26 23:28:47 example.go:56: Processing value spec: CronJobsScheduledAnnotation
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CronJobsScheduledAnnotation
+2024/08/26 23:28:47 example.go:56: Processing value spec: DevicePluginCDIDevices
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DevicePluginCDIDevices
+2024/08/26 23:28:47 example.go:56: Processing value spec: DisableAllocatorDualWrite
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DisableAllocatorDualWrite
+2024/08/26 23:28:47 example.go:56: Processing value spec: DisableCloudProviders
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DisableCloudProviders
+2024/08/26 23:28:47 example.go:56: Processing value spec: DisableKubeletCloudCredentialProviders
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DisableKubeletCloudCredentialProviders
+2024/08/26 23:28:47 example.go:56: Processing value spec: AllowInsecureKubeletCertificateSigningRequests
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: AllowInsecureKubeletCertificateSigningRequests
+2024/08/26 23:28:47 example.go:56: Processing value spec: DisableNodeKubeProxyVersion
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DisableNodeKubeProxyVersion
+2024/08/26 23:28:47 example.go:56: Processing value spec: DRAControlPlaneController
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DRAControlPlaneController
+2024/08/26 23:28:47 example.go:56: Processing value spec: DynamicResourceAllocation
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: DynamicResourceAllocation
+2024/08/26 23:28:47 example.go:56: Processing value spec: EventedPLEG
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: EventedPLEG
+2024/08/26 23:28:47 example.go:56: Processing value spec: ExecProbeTimeout
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ExecProbeTimeout
+2024/08/26 23:28:47 example.go:56: Processing value spec: RetryGenerateName
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: RetryGenerateName
+2024/08/26 23:28:47 example.go:56: Processing value spec: GracefulNodeShutdown
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: GracefulNodeShutdown
+2024/08/26 23:28:47 example.go:56: Processing value spec: GracefulNodeShutdownBasedOnPodPriority
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: GracefulNodeShutdownBasedOnPodPriority
+2024/08/26 23:28:47 example.go:56: Processing value spec: HPAContainerMetrics
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: HPAContainerMetrics
+2024/08/26 23:28:47 example.go:56: Processing value spec: HPAScaleToZero
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: HPAScaleToZero
+2024/08/26 23:28:47 example.go:56: Processing value spec: HonorPVReclaimPolicy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: HonorPVReclaimPolicy
+2024/08/26 23:28:47 example.go:56: Processing value spec: InTreePluginPortworxUnregister
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: InTreePluginPortworxUnregister
+2024/08/26 23:28:47 example.go:56: Processing value spec: JobBackoffLimitPerIndex
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: JobBackoffLimitPerIndex
+2024/08/26 23:28:47 example.go:56: Processing value spec: JobManagedBy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: JobManagedBy
+2024/08/26 23:28:47 example.go:56: Processing value spec: JobPodFailurePolicy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: JobPodFailurePolicy
+2024/08/26 23:28:47 example.go:56: Processing value spec: JobPodReplacementPolicy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: JobPodReplacementPolicy
+2024/08/26 23:28:47 example.go:56: Processing value spec: JobSuccessPolicy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: JobSuccessPolicy
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeletCgroupDriverFromCRI
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeletCgroupDriverFromCRI
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeletInUserNamespace
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeletInUserNamespace
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeletPodResourcesDynamicResources
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeletPodResourcesDynamicResources
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeletPodResourcesGet
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeletPodResourcesGet
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeletSeparateDiskGC
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeletSeparateDiskGC
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeletTracing
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeletTracing
+2024/08/26 23:28:47 example.go:56: Processing value spec: KubeProxyDrainingTerminatingNodes
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: KubeProxyDrainingTerminatingNodes
+2024/08/26 23:28:47 example.go:56: Processing value spec: LegacyServiceAccountTokenCleanUp
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: LegacyServiceAccountTokenCleanUp
+2024/08/26 23:28:47 example.go:56: Processing value spec: LocalStorageCapacityIsolationFSQuotaMonitoring
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: LocalStorageCapacityIsolationFSQuotaMonitoring
+2024/08/26 23:28:47 example.go:56: Processing value spec: LogarithmicScaleDown
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: LogarithmicScaleDown
+2024/08/26 23:28:47 example.go:56: Processing value spec: MatchLabelKeysInPodAffinity
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MatchLabelKeysInPodAffinity
+2024/08/26 23:28:47 example.go:56: Processing value spec: MatchLabelKeysInPodTopologySpread
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MatchLabelKeysInPodTopologySpread
+2024/08/26 23:28:47 example.go:56: Processing value spec: MaxUnavailableStatefulSet
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MaxUnavailableStatefulSet
+2024/08/26 23:28:47 example.go:56: Processing value spec: MemoryManager
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MemoryManager
+2024/08/26 23:28:47 example.go:56: Processing value spec: MemoryQoS
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MemoryQoS
+2024/08/26 23:28:47 example.go:56: Processing value spec: MinDomainsInPodTopologySpread
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MinDomainsInPodTopologySpread
+2024/08/26 23:28:47 example.go:56: Processing value spec: MultiCIDRServiceAllocator
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MultiCIDRServiceAllocator
+2024/08/26 23:28:47 example.go:56: Processing value spec: NewVolumeManagerReconstruction
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: NewVolumeManagerReconstruction
+2024/08/26 23:28:47 example.go:56: Processing value spec: NFTablesProxyMode
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: NFTablesProxyMode
+2024/08/26 23:28:47 example.go:56: Processing value spec: NodeLogQuery
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: NodeLogQuery
+2024/08/26 23:28:47 example.go:56: Processing value spec: NodeOutOfServiceVolumeDetach
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: NodeOutOfServiceVolumeDetach
+2024/08/26 23:28:47 example.go:56: Processing value spec: NodeSwap
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: NodeSwap
+2024/08/26 23:28:47 example.go:56: Processing value spec: PDBUnhealthyPodEvictionPolicy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PDBUnhealthyPodEvictionPolicy
+2024/08/26 23:28:47 example.go:56: Processing value spec: PersistentVolumeLastPhaseTransitionTime
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PersistentVolumeLastPhaseTransitionTime
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodAndContainerStatsFromCRI
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodAndContainerStatsFromCRI
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodDeletionCost
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodDeletionCost
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodDisruptionConditions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodDisruptionConditions
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodIndexLabel
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodIndexLabel
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodReadyToStartContainersCondition
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodReadyToStartContainersCondition
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodHostIPs
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodHostIPs
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodLifecycleSleepAction
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodLifecycleSleepAction
+2024/08/26 23:28:47 example.go:56: Processing value spec: PodSchedulingReadiness
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PodSchedulingReadiness
+2024/08/26 23:28:47 example.go:56: Processing value spec: PortForwardWebsockets
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: PortForwardWebsockets
+2024/08/26 23:28:47 example.go:56: Processing value spec: ProcMountType
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ProcMountType
+2024/08/26 23:28:47 example.go:56: Processing value spec: QOSReserved
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: QOSReserved
+2024/08/26 23:28:47 example.go:56: Processing value spec: RecoverVolumeExpansionFailure
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: RecoverVolumeExpansionFailure
+2024/08/26 23:28:47 example.go:56: Processing value spec: RelaxedEnvironmentVariableValidation
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: RelaxedEnvironmentVariableValidation
+2024/08/26 23:28:47 example.go:56: Processing value spec: ReloadKubeletServerCertificateFile
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ReloadKubeletServerCertificateFile
+2024/08/26 23:28:47 example.go:56: Processing value spec: ResourceHealthStatus
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ResourceHealthStatus
+2024/08/26 23:28:47 example.go:56: Processing value spec: RotateKubeletServerCertificate
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: RotateKubeletServerCertificate
+2024/08/26 23:28:47 example.go:56: Processing value spec: RuntimeClassInImageCriAPI
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: RuntimeClassInImageCriAPI
+2024/08/26 23:28:47 example.go:56: Processing value spec: ElasticIndexedJob
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ElasticIndexedJob
+2024/08/26 23:28:47 example.go:56: Processing value spec: SchedulerQueueingHints
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SchedulerQueueingHints
+2024/08/26 23:28:47 example.go:56: Processing value spec: SeparateTaintEvictionController
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SeparateTaintEvictionController
+2024/08/26 23:28:47 example.go:56: Processing value spec: ServiceAccountTokenJTI
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ServiceAccountTokenJTI
+2024/08/26 23:28:47 example.go:56: Processing value spec: ServiceAccountTokenNodeBinding
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ServiceAccountTokenNodeBinding
+2024/08/26 23:28:47 example.go:56: Processing value spec: ServiceAccountTokenNodeBindingValidation
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ServiceAccountTokenNodeBindingValidation
+2024/08/26 23:28:47 example.go:56: Processing value spec: ServiceAccountTokenPodNodeInfo
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ServiceAccountTokenPodNodeInfo
+2024/08/26 23:28:47 example.go:56: Processing value spec: ServiceTrafficDistribution
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ServiceTrafficDistribution
+2024/08/26 23:28:47 example.go:56: Processing value spec: SidecarContainers
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SidecarContainers
+2024/08/26 23:28:47 example.go:56: Processing value spec: SizeMemoryBackedVolumes
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SizeMemoryBackedVolumes
+2024/08/26 23:28:47 example.go:56: Processing value spec: StatefulSetAutoDeletePVC
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: StatefulSetAutoDeletePVC
+2024/08/26 23:28:47 example.go:56: Processing value spec: StatefulSetStartOrdinal
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: StatefulSetStartOrdinal
+2024/08/26 23:28:47 example.go:56: Processing value spec: StorageVersionMigrator
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: StorageVersionMigrator
+2024/08/26 23:28:47 example.go:56: Processing value spec: TopologyAwareHints
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: TopologyAwareHints
+2024/08/26 23:28:47 example.go:56: Processing value spec: TopologyManagerPolicyAlphaOptions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: TopologyManagerPolicyAlphaOptions
+2024/08/26 23:28:47 example.go:56: Processing value spec: TopologyManagerPolicyBetaOptions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: TopologyManagerPolicyBetaOptions
+2024/08/26 23:28:47 example.go:56: Processing value spec: TopologyManagerPolicyOptions
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: TopologyManagerPolicyOptions
+2024/08/26 23:28:47 example.go:56: Processing value spec: TranslateStreamCloseWebsocketRequests
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: TranslateStreamCloseWebsocketRequests
+2024/08/26 23:28:47 example.go:56: Processing value spec: UnknownVersionInteroperabilityProxy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: UnknownVersionInteroperabilityProxy
+2024/08/26 23:28:47 example.go:56: Processing value spec: UserNamespacesSupport
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: UserNamespacesSupport
+2024/08/26 23:28:47 example.go:56: Processing value spec: VolumeAttributesClass
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: VolumeAttributesClass
+2024/08/26 23:28:47 example.go:56: Processing value spec: VolumeCapacityPriority
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: VolumeCapacityPriority
+2024/08/26 23:28:47 example.go:56: Processing value spec: WinDSR
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: WinDSR
+2024/08/26 23:28:47 example.go:56: Processing value spec: WinOverlay
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: WinOverlay
+2024/08/26 23:28:47 example.go:56: Processing value spec: WindowsHostNetwork
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: WindowsHostNetwork
+2024/08/26 23:28:47 example.go:56: Processing value spec: NodeInclusionPolicyInPodTopologySpread
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: NodeInclusionPolicyInPodTopologySpread
+2024/08/26 23:28:47 example.go:56: Processing value spec: SELinuxMountReadWriteOncePod
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SELinuxMountReadWriteOncePod
+2024/08/26 23:28:47 example.go:56: Processing value spec: InPlacePodVerticalScaling
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: InPlacePodVerticalScaling
+2024/08/26 23:28:47 example.go:56: Processing value spec: LoadBalancerIPMode
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: LoadBalancerIPMode
+2024/08/26 23:28:47 example.go:56: Processing value spec: ImageMaximumGCAge
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ImageMaximumGCAge
+2024/08/26 23:28:47 example.go:56: Processing value spec: UserNamespacesPodSecurityStandards
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: UserNamespacesPodSecurityStandards
+2024/08/26 23:28:47 example.go:56: Processing value spec: StorageNamespaceIndex
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: StorageNamespaceIndex
+2024/08/26 23:28:47 example.go:56: Processing value spec: SELinuxMount
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SELinuxMount
+2024/08/26 23:28:47 example.go:56: Processing value spec: RecursiveReadOnlyMounts
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: RecursiveReadOnlyMounts
+2024/08/26 23:28:47 example.go:56: Processing value spec: SupplementalGroupsPolicy
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: SupplementalGroupsPolicy
+2024/08/26 23:28:47 example.go:56: Processing value spec: ImageVolume
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: ImageVolume
+2024/08/26 23:28:47 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/my_features.go
+2024/08/26 23:28:47 example.go:79: Checking for feature gate import
+2024/08/26 23:28:47 example.go:82: Feature gate import found
+2024/08/26 23:28:47 example.go:53: Found const declaration
+2024/08/26 23:28:47 example.go:56: Processing value spec: MissingInfoFeature
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MissingInfoFeature
+2024/08/26 23:28:47 example.go:56: Processing value spec: MissingKEPFeature
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MissingKEPFeature
+2024/08/26 23:28:47 example.go:56: Processing value spec: MissingVersionFeature
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: MissingVersionFeature
+2024/08/26 23:28:47 example.go:56: Processing value spec: IncorrectDefaultFeature
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: IncorrectDefaultFeature
+2024/08/26 23:28:47 example.go:56: Processing value spec: IncorrectPreReleaseFeature
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: IncorrectPreReleaseFeature
+2024/08/26 23:28:47 example.go:56: Processing value spec: CorrectFeature
+2024/08/26 23:28:47 example.go:91: Extracting feature info from spec: CorrectFeature
+2024/08/26 23:28:47 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/versioned_kube_features.go
+2024/08/26 23:28:47 example.go:79: Checking for feature gate import
+2024/08/26 23:28:47 example.go:82: Feature gate import found
+2024/08/26 23:28:47 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/client_adapter_test.go
+2024/08/26 23:28:47 example.go:79: Checking for feature gate import
+2024/08/26 23:28:47 example.go:82: Feature gate import found
+2024/08/26 23:28:47 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/kube_features_test.go
+2024/08/26 23:28:47 example.go:79: Checking for feature gate import
+2024/08/26 23:28:47 example.go:82: Feature gate import found
+2024/08/26 23:28:47 example.go:74: Finished run function

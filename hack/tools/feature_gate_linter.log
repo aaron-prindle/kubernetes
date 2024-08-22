@@ -1,0 +1,614 @@
+2024/08/27 18:28:37 example.go:32: In init function
+2024/08/27 18:28:37 example.go:43: Starting run function
+2024/08/27 18:28:37 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/client_adapter.go
+2024/08/27 18:28:37 example.go:79: Checking for feature gate import
+2024/08/27 18:28:37 example.go:82: Feature gate import found
+2024/08/27 18:28:37 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/kube_features.go
+2024/08/27 18:28:37 example.go:79: Checking for feature gate import
+2024/08/27 18:28:37 example.go:82: Feature gate import found
+2024/08/27 18:28:37 example.go:53: Found const declaration
+2024/08/27 18:28:37 example.go:56: Processing value spec: CrossNamespaceVolumeDataSource
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CrossNamespaceVolumeDataSource
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CrossNamespaceVolumeDataSource, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AllowDNSOnlyNodeCSR
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AllowDNSOnlyNodeCSR
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AllowDNSOnlyNodeCSR, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AllowServiceLBStatusOnNonLB
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AllowServiceLBStatusOnNonLB
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AllowServiceLBStatusOnNonLB, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AnyVolumeDataSource
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AnyVolumeDataSource
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AnyVolumeDataSource, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AppArmor
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AppArmor
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AppArmor, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AppArmorFields
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AppArmorFields
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AppArmorFields, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AuthorizeNodeWithSelectors
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AuthorizeNodeWithSelectors
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AuthorizeNodeWithSelectors, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ClusterTrustBundle
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ClusterTrustBundle
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ClusterTrustBundle, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ClusterTrustBundleProjection
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ClusterTrustBundleProjection
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ClusterTrustBundleProjection, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CPUCFSQuotaPeriod
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CPUCFSQuotaPeriod
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CPUCFSQuotaPeriod, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CPUManager
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CPUManager
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CPUManager, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CPUManagerPolicyAlphaOptions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CPUManagerPolicyAlphaOptions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CPUManagerPolicyAlphaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CPUManagerPolicyBetaOptions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CPUManagerPolicyBetaOptions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CPUManagerPolicyBetaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CPUManagerPolicyOptions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CPUManagerPolicyOptions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CPUManagerPolicyOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CoordinatedLeaderElection
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CoordinatedLeaderElection
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CoordinatedLeaderElection, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CSIMigrationPortworx
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CSIMigrationPortworx
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CSIMigrationPortworx, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CSIVolumeHealth
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CSIVolumeHealth
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CSIVolumeHealth, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CloudControllerManagerWebhook
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CloudControllerManagerWebhook
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CloudControllerManagerWebhook, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ContainerCheckpoint
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ContainerCheckpoint
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ContainerCheckpoint, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: CronJobsScheduledAnnotation
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: CronJobsScheduledAnnotation
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: CronJobsScheduledAnnotation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DevicePluginCDIDevices
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DevicePluginCDIDevices
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DevicePluginCDIDevices, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DisableAllocatorDualWrite
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DisableAllocatorDualWrite
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DisableAllocatorDualWrite, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DisableCloudProviders
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DisableCloudProviders
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DisableCloudProviders, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DisableKubeletCloudCredentialProviders
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DisableKubeletCloudCredentialProviders
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DisableKubeletCloudCredentialProviders, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: AllowInsecureKubeletCertificateSigningRequests
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: AllowInsecureKubeletCertificateSigningRequests
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: AllowInsecureKubeletCertificateSigningRequests, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DisableNodeKubeProxyVersion
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DisableNodeKubeProxyVersion
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DisableNodeKubeProxyVersion, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DRAControlPlaneController
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DRAControlPlaneController
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DRAControlPlaneController, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: DynamicResourceAllocation
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: DynamicResourceAllocation
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: DynamicResourceAllocation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: EventedPLEG
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: EventedPLEG
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: EventedPLEG, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ExecProbeTimeout
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ExecProbeTimeout
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ExecProbeTimeout, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: RetryGenerateName
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: RetryGenerateName
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: RetryGenerateName, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: GracefulNodeShutdown
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: GracefulNodeShutdown
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: GracefulNodeShutdown, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: GracefulNodeShutdownBasedOnPodPriority
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: GracefulNodeShutdownBasedOnPodPriority
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: GracefulNodeShutdownBasedOnPodPriority, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: HPAContainerMetrics
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: HPAContainerMetrics
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: HPAContainerMetrics, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: HPAScaleToZero
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: HPAScaleToZero
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: HPAScaleToZero, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: HonorPVReclaimPolicy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: HonorPVReclaimPolicy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: HonorPVReclaimPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: InTreePluginPortworxUnregister
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: InTreePluginPortworxUnregister
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: InTreePluginPortworxUnregister, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: JobBackoffLimitPerIndex
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: JobBackoffLimitPerIndex
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: JobBackoffLimitPerIndex, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: JobManagedBy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: JobManagedBy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: JobManagedBy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: JobPodFailurePolicy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: JobPodFailurePolicy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: JobPodFailurePolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: JobPodReplacementPolicy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: JobPodReplacementPolicy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: JobPodReplacementPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: JobSuccessPolicy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: JobSuccessPolicy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: JobSuccessPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeletCgroupDriverFromCRI
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeletCgroupDriverFromCRI
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeletCgroupDriverFromCRI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeletInUserNamespace
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeletInUserNamespace
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeletInUserNamespace, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeletPodResourcesDynamicResources
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeletPodResourcesDynamicResources
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeletPodResourcesDynamicResources, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeletPodResourcesGet
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeletPodResourcesGet
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeletPodResourcesGet, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeletSeparateDiskGC
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeletSeparateDiskGC
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeletSeparateDiskGC, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeletTracing
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeletTracing
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeletTracing, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: KubeProxyDrainingTerminatingNodes
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: KubeProxyDrainingTerminatingNodes
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: KubeProxyDrainingTerminatingNodes, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: LegacyServiceAccountTokenCleanUp
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: LegacyServiceAccountTokenCleanUp
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: LegacyServiceAccountTokenCleanUp, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: LocalStorageCapacityIsolationFSQuotaMonitoring
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: LocalStorageCapacityIsolationFSQuotaMonitoring
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: LocalStorageCapacityIsolationFSQuotaMonitoring, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: LogarithmicScaleDown
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: LogarithmicScaleDown
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: LogarithmicScaleDown, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MatchLabelKeysInPodAffinity
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MatchLabelKeysInPodAffinity
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MatchLabelKeysInPodAffinity, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MatchLabelKeysInPodTopologySpread
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MatchLabelKeysInPodTopologySpread
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MatchLabelKeysInPodTopologySpread, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MaxUnavailableStatefulSet
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MaxUnavailableStatefulSet
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MaxUnavailableStatefulSet, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MemoryManager
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MemoryManager
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MemoryManager, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MemoryQoS
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MemoryQoS
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MemoryQoS, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MinDomainsInPodTopologySpread
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MinDomainsInPodTopologySpread
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MinDomainsInPodTopologySpread, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: MultiCIDRServiceAllocator
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: MultiCIDRServiceAllocator
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: MultiCIDRServiceAllocator, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: NewVolumeManagerReconstruction
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: NewVolumeManagerReconstruction
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: NewVolumeManagerReconstruction, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: NFTablesProxyMode
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: NFTablesProxyMode
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: NFTablesProxyMode, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: NodeLogQuery
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: NodeLogQuery
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: NodeLogQuery, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: NodeOutOfServiceVolumeDetach
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: NodeOutOfServiceVolumeDetach
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: NodeOutOfServiceVolumeDetach, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: NodeSwap
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: NodeSwap
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: NodeSwap, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PDBUnhealthyPodEvictionPolicy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PDBUnhealthyPodEvictionPolicy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PDBUnhealthyPodEvictionPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PersistentVolumeLastPhaseTransitionTime
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PersistentVolumeLastPhaseTransitionTime
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PersistentVolumeLastPhaseTransitionTime, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodAndContainerStatsFromCRI
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodAndContainerStatsFromCRI
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodAndContainerStatsFromCRI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodDeletionCost
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodDeletionCost
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodDeletionCost, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodDisruptionConditions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodDisruptionConditions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodDisruptionConditions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodIndexLabel
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodIndexLabel
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodIndexLabel, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodReadyToStartContainersCondition
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodReadyToStartContainersCondition
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodReadyToStartContainersCondition, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodHostIPs
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodHostIPs
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodHostIPs, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodLifecycleSleepAction
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodLifecycleSleepAction
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodLifecycleSleepAction, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PodSchedulingReadiness
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PodSchedulingReadiness
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PodSchedulingReadiness, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: PortForwardWebsockets
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: PortForwardWebsockets
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: PortForwardWebsockets, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ProcMountType
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ProcMountType
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ProcMountType, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: QOSReserved
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: QOSReserved
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: QOSReserved, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: RecoverVolumeExpansionFailure
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: RecoverVolumeExpansionFailure
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: RecoverVolumeExpansionFailure, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: RelaxedEnvironmentVariableValidation
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: RelaxedEnvironmentVariableValidation
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: RelaxedEnvironmentVariableValidation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ReloadKubeletServerCertificateFile
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ReloadKubeletServerCertificateFile
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ReloadKubeletServerCertificateFile, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ResourceHealthStatus
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ResourceHealthStatus
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ResourceHealthStatus, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: RotateKubeletServerCertificate
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: RotateKubeletServerCertificate
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: RotateKubeletServerCertificate, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: RuntimeClassInImageCriAPI
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: RuntimeClassInImageCriAPI
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: RuntimeClassInImageCriAPI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ElasticIndexedJob
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ElasticIndexedJob
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ElasticIndexedJob, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SchedulerQueueingHints
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SchedulerQueueingHints
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SchedulerQueueingHints, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SeparateTaintEvictionController
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SeparateTaintEvictionController
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SeparateTaintEvictionController, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ServiceAccountTokenJTI
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ServiceAccountTokenJTI
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ServiceAccountTokenJTI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ServiceAccountTokenNodeBinding
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ServiceAccountTokenNodeBinding
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ServiceAccountTokenNodeBinding, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ServiceAccountTokenNodeBindingValidation
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ServiceAccountTokenNodeBindingValidation
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ServiceAccountTokenNodeBindingValidation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ServiceAccountTokenPodNodeInfo
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ServiceAccountTokenPodNodeInfo
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ServiceAccountTokenPodNodeInfo, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ServiceTrafficDistribution
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ServiceTrafficDistribution
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ServiceTrafficDistribution, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SidecarContainers
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SidecarContainers
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SidecarContainers, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SizeMemoryBackedVolumes
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SizeMemoryBackedVolumes
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SizeMemoryBackedVolumes, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: StatefulSetAutoDeletePVC
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: StatefulSetAutoDeletePVC
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: StatefulSetAutoDeletePVC, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: StatefulSetStartOrdinal
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: StatefulSetStartOrdinal
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: StatefulSetStartOrdinal, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: StorageVersionMigrator
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: StorageVersionMigrator
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: StorageVersionMigrator, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: TopologyAwareHints
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: TopologyAwareHints
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: TopologyAwareHints, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: TopologyManagerPolicyAlphaOptions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: TopologyManagerPolicyAlphaOptions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: TopologyManagerPolicyAlphaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: TopologyManagerPolicyBetaOptions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: TopologyManagerPolicyBetaOptions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: TopologyManagerPolicyBetaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: TopologyManagerPolicyOptions
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: TopologyManagerPolicyOptions
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: TopologyManagerPolicyOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: TranslateStreamCloseWebsocketRequests
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: TranslateStreamCloseWebsocketRequests
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: TranslateStreamCloseWebsocketRequests, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: UnknownVersionInteroperabilityProxy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: UnknownVersionInteroperabilityProxy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: UnknownVersionInteroperabilityProxy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: UserNamespacesSupport
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: UserNamespacesSupport
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: UserNamespacesSupport, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: VolumeAttributesClass
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: VolumeAttributesClass
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: VolumeAttributesClass, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: VolumeCapacityPriority
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: VolumeCapacityPriority
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: VolumeCapacityPriority, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: WinDSR
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: WinDSR
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: WinDSR, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: WinOverlay
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: WinOverlay
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: WinOverlay, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: WindowsHostNetwork
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: WindowsHostNetwork
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: WindowsHostNetwork, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: NodeInclusionPolicyInPodTopologySpread
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: NodeInclusionPolicyInPodTopologySpread
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: NodeInclusionPolicyInPodTopologySpread, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SELinuxMountReadWriteOncePod
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SELinuxMountReadWriteOncePod
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SELinuxMountReadWriteOncePod, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: InPlacePodVerticalScaling
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: InPlacePodVerticalScaling
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: InPlacePodVerticalScaling, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: LoadBalancerIPMode
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: LoadBalancerIPMode
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: LoadBalancerIPMode, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ImageMaximumGCAge
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ImageMaximumGCAge
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ImageMaximumGCAge, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: UserNamespacesPodSecurityStandards
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: UserNamespacesPodSecurityStandards
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: UserNamespacesPodSecurityStandards, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: StorageNamespaceIndex
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: StorageNamespaceIndex
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: StorageNamespaceIndex, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SELinuxMount
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SELinuxMount
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SELinuxMount, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: RecursiveReadOnlyMounts
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: RecursiveReadOnlyMounts
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: RecursiveReadOnlyMounts, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: SupplementalGroupsPolicy
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: SupplementalGroupsPolicy
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: SupplementalGroupsPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:56: Processing value spec: ImageVolume
+2024/08/27 18:28:37 example.go:92: Extracting feature info from spec: ImageVolume
+2024/08/27 18:28:37 example.go:136: Successfully extracted feature: ImageVolume, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CrossNamespaceVolumeDataSource
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CrossNamespaceVolumeDataSource, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AllowDNSOnlyNodeCSR
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AllowDNSOnlyNodeCSR, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AllowServiceLBStatusOnNonLB
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AllowServiceLBStatusOnNonLB, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AnyVolumeDataSource
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AnyVolumeDataSource, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AppArmor
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AppArmor, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AppArmorFields
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AppArmorFields, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AuthorizeNodeWithSelectors
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AuthorizeNodeWithSelectors, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ClusterTrustBundle
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ClusterTrustBundle, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ClusterTrustBundleProjection
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ClusterTrustBundleProjection, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CPUCFSQuotaPeriod
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CPUCFSQuotaPeriod, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CPUManager
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CPUManager, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CPUManagerPolicyAlphaOptions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CPUManagerPolicyAlphaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CPUManagerPolicyBetaOptions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CPUManagerPolicyBetaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CPUManagerPolicyOptions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CPUManagerPolicyOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CoordinatedLeaderElection
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CoordinatedLeaderElection, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CSIMigrationPortworx
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CSIMigrationPortworx, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CSIVolumeHealth
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CSIVolumeHealth, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CloudControllerManagerWebhook
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CloudControllerManagerWebhook, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ContainerCheckpoint
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ContainerCheckpoint, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: CronJobsScheduledAnnotation
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: CronJobsScheduledAnnotation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DevicePluginCDIDevices
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DevicePluginCDIDevices, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DisableAllocatorDualWrite
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DisableAllocatorDualWrite, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DisableCloudProviders
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DisableCloudProviders, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DisableKubeletCloudCredentialProviders
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DisableKubeletCloudCredentialProviders, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: AllowInsecureKubeletCertificateSigningRequests
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: AllowInsecureKubeletCertificateSigningRequests, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DisableNodeKubeProxyVersion
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DisableNodeKubeProxyVersion, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DRAControlPlaneController
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DRAControlPlaneController, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: DynamicResourceAllocation
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: DynamicResourceAllocation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: EventedPLEG
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: EventedPLEG, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ExecProbeTimeout
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ExecProbeTimeout, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: RetryGenerateName
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: RetryGenerateName, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: GracefulNodeShutdown
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: GracefulNodeShutdown, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: GracefulNodeShutdownBasedOnPodPriority
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: GracefulNodeShutdownBasedOnPodPriority, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: HPAContainerMetrics
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: HPAContainerMetrics, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: HPAScaleToZero
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: HPAScaleToZero, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: HonorPVReclaimPolicy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: HonorPVReclaimPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: InTreePluginPortworxUnregister
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: InTreePluginPortworxUnregister, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: JobBackoffLimitPerIndex
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: JobBackoffLimitPerIndex, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: JobManagedBy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: JobManagedBy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: JobPodFailurePolicy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: JobPodFailurePolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: JobPodReplacementPolicy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: JobPodReplacementPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: JobSuccessPolicy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: JobSuccessPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeletCgroupDriverFromCRI
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeletCgroupDriverFromCRI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeletInUserNamespace
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeletInUserNamespace, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeletPodResourcesDynamicResources
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeletPodResourcesDynamicResources, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeletPodResourcesGet
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeletPodResourcesGet, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeletSeparateDiskGC
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeletSeparateDiskGC, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeletTracing
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeletTracing, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: KubeProxyDrainingTerminatingNodes
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: KubeProxyDrainingTerminatingNodes, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: LegacyServiceAccountTokenCleanUp
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: LegacyServiceAccountTokenCleanUp, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: LocalStorageCapacityIsolationFSQuotaMonitoring
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: LocalStorageCapacityIsolationFSQuotaMonitoring, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: LogarithmicScaleDown
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: LogarithmicScaleDown, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MatchLabelKeysInPodAffinity
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MatchLabelKeysInPodAffinity, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MatchLabelKeysInPodTopologySpread
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MatchLabelKeysInPodTopologySpread, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MaxUnavailableStatefulSet
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MaxUnavailableStatefulSet, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MemoryManager
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MemoryManager, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MemoryQoS
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MemoryQoS, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MinDomainsInPodTopologySpread
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MinDomainsInPodTopologySpread, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: MultiCIDRServiceAllocator
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: MultiCIDRServiceAllocator, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: NewVolumeManagerReconstruction
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: NewVolumeManagerReconstruction, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: NFTablesProxyMode
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: NFTablesProxyMode, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: NodeLogQuery
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: NodeLogQuery, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: NodeOutOfServiceVolumeDetach
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: NodeOutOfServiceVolumeDetach, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: NodeSwap
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: NodeSwap, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PDBUnhealthyPodEvictionPolicy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PDBUnhealthyPodEvictionPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PersistentVolumeLastPhaseTransitionTime
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PersistentVolumeLastPhaseTransitionTime, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodAndContainerStatsFromCRI
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodAndContainerStatsFromCRI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodDeletionCost
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodDeletionCost, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodDisruptionConditions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodDisruptionConditions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodIndexLabel
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodIndexLabel, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodReadyToStartContainersCondition
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodReadyToStartContainersCondition, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodHostIPs
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodHostIPs, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodLifecycleSleepAction
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodLifecycleSleepAction, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PodSchedulingReadiness
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PodSchedulingReadiness, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: PortForwardWebsockets
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: PortForwardWebsockets, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ProcMountType
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ProcMountType, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: QOSReserved
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: QOSReserved, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: RecoverVolumeExpansionFailure
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: RecoverVolumeExpansionFailure, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: RelaxedEnvironmentVariableValidation
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: RelaxedEnvironmentVariableValidation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ReloadKubeletServerCertificateFile
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ReloadKubeletServerCertificateFile, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ResourceHealthStatus
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ResourceHealthStatus, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: RotateKubeletServerCertificate
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: RotateKubeletServerCertificate, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: RuntimeClassInImageCriAPI
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: RuntimeClassInImageCriAPI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ElasticIndexedJob
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ElasticIndexedJob, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SchedulerQueueingHints
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SchedulerQueueingHints, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SeparateTaintEvictionController
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SeparateTaintEvictionController, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ServiceAccountTokenJTI
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ServiceAccountTokenJTI, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ServiceAccountTokenNodeBinding
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ServiceAccountTokenNodeBinding, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ServiceAccountTokenNodeBindingValidation
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ServiceAccountTokenNodeBindingValidation, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ServiceAccountTokenPodNodeInfo
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ServiceAccountTokenPodNodeInfo, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ServiceTrafficDistribution
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ServiceTrafficDistribution, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SidecarContainers
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SidecarContainers, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SizeMemoryBackedVolumes
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SizeMemoryBackedVolumes, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: StatefulSetAutoDeletePVC
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: StatefulSetAutoDeletePVC, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: StatefulSetStartOrdinal
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: StatefulSetStartOrdinal, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: StorageVersionMigrator
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: StorageVersionMigrator, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: TopologyAwareHints
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: TopologyAwareHints, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: TopologyManagerPolicyAlphaOptions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: TopologyManagerPolicyAlphaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: TopologyManagerPolicyBetaOptions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: TopologyManagerPolicyBetaOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: TopologyManagerPolicyOptions
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: TopologyManagerPolicyOptions, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: TranslateStreamCloseWebsocketRequests
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: TranslateStreamCloseWebsocketRequests, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: UnknownVersionInteroperabilityProxy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: UnknownVersionInteroperabilityProxy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: UserNamespacesSupport
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: UserNamespacesSupport, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: VolumeAttributesClass
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: VolumeAttributesClass, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: VolumeCapacityPriority
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: VolumeCapacityPriority, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: WinDSR
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: WinDSR, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: WinOverlay
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: WinOverlay, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: WindowsHostNetwork
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: WindowsHostNetwork, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: NodeInclusionPolicyInPodTopologySpread
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: NodeInclusionPolicyInPodTopologySpread, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SELinuxMountReadWriteOncePod
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SELinuxMountReadWriteOncePod, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: InPlacePodVerticalScaling
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: InPlacePodVerticalScaling, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: LoadBalancerIPMode
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: LoadBalancerIPMode, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ImageMaximumGCAge
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ImageMaximumGCAge, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: UserNamespacesPodSecurityStandards
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: UserNamespacesPodSecurityStandards, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: StorageNamespaceIndex
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: StorageNamespaceIndex, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SELinuxMount
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SELinuxMount, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: RecursiveReadOnlyMounts
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: RecursiveReadOnlyMounts, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: SupplementalGroupsPolicy
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: SupplementalGroupsPolicy, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:66: Reporting feature: ImageVolume
+2024/08/27 18:28:37 example.go:143: Formatted feature info: Feature: ImageVolume, Default: false, PreRelease: 
+2024/08/27 18:28:37 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/versioned_kube_features.go
+2024/08/27 18:28:37 example.go:79: Checking for feature gate import
+2024/08/27 18:28:37 example.go:82: Feature gate import found
+2024/08/27 18:28:37 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/client_adapter_test.go
+2024/08/27 18:28:37 example.go:79: Checking for feature gate import
+2024/08/27 18:28:37 example.go:82: Feature gate import found
+2024/08/27 18:28:37 example.go:45: Processing file: /usr/local/google/home/aprindle/example-plugin-linter/features/kube_features_test.go
+2024/08/27 18:28:37 example.go:79: Checking for feature gate import
+2024/08/27 18:28:37 example.go:82: Feature gate import found
+2024/08/27 18:28:37 example.go:74: Finished run function

@@ -1,0 +1,192 @@
+package linters
+
+import (
+	"go/ast"
+	"go/token"
+	"strconv"
+	"strings"
+
+	"golang.org/x/tools/go/analysis"
+)
+
+var FeatureGateAnalyzer = &analysis.Analyzer{
+	Name: "featuregate",
+	Doc:  "finds and validates feature gate specifications",
+	Run:  run,
+}
+
+type featureInfo struct {
+	Name       string
+	Default    bool
+	PreRelease string
+	Version    string
+}
+
+func run(pass *analysis.Pass) (interface{}, error) {
+	for _, file := range pass.Files {
+		if !hasFeatureGateImport(file) {
+			continue
+		}
+
+		globalVars := globalVariableDeclarations(file)
+		var allFeatures []featureInfo
+
+		for _, decl := range file.Decls {
+			switch d := decl.(type) {
+			case *ast.GenDecl:
+				if d.Tok == token.CONST || d.Tok == token.VAR {
+					features := extractFeatureInfoList(d, globalVars)
+					allFeatures = append(allFeatures, features...)
+				}
+			case *ast.FuncDecl:
+				features := extractFeaturesFromFunction(d, globalVars)
+				allFeatures = append(allFeatures, features...)
+			}
+		}
+
+		for _, feature := range allFeatures {
+			pass.Report(analysis.Diagnostic{
+				Pos:      token.NoPos,
+				Category: "featuregate",
+				Message:  formatFeatureInfo(feature),
+			})
+		}
+	}
+
+	return nil, nil
+}
+
+func hasFeatureGateImport(file *ast.File) bool {
+	for _, imp := range file.Imports {
+		if imp.Path != nil && imp.Path.Value == `"k8s.io/component-base/featuregate"` {
+			return true
+		}
+	}
+	return false
+}
+
+func globalVariableDeclarations(file *ast.File) map[string]ast.Expr {
+	vars := make(map[string]ast.Expr)
+	for _, decl := range file.Decls {
+		if genDecl, ok := decl.(*ast.GenDecl); ok && (genDecl.Tok == token.VAR || genDecl.Tok == token.CONST) {
+			for _, spec := range genDecl.Specs {
+				if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+					for i, name := range valueSpec.Names {
+						if i < len(valueSpec.Values) {
+							vars[name.Name] = valueSpec.Values[i]
+						}
+					}
+				}
+			}
+		}
+	}
+	return vars
+}
+
+func extractFeatureInfoList(decl *ast.GenDecl, globalVars map[string]ast.Expr) []featureInfo {
+	var features []featureInfo
+	for _, spec := range decl.Specs {
+		if valueSpec, ok := spec.(*ast.ValueSpec); ok {
+			for i, name := range valueSpec.Names {
+				if i < len(valueSpec.Values) {
+					if feature := extractFeatureInfo(name.Name, valueSpec.Values[i], globalVars); feature != nil {
+						features = append(features, *feature)
+					}
+				}
+			}
+		}
+	}
+	return features
+}
+
+func extractFeaturesFromFunction(funcDecl *ast.FuncDecl, globalVars map[string]ast.Expr) []featureInfo {
+	var features []featureInfo
+	ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
+		if returnStmt, ok := n.(*ast.ReturnStmt); ok {
+			for _, expr := range returnStmt.Results {
+				if feature := extractFeatureInfo("", expr, globalVars); feature != nil {
+					features = append(features, *feature)
+				}
+			}
+		}
+		return true
+	})
+	return features
+}
+
+func extractFeatureInfo(name string, expr ast.Expr, globalVars map[string]ast.Expr) *featureInfo {
+	switch e := expr.(type) {
+	case *ast.CompositeLit:
+		if isFeatureGateSpec(e.Type) {
+			return parseFeatureSpec(name, e)
+		}
+	case *ast.Ident:
+		if globalExpr, ok := globalVars[e.Name]; ok {
+			return extractFeatureInfo(e.Name, globalExpr, globalVars)
+		}
+	}
+	return nil
+}
+
+func isFeatureGateSpec(expr ast.Expr) bool {
+	if sel, ok := expr.(*ast.SelectorExpr); ok {
+		return sel.Sel.Name == "FeatureSpec"
+	}
+	return false
+}
+
+func parseFeatureSpec(name string, lit *ast.CompositeLit) *featureInfo {
+	info := &featureInfo{Name: name}
+	for _, elt := range lit.Elts {
+		if kv, ok := elt.(*ast.KeyValueExpr); ok {
+			key := kv.Key.(*ast.Ident).Name
+			switch key {
+			case "Default":
+				if basicLit, ok := kv.Value.(*ast.BasicLit); ok && basicLit.Kind == token.BOOL {
+					info.Default, _ = strconv.ParseBool(basicLit.Value)
+				}
+			case "PreRelease":
+				if basicLit, ok := kv.Value.(*ast.BasicLit); ok && basicLit.Kind == token.STRING {
+					info.PreRelease = strings.Trim(basicLit.Value, `"`)
+				}
+			case "Version":
+				if callExpr, ok := kv.Value.(*ast.CallExpr); ok {
+					info.Version = extractVersionFromCallExpr(callExpr)
+				}
+			}
+		}
+	}
+	return info
+}
+
+func extractVersionFromCallExpr(callExpr *ast.CallExpr) string {
+	if sel, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+		if sel.Sel.Name == "MustParse" {
+			if len(callExpr.Args) > 0 {
+				if arg, ok := callExpr.Args[0].(*ast.BasicLit); ok && arg.Kind == token.STRING {
+					return strings.Trim(arg.Value, `"`)
+				}
+			}
+		} else if sel.Sel.Name == "MajorMinor" {
+			if len(callExpr.Args) == 2 {
+				major := extractIntArg(callExpr.Args[0])
+				minor := extractIntArg(callExpr.Args[1])
+				return fmt.Sprintf("v%d.%d", major, minor)
+			}
+		}
+	}
+	return ""
+}
+
+func extractIntArg(expr ast.Expr) int {
+	if lit, ok := expr.(*ast.BasicLit); ok && lit.Kind == token.INT {
+		val, _ := strconv.Atoi(lit.Value)
+		return val
+	}
+	return 0
+}
+
+func formatFeatureInfo(info featureInfo) string {
+	return fmt.Sprintf("Feature: %s, Default: %v, PreRelease: %s, Version: %s",
+		info.Name, info.Default, info.PreRelease, info.Version)
+}
