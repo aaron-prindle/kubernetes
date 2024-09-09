@@ -108,12 +108,13 @@ func (e *resourceExpirationEvaluator) shouldServe(gv schema.GroupVersion, versio
 		}
 	}
 
-	removed, ok := versionedPtr.(removedInterface)
-	if !ok {
-		return true
-	}
-	majorRemoved, minorRemoved := removed.APILifecycleRemoved()
-	return e.ShouldServeForVersion(majorRemoved, minorRemoved)
+	// _, ok = versionedPtr.(removedInterface)
+	// if !ok {
+	// 	return true
+	// }
+	// majorRemoved, minorRemoved := removed.APILifecycleRemoved()
+	// return e.ShouldServeForVersion(majorRemoved, minorRemoved)
+	return true
 }
 
 func (e *resourceExpirationEvaluator) ShouldServeForVersion(majorRemoved, minorRemoved int) bool {

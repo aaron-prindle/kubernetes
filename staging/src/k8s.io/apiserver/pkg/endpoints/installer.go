@@ -770,7 +770,7 @@ func (a *APIInstaller) registerResourceHandlers(path string, storage rest.Storag
 			currentMajor, currentMinor, _ := deprecation.MajorMinor(versioninfo.Get())
 			deprecated = deprecation.IsDeprecated(versionedPtrWithGVK, currentMajor, currentMinor)
 			if deprecated {
-				removedRelease = deprecation.RemovedRelease(versionedPtrWithGVK)
+				// removedRelease = deprecation.RemovedRelease(versionedPtrWithGVK)
 				warnings = append(warnings, deprecation.WarningMessage(versionedPtrWithGVK))
 			}
 		}
