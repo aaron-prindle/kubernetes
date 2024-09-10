@@ -1,5 +1,5 @@
 /*
-Copyright 2014 The Kubernetes Authors.
+Copyright 2024 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package content
+package validate
 
 import (
-	"fmt"
+	"k8s.io/apimachinery/pkg/api/operation"
+	"k8s.io/apimachinery/pkg/api/validate/content"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// MaxLenError returns a string explanation of a "string too long" validation
-// failure.
-func MaxLenError(length int) string {
-	return fmt.Sprintf("must be no more than %d characters", length)
-}
-
-// MinLenError returns a string explanation of a "string too short" validation
-// failure.
-func MinLenError(length int) string {
-	return fmt.Sprintf("must be at least %d characters", length)
+// MinLength verifies that the specified value is not shorter than min
+// characters.
+func MinLength(_ operation.Context, fldPath *field.Path, value, _ *string, min int) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if len(*value) < min {
+		return field.ErrorList{field.Invalid(fldPath, *value, content.MinLenError(min))}
+	}
+	return nil
 }
