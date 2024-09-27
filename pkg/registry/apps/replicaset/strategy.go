@@ -27,6 +27,7 @@ import (
 
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/operation"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -116,7 +117,7 @@ func (rsStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	rs := obj.(*apps.ReplicaSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&rs.Spec.Template, nil)
 	allErrs := appsvalidation.ValidateReplicaSet(rs, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -165,7 +166,7 @@ func (rsStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 
 	return allErrs
 }
@@ -240,7 +241,7 @@ func (rsStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.O
 
 func (rsStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := appsvalidation.ValidateReplicaSetStatusUpdate(obj.(*apps.ReplicaSet), old.(*apps.ReplicaSet))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

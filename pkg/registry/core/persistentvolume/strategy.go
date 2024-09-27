@@ -22,6 +22,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -80,7 +81,7 @@ func (persistentvolumeStrategy) Validate(ctx context.Context, obj runtime.Object
 	opts := validation.ValidationOptionsForPersistentVolume(persistentvolume, nil)
 	errorList := validation.ValidatePersistentVolume(persistentvolume, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(persistentvolume)...)
-	errorList = append(errorList, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	errorList = append(errorList, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return errorList
 }
 
@@ -112,7 +113,7 @@ func (persistentvolumeStrategy) ValidateUpdate(ctx context.Context, obj, old run
 	errorList := validation.ValidatePersistentVolume(newPv, opts)
 	errorList = append(errorList, volumevalidation.ValidatePersistentVolume(newPv)...)
 	errorList = append(errorList, validation.ValidatePersistentVolumeUpdate(newPv, oldPv, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return errorList
 }
 
@@ -166,7 +167,7 @@ func (persistentvolumeStatusStrategy) PrepareForUpdate(ctx context.Context, obj,
 
 func (persistentvolumeStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidatePersistentVolumeStatusUpdate(obj.(*api.PersistentVolume), old.(*api.PersistentVolume))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

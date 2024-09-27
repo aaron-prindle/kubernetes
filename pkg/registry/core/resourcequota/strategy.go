@@ -21,6 +21,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -74,7 +75,7 @@ func (resourcequotaStrategy) PrepareForUpdate(ctx context.Context, obj, old runt
 func (resourcequotaStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	resourcequota := obj.(*api.ResourceQuota)
 	allErrs := validation.ValidateResourceQuota(resourcequota)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -96,7 +97,7 @@ func (resourcequotaStrategy) AllowCreateOnUpdate() bool {
 func (resourcequotaStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	newObj, oldObj := obj.(*api.ResourceQuota), old.(*api.ResourceQuota)
 	allErrs := validation.ValidateResourceQuotaUpdate(newObj, oldObj)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 
@@ -136,7 +137,7 @@ func (resourcequotaStatusStrategy) PrepareForUpdate(ctx context.Context, obj, ol
 
 func (resourcequotaStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateResourceQuotaStatusUpdate(obj.(*api.ResourceQuota), old.(*api.ResourceQuota))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

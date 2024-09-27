@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -98,7 +99,7 @@ func (namespaceStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 func (namespaceStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	namespace := obj.(*api.Namespace)
 	allErrs := validation.ValidateNamespace(namespace)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -142,7 +143,7 @@ func (namespaceStrategy) AllowCreateOnUpdate() bool {
 func (namespaceStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	errorList := validation.ValidateNamespace(obj.(*api.Namespace))
 	allErrs := append(errorList, validation.ValidateNamespaceUpdate(obj.(*api.Namespace), old.(*api.Namespace))...)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 
@@ -179,7 +180,7 @@ func (namespaceStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old ru
 
 func (namespaceStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateNamespaceStatusUpdate(obj.(*api.Namespace), old.(*api.Namespace))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

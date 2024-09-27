@@ -22,6 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/api/operation"
 	genericvalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/api/validation/path"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -222,20 +223,20 @@ func AdmissionToValidateObjectFunc(admit admission.Interface, staticAttributes a
 	}
 }
 
-func ValidateDeclaratively(ctx context.Context, scheme *runtime.Scheme, obj runtime.Object, subresources ...string) field.ErrorList {
+func ValidateDeclaratively(ctx context.Context, opts *operation.ValidationOpts, scheme *runtime.Scheme, obj runtime.Object, subresources ...string) field.ErrorList {
 	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
 		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
 		versionedObj, err := scheme.ConvertToVersion(obj, groupVersion)
 		if err != nil {
 			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
 		}
-		return scheme.Validate(versionedObj, subresources...)
+		return scheme.Validate(opts, versionedObj, subresources...)
 	} else {
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}
 }
 
-func ValidateUpdateDeclaratively(ctx context.Context, scheme *runtime.Scheme, obj, oldObj runtime.Object, subresources ...string) field.ErrorList {
+func ValidateUpdateDeclaratively(ctx context.Context, opts *operation.ValidationOpts, scheme *runtime.Scheme, obj, oldObj runtime.Object, subresources ...string) field.ErrorList {
 	if requestInfo, found := genericapirequest.RequestInfoFrom(ctx); found {
 		groupVersion := schema.GroupVersion{Group: requestInfo.APIGroup, Version: requestInfo.APIVersion}
 		versionedObj, err := scheme.ConvertToVersion(obj, groupVersion)
@@ -246,7 +247,7 @@ func ValidateUpdateDeclaratively(ctx context.Context, scheme *runtime.Scheme, ob
 		if err != nil {
 			return field.ErrorList{field.InternalError(nil, fmt.Errorf("unexpected error converting to versioned type: %w", err))}
 		}
-		return scheme.ValidateUpdate(versionedObj, versionedOldObj, subresources...)
+		return scheme.ValidateUpdate(opts, versionedObj, versionedOldObj, subresources...)
 	} else {
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("could not find requestInfo in context"))}
 	}

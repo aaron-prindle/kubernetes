@@ -22,6 +22,7 @@ import (
 
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -84,7 +85,7 @@ func (persistentvolumeclaimStrategy) Validate(ctx context.Context, obj runtime.O
 	pvc := obj.(*api.PersistentVolumeClaim)
 	opts := validation.ValidationOptionsForPersistentVolumeClaim(pvc, nil)
 	allErrs := validation.ValidatePersistentVolumeClaim(pvc, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -128,7 +129,7 @@ func (persistentvolumeclaimStrategy) ValidateUpdate(ctx context.Context, obj, ol
 	opts := validation.ValidationOptionsForPersistentVolumeClaim(newPvc, oldPvc)
 	errorList := validation.ValidatePersistentVolumeClaim(newPvc, opts)
 	errorList = append(errorList, validation.ValidatePersistentVolumeClaimUpdate(newPvc, oldPvc, opts)...)
-	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	errorList = append(errorList, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return errorList
 }
 

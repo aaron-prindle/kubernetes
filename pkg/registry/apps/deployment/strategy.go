@@ -25,6 +25,7 @@ import (
 	appsv1beta1 "k8s.io/api/apps/v1beta1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/operation"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -88,7 +89,7 @@ func (deploymentStrategy) Validate(ctx context.Context, obj runtime.Object) fiel
 	deployment := obj.(*apps.Deployment)
 	opts := pod.GetValidationOptionsFromPodTemplate(&deployment.Spec.Template, nil)
 	allErrs := appsvalidation.ValidateDeployment(deployment, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -153,7 +154,7 @@ func (deploymentStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.O
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 
 	return allErrs
 }
@@ -202,7 +203,7 @@ func (deploymentStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old r
 // ValidateUpdate is the default update validation for an end user updating status
 func (deploymentStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := appsvalidation.ValidateDeploymentStatusUpdate(obj.(*apps.Deployment), old.(*apps.Deployment))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

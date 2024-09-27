@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -62,7 +63,7 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	cfg := obj.(*api.ConfigMap)
 
 	allErrs := validation.ValidateConfigMap(cfg)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -87,7 +88,7 @@ func (strategy) ValidateUpdate(ctx context.Context, newObj, oldObj runtime.Objec
 	oldCfg, newCfg := oldObj.(*api.ConfigMap), newObj.(*api.ConfigMap)
 
 	allErrs := validation.ValidateConfigMapUpdate(newCfg, oldCfg)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, newCfg, oldCfg)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, newCfg, oldCfg)...)
 	return allErrs
 }
 

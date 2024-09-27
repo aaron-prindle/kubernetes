@@ -19,6 +19,7 @@ package controllerrevision
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -63,7 +64,7 @@ func (strategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorLis
 	revision := obj.(*apps.ControllerRevision)
 
 	allErrs := validation.ValidateControllerRevisionCreate(revision)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -82,7 +83,7 @@ func (strategy) AllowUnconditionalUpdate() bool {
 func (strategy) ValidateUpdate(ctx context.Context, newObj, oldObj runtime.Object) field.ErrorList {
 	oldRevision, newRevision := oldObj.(*apps.ControllerRevision), newObj.(*apps.ControllerRevision)
 	allErrs := validation.ValidateControllerRevisionUpdate(newRevision, oldRevision)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, newObj, oldObj)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, nil, legacyscheme.Scheme, newObj, oldObj)...)
 	return allErrs
 }
 

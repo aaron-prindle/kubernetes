@@ -19,6 +19,7 @@ package limitrange
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -55,7 +56,7 @@ func (limitrangeStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime
 func (limitrangeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	limitRange := obj.(*api.LimitRange)
 	allErrs := validation.ValidateLimitRange(limitRange)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -75,7 +76,7 @@ func (limitrangeStrategy) AllowCreateOnUpdate() bool {
 func (limitrangeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	limitRange := obj.(*api.LimitRange)
 	allErrs := validation.ValidateLimitRange(limitRange)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

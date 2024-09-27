@@ -28,6 +28,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -125,7 +126,7 @@ func (rcStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorL
 	controller := obj.(*api.ReplicationController)
 	opts := pod.GetValidationOptionsFromPodTemplate(controller.Spec.Template, nil)
 	allErrs := corevalidation.ValidateReplicationController(controller, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -177,7 +178,7 @@ func (rcStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) f
 		}
 	}
 
-	errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	errs = append(errs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 
 	return errs
 }
@@ -252,7 +253,7 @@ func (rcStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.O
 
 func (rcStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := corevalidation.ValidateReplicationControllerStatusUpdate(obj.(*api.ReplicationController), old.(*api.ReplicationController))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

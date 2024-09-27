@@ -19,6 +19,7 @@ package endpoint
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -54,7 +55,7 @@ func (endpointsStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.
 // Validate validates a new endpoints.
 func (endpointsStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsCreate(obj.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -75,7 +76,7 @@ func (endpointsStrategy) AllowCreateOnUpdate() bool {
 // ValidateUpdate is the default update validation for an end user.
 func (endpointsStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateEndpointsUpdate(obj.(*api.Endpoints), old.(*api.Endpoints))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 

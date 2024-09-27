@@ -26,6 +26,7 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/operation"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -129,7 +130,7 @@ func nodeConfigSourceInUse(node *api.Node) bool {
 func (nodeStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
 	node := obj.(*api.Node)
 	allErrs := validation.ValidateNode(node)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -146,7 +147,7 @@ func (nodeStrategy) Canonicalize(obj runtime.Object) {
 func (nodeStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	errorList := validation.ValidateNode(obj.(*api.Node))
 	allErrs := append(errorList, validation.ValidateNodeUpdate(obj.(*api.Node), old.(*api.Node))...)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 
@@ -200,7 +201,7 @@ func nodeStatusConfigInUse(node *api.Node) bool {
 
 func (nodeStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateNodeUpdate(obj.(*api.Node), old.(*api.Node))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

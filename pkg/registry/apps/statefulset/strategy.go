@@ -21,6 +21,7 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -142,7 +143,7 @@ func (statefulSetStrategy) Validate(ctx context.Context, obj runtime.Object) fie
 	opts := pod.GetValidationOptionsFromPodTemplate(&statefulSet.Spec.Template, nil)
 
 	allErrs := validation.ValidateStatefulSet(statefulSet, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -172,7 +173,7 @@ func (statefulSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.
 
 	opts := pod.GetValidationOptionsFromPodTemplate(&newStatefulSet.Spec.Template, &oldStatefulSet.Spec.Template)
 	allErrs := validation.ValidateStatefulSetUpdate(newStatefulSet, oldStatefulSet, opts)
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 	return allErrs
 }
 
@@ -225,7 +226,7 @@ func (statefulSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old 
 func (statefulSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	// TODO: Validate status updates.
 	allErrs := validation.ValidateStatefulSetStatusUpdate(obj.(*apps.StatefulSet), old.(*apps.StatefulSet))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 

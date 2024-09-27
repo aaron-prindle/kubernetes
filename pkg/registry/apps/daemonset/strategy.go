@@ -23,6 +23,7 @@ import (
 
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/operation"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -123,7 +124,7 @@ func (daemonSetStrategy) Validate(ctx context.Context, obj runtime.Object) field
 	daemonSet := obj.(*apps.DaemonSet)
 	opts := pod.GetValidationOptionsFromPodTemplate(&daemonSet.Spec.Template, nil)
 	allErrs := validation.ValidateDaemonSet(daemonSet, opts)
-	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, legacyscheme.Scheme, obj)...)
+	allErrs = append(allErrs, rest.ValidateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj)...)
 	return allErrs
 }
 
@@ -169,7 +170,7 @@ func (daemonSetStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Ob
 		}
 	}
 
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old)...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old)...)
 
 	return allErrs
 }
@@ -215,7 +216,7 @@ func (daemonSetStatusStrategy) PrepareForUpdate(ctx context.Context, obj, old ru
 
 func (daemonSetStatusStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
 	allErrs := validation.ValidateDaemonSetStatusUpdate(obj.(*apps.DaemonSet), old.(*apps.DaemonSet))
-	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, legacyscheme.Scheme, obj, old, "status")...)
+	allErrs = append(allErrs, rest.ValidateUpdateDeclaratively(ctx, operation.EmptyValidationOpts(), legacyscheme.Scheme, obj, old, "status")...)
 	return allErrs
 }
 
