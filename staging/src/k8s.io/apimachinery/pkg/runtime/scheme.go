@@ -367,9 +367,9 @@ func (s *Scheme) AddValidationFunc(srcType Object, fn func(opCtx operation.Conte
 // Validate validates the provided Object according to the generated declarative validation code.
 // WARNING: This does not validate all objects!  The handwritten validation code in validation.go
 // is not run when this is called.  Only the generated zz_generated.validations.go validation code is run.
-func (s *Scheme) Validate(object Object, subresources ...string) field.ErrorList {
+func (s *Scheme) Validate(opts *operation.ValidationOpts, object Object, subresources ...string) field.ErrorList {
 	if fn, ok := s.validationFuncs[reflect.TypeOf(object)]; ok {
-		return fn(operation.Context{Operation: operation.Create}, object, nil, subresources...)
+		return fn(operation.Context{Operation: operation.Create, Opts: opts}, object, nil, subresources...)
 	}
 	return nil
 }
@@ -377,9 +377,9 @@ func (s *Scheme) Validate(object Object, subresources ...string) field.ErrorList
 // ValidateUpdate validates the provided object and oldObject according to the generated declarative validation code.
 // WARNING: This does not validate all objects!  The handwritten validation code in validation.go
 // is not run when this is called.  Only the generated zz_generated.validations.go validation code is run.
-func (s *Scheme) ValidateUpdate(object, oldObject Object, subresources ...string) field.ErrorList {
+func (s *Scheme) ValidateUpdate(opts *operation.ValidationOpts, object, oldObject Object, subresources ...string) field.ErrorList {
 	if fn, ok := s.validationFuncs[reflect.TypeOf(object)]; ok {
-		return fn(operation.Context{Operation: operation.Update}, oldObject, object, subresources...)
+		return fn(operation.Context{Operation: operation.Update, Opts: opts}, oldObject, object, subresources...)
 	}
 	return nil
 }
