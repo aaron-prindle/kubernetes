@@ -18,7 +18,6 @@ package validators
 
 import (
 	"k8s.io/gengo/v2"
-	"k8s.io/gengo/v2/generator"
 	"k8s.io/gengo/v2/types"
 )
 
@@ -27,7 +26,7 @@ func init() {
 	AddToRegistry(InitOptionalDeclarativeValidator)
 }
 
-func InitRequiredDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitRequiredDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &requiredDeclarativeValidator{}
 }
 
@@ -57,7 +56,7 @@ func (requiredDeclarativeValidator) Docs() []TagDoc {
 	}}
 }
 
-func InitOptionalDeclarativeValidator(c *generator.Context) DeclarativeValidator {
+func InitOptionalDeclarativeValidator(_ *ValidatorConfig) DeclarativeValidator {
 	return &optionalDeclarativeValidator{}
 }
 
