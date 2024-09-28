@@ -1212,6 +1212,7 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 		fn, extraArgs := v.SignatureAndArgs()
 		targs := generator.Args{
 			"funcName": c.Universe.Type(fn),
+			"field":    mkSymbolArgs(c, fieldPkgSymbols),
 		}
 
 		emitCall := func() {
@@ -1233,6 +1234,24 @@ func emitCallsToValidators(c *generator.Context, validations []validators.Functi
 				toGolangSourceDataLiteral(sw, c, arg)
 			}
 			sw.Do(")", targs)
+		}
+
+		// If validation is conditional, wrap the validation function with a conditions check.
+		if !v.Conditions().Empty() {
+			emitBaseFunction := emitCall
+			emitCall = func() {
+				sw.Do("func() $.field.ErrorList|raw$ {\n", targs)
+				sw.Do("  if opCtx.Opts.HasFlags(", nil)
+				toGolangSourceDataLiteral(sw, c, v.Conditions().Flags)
+				sw.Do(") {\n", nil)
+				sw.Do("    return ", nil)
+				emitBaseFunction()
+				sw.Do("\n", nil)
+				sw.Do("  } else {\n", nil)
+				sw.Do("    return nil // skip validation\n", nil)
+				sw.Do("  }\n", nil)
+				sw.Do("}()", nil)
+			}
 		}
 
 		if isShortCircuit {

@@ -37,6 +37,21 @@ type ValidationOpts struct {
 	Flags sets.Set[string]
 }
 
+// HasFlags returns true if all the provided flags are set.
+func (o *ValidationOpts) HasFlags(flags []string) bool {
+	if o == nil {
+		return len(flags) == 0
+	} else {
+		for _, f := range flags {
+			if !o.Flags.Has(f) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+// EmptyValidationOpts returns empty validation options.
 func EmptyValidationOpts() *ValidationOpts {
 	return nil
 }
