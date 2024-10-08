@@ -19,6 +19,7 @@ package validate
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/operation"
@@ -95,6 +96,32 @@ func DiscriminatedUnion[T ~string](opCtx operation.Context, fldPath *field.Path,
 	return errs
 }
 
+// RequiredIf verifies that a field is required when a condition is true.
+//
+// For example:
+//
+//	func ValidateMyStruct(opCtx operation.Context, fldPath *field.Path, in *MyStruct) field.ErrorList {
+//		return RequiredIf(opCtx, fldPath.Child("FieldA"), in.FieldA, in.Type == "EnumA", "FieldA is required when Type is EnumA")
+//	}
+//
+
+//     func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, fieldValues ...any) field.ErrorList {
+// validate.Union(opCtx,                   fldPath,            obj, oldObj, unionMembershipForU,  obj.M1, obj.M2)...)
+
+// func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, fieldValues ...any) field.ErrorList {
+func RequiredIf(opCtx operation.Context, fldPath *field.Path, _, _ any, condition bool, fieldValues ...any) field.ErrorList {
+	// func RequiredIf(opCtx operation.Context, fldPath *field.Path, fieldValue any, condition bool, message string) field.ErrorList {
+	if condition {
+		rv := reflect.ValueOf(fieldValues[0])
+		if !rv.IsValid() || rv.IsZero() {
+			return field.ErrorList{
+				field.Required(fldPath, "TODO: aaron-prindle"),
+			}
+		}
+	}
+	return nil
+}
+
 type member struct {
 	fieldName, memberName string
 }
@@ -146,4 +173,40 @@ func (u UnionMembership) allFields() []string {
 		memberNames = append(memberNames, fmt.Sprintf("`%s`", f.fieldName))
 	}
 	return memberNames
+}
+
+// EvaluateCondition evaluates a condition based on the operator and values provided.
+//
+// Supported operators: ==, !=, >, >=, <, <=
+//
+// Both fieldValue and value are treated as strings; if possible, they are converted to numbers for numeric comparisons.
+func EvaluateCondition(fieldValue any, operator string, value string) (bool, error) {
+	fv := fmt.Sprintf("%v", fieldValue)
+
+	switch operator {
+	case "==":
+		return fv == value, nil
+	case "!=":
+		return fv != value, nil
+	case ">", ">=", "<", "<=":
+		// Attempt to parse both values as numbers
+		fvNum, err1 := strconv.ParseFloat(fv, 64)
+		valNum, err2 := strconv.ParseFloat(value, 64)
+		if err1 != nil || err2 != nil {
+			return false, fmt.Errorf("non-numeric value in numeric comparison")
+		}
+		switch operator {
+		case ">":
+			return fvNum > valNum, nil
+		case ">=":
+			return fvNum >= valNum, nil
+		case "<":
+			return fvNum < valNum, nil
+		case "<=":
+			return fvNum <= valNum, nil
+		}
+	default:
+		return false, fmt.Errorf("unsupported operator: %s", operator)
+	}
+	return false, fmt.Errorf("invalid comparison")
 }
