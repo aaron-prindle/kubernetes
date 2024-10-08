@@ -110,6 +110,8 @@ type TestServerInstanceOptions struct {
 	EmulationVersion string
 	// Set non-default request timeout in the server.
 	RequestTimeout time.Duration
+	// TODO(aaron-prindle) FIXME - add docs string
+	AddMetrics bool
 }
 
 // TestServer return values supplied by kube-test-ApiServer
@@ -194,6 +196,8 @@ func StartTestServer(t ktesting.TB, instanceOptions *TestServerInstanceOptions, 
 	fs := pflag.NewFlagSet("test", pflag.PanicOnError)
 
 	featureGate := utilfeature.DefaultMutableFeatureGate
+	// TODO(aaron-prindle) FIXME - DEBUG
+	featureGate.AddMetrics()
 	effectiveVersion := utilversion.DefaultKubeEffectiveVersion()
 	if instanceOptions.BinaryVersion != "" {
 		effectiveVersion = utilversion.NewEffectiveVersion(instanceOptions.BinaryVersion)
