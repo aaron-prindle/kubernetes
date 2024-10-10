@@ -19,8 +19,12 @@ package validate
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
+	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/checker/decls"
+	expr "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -95,6 +99,119 @@ func DiscriminatedUnion[T ~string](opCtx operation.Context, fldPath *field.Path,
 	return errs
 }
 
+// RequiredIf verifies that a field is required when a CEL condition evaluates to true.
+//
+// For example:
+//
+//	func ValidateMyStruct(opCtx operation.Context, obj, oldObj *MyStruct, fldPath *field.Path) field.ErrorList {
+//		return RequiredIf(opCtx, fldPath.Child("FieldA"), obj.FieldA, obj, "Type == 'EnumA'")
+//	}
+// func Union(opCtx operation.Context, fldPath *field.Path, _, _ any, union *UnionMembership, fieldValues ...any) field.ErrorList {
+
+func RequiredIf(opCtx operation.Context, fldPath *field.Path, obj, oldObj any, condition string, fieldValues ...any) field.ErrorList {
+	var errs field.ErrorList
+
+	// Convert obj to a map[string]interface{} for activation
+	objMap, err := structToMap(obj)
+	if err != nil {
+		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("failed to convert object to map: %v", err))}
+	}
+
+	// Create declarations for the fields in obj
+	declsList := []*expr.Decl{}
+	for k, v := range objMap {
+		var declType *expr.Type
+		switch v.(type) {
+		case string:
+			declType = decls.String
+		case int, int32, int64:
+			declType = decls.Int
+		case float32, float64:
+			declType = decls.Double
+		case bool:
+			declType = decls.Bool
+		default:
+			declType = decls.Dyn
+		}
+		declsList = append(declsList, decls.NewVar(k, declType))
+	}
+
+	// Create a CEL environment with variable declarations
+	env, err := cel.NewEnv(
+		cel.Declarations(declsList...),
+	)
+	if err != nil {
+		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("failed to create CEL environment: %v", err))}
+	}
+
+	// Parse the CEL expression
+	ast, issues := env.Parse(condition)
+	if issues != nil && issues.Err() != nil {
+		return field.ErrorList{field.Invalid(fldPath, condition, fmt.Sprintf("invalid CEL expression: %v", issues.Err()))}
+	}
+
+	// Check the type of the expression
+	checkedAst, issues := env.Check(ast)
+	if issues != nil && issues.Err() != nil {
+		return field.ErrorList{field.Invalid(fldPath, condition, fmt.Sprintf("type-check error in CEL expression: %v", issues.Err()))}
+	}
+
+	// Programmatically evaluate the expression
+	prg, err := env.Program(checkedAst)
+	if err != nil {
+		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("failed to create CEL program: %v", err))}
+	}
+
+	// Evaluate the expression with the input variables
+	out, _, err := prg.Eval(objMap)
+	if err != nil {
+		return field.ErrorList{field.InternalError(fldPath, fmt.Errorf("failed to evaluate CEL expression: %v", err))}
+	}
+
+	// Check if the condition is true
+	conditionMet, ok := out.Value().(bool)
+	if !ok {
+		return field.ErrorList{field.Invalid(fldPath, condition, "CEL expression did not return a boolean")}
+	}
+
+	if conditionMet {
+		rv := reflect.ValueOf(fieldValues[0])
+		// rv := reflect.ValueOf(fieldValue)
+		if !rv.IsValid() || rv.IsZero() {
+			return field.ErrorList{
+				field.Required(fldPath, fmt.Sprintf("field is required when: %s", condition)),
+			}
+		}
+	}
+
+	return errs
+}
+
+// Helper function to convert a struct to a map[string]interface{}
+func structToMap(obj any) (map[string]interface{}, error) {
+	result := make(map[string]interface{})
+	val := reflect.ValueOf(obj)
+	if val.Kind() != reflect.Ptr || val.IsNil() {
+		return nil, fmt.Errorf("obj must be a non-nil pointer to a struct")
+	}
+	val = val.Elem()
+	if val.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("obj must point to a struct")
+	}
+	typ := val.Type()
+	for i := 0; i < val.NumField(); i++ {
+		fieldVal := val.Field(i)
+		fieldType := typ.Field(i)
+		fieldName := fieldType.Name
+		// Include only exported fields
+		if fieldType.PkgPath != "" {
+			continue
+		}
+		result[fieldName] = fieldVal.Interface()
+	}
+	return result, nil
+}
+
 type member struct {
 	fieldName, memberName string
 }
@@ -146,4 +263,40 @@ func (u UnionMembership) allFields() []string {
 		memberNames = append(memberNames, fmt.Sprintf("`%s`", f.fieldName))
 	}
 	return memberNames
+}
+
+// EvaluateCondition evaluates a condition based on the operator and values provided.
+//
+// Supported operators: ==, !=, >, >=, <, <=
+//
+// Both fieldValue and value are treated as strings; if possible, they are converted to numbers for numeric comparisons.
+func EvaluateCondition(fieldValue any, operator string, value string) (bool, error) {
+	fv := fmt.Sprintf("%v", fieldValue)
+
+	switch operator {
+	case "==":
+		return fv == value, nil
+	case "!=":
+		return fv != value, nil
+	case ">", ">=", "<", "<=":
+		// Attempt to parse both values as numbers
+		fvNum, err1 := strconv.ParseFloat(fv, 64)
+		valNum, err2 := strconv.ParseFloat(value, 64)
+		if err1 != nil || err2 != nil {
+			return false, fmt.Errorf("non-numeric value in numeric comparison")
+		}
+		switch operator {
+		case ">":
+			return fvNum > valNum, nil
+		case ">=":
+			return fvNum >= valNum, nil
+		case "<":
+			return fvNum < valNum, nil
+		case "<=":
+			return fvNum <= valNum, nil
+		}
+	default:
+		return false, fmt.Errorf("unsupported operator: %s", operator)
+	}
+	return false, fmt.Errorf("invalid comparison")
 }

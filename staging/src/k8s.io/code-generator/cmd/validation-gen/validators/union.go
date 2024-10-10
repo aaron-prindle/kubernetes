@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The Kubernetes Authors.
+Copyright 2024 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import (
 
 var discriminatedUnionValidator = types.Name{Package: libValidationPkg, Name: "DiscriminatedUnion"}
 var unionValidator = types.Name{Package: libValidationPkg, Name: "Union"}
+var requiredIfValidator = types.Name{Package: libValidationPkg, Name: "RequiredIf"}
 
 var newDiscriminatedUnionMembership = types.Name{Package: libValidationPkg, Name: "NewDiscriminatedUnionMembership"}
 var newUnionMembership = types.Name{Package: libValidationPkg, Name: "NewUnionMembership"}
@@ -47,10 +48,9 @@ type unionDeclarativeValidator struct {
 }
 
 const (
-	// +union and +unionDiscriminator tag are used by openapi-gen to publish x-kubernetes-union and x-kubernetes-discriminator
-	// extensions into Kubernetes published OpenAPI.
 	discriminatorTagName = "unionDiscriminator"
 	memberTagName        = "unionMember"
+	requiredIfTagName    = "requiredIf"
 )
 
 // discriminatorParams defines JSON the parameter value for the +unionDiscriminator tag.
@@ -73,6 +73,11 @@ type memberParams struct {
 	// Optional.
 	// Defaults to the go field name.
 	MemberName string `json:"memberName,omitempty"`
+}
+
+// requiredIfParams defines the JSON parameter value for the +requiredIf tag.
+type requiredIfParams struct {
+	Condition string `json:"condition"`
 }
 
 // union defines how a union validation will be generated, based
@@ -107,9 +112,17 @@ func (us unions) getOrCreate(name string) *union {
 	return u
 }
 
+// conditionalValidation holds information for conditional field validations.
+type conditionalValidation struct {
+	Field     types.Member // The field to validate (e.g., FieldA)
+	Condition string       // The CEL condition expression
+}
+
 func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments []string) (Validations, error) {
 	result := Validations{}
 	unions := unions{}
+	conditionalValidations := []conditionalValidation{}
+
 	for _, member := range t.Members {
 		commentTags := gengo.ExtractCommentTags("+", member.CommentLines)
 		if commentTag, ok := commentTags[memberTagName]; ok {
@@ -160,6 +173,25 @@ func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 				u.discriminatorMember = member
 			}
 		}
+
+		// Parse +requiredIf tag
+		if commentTag, ok := commentTags[requiredIfTagName]; ok {
+			if len(commentTag) != 1 {
+				return result, fmt.Errorf("must have one %q tag", requiredIfTagName)
+			}
+			tag := commentTag[0]
+			p := &requiredIfParams{}
+			if err := json.Unmarshal([]byte(tag), &p); err != nil {
+				return result, fmt.Errorf("error parsing JSON value: %v (%q)", err, tag)
+			}
+			if p.Condition == "" {
+				return result, fmt.Errorf("condition must be specified in %q tag", requiredIfTagName)
+			}
+			conditionalValidations = append(conditionalValidations, conditionalValidation{
+				Field:     member,
+				Condition: p.Condition,
+			})
+		}
 	}
 
 	// Sort the keys for stable output.
@@ -189,40 +221,81 @@ func (c *unionDeclarativeValidator) ExtractValidations(t *types.Type, comments [
 		}
 	}
 
+	// Generate validation functions for conditional validations
+	for _, cv := range conditionalValidations {
+		fn := Function(
+			requiredIfTagName,
+			DefaultFlags,
+			requiredIfValidator,
+			cv.Condition,
+			cv.Field,
+		)
+		result.Functions = append(result.Functions, fn)
+	}
+
 	return result, nil
 }
 
 func (unionDeclarativeValidator) Docs() []TagDoc {
-	return []TagDoc{{
-		Tag:         discriminatorTagName,
-		Description: "Indicates that this field is the discriminator for a union.",
-		Contexts:    []TagContext{TagContextField},
-		Payloads: []TagPayloadDoc{{
-			Description: "<json-object>",
-			Docs:        "",
-			Schema: []TagPayloadSchema{{
-				Key:   "union",
-				Value: "<string>",
-				Docs:  "the name of the union, if more than one exists",
-			}},
-		}},
-	}, {
-		Tag:         memberTagName,
-		Description: "Indicates that this field is a member of a union.",
-		Contexts:    []TagContext{TagContextField},
-		Payloads: []TagPayloadDoc{{
-			Description: "<json-object>",
-			Docs:        "",
-			Schema: []TagPayloadSchema{{
-				Key:   "union",
-				Value: "<string>",
-				Docs:  "the name of the union, if more than one exists",
-			}, {
-				Key:     "memberName",
-				Value:   "<string>",
-				Docs:    "the discriminator value for this member",
-				Default: "the field's name",
-			}},
-		}},
-	}}
+	return []TagDoc{
+		{
+			Tag:         discriminatorTagName,
+			Description: "Indicates that this field is the discriminator for a union.",
+			Contexts:    []TagContext{TagContextField},
+			Payloads: []TagPayloadDoc{
+				{
+					Description: "<json-object>",
+					Docs:        "",
+					Schema: []TagPayloadSchema{
+						{
+							Key:   "union",
+							Value: "<string>",
+							Docs:  "the name of the union, if more than one exists",
+						},
+					},
+				},
+			},
+		},
+		{
+			Tag:         memberTagName,
+			Description: "Indicates that this field is a member of a union.",
+			Contexts:    []TagContext{TagContextField},
+			Payloads: []TagPayloadDoc{
+				{
+					Description: "<json-object>",
+					Docs:        "",
+					Schema: []TagPayloadSchema{
+						{
+							Key:   "union",
+							Value: "<string>",
+							Docs:  "the name of the union, if more than one exists",
+						},
+						{
+							Key:     "memberName",
+							Value:   "<string>",
+							Docs:    "the discriminator value for this member",
+							Default: "the field's name",
+						},
+					},
+				},
+			},
+		},
+		{
+			Tag:         requiredIfTagName,
+			Description: "Specifies that this field is required when a CEL condition is met.",
+			Contexts:    []TagContext{TagContextField},
+			Payloads: []TagPayloadDoc{
+				{
+					Description: "<json-object>",
+					Schema: []TagPayloadSchema{
+						{
+							Key:   "condition",
+							Value: "<string>",
+							Docs:  "the CEL expression to evaluate",
+						},
+					},
+				},
+			},
+		},
+	}
 }
