@@ -24,7 +24,7 @@ package v1
 import (
 	fmt "fmt"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	validate "k8s.io/apimachinery/pkg/api/validate"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
@@ -35,398 +35,398 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
-	scheme.AddValidationFunc(new(v1.Binding), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Binding), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Binding(obj.(*v1.Binding), nil)
+			return Validate_Binding(obj.(*corev1.Binding), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ComponentStatus), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ComponentStatus), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ComponentStatus(obj.(*v1.ComponentStatus), nil)
+			return Validate_ComponentStatus(obj.(*corev1.ComponentStatus), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ComponentStatusList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ComponentStatusList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ComponentStatusList(obj.(*v1.ComponentStatusList), nil)
+			return Validate_ComponentStatusList(obj.(*corev1.ComponentStatusList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ConfigMap), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ConfigMap), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ConfigMap(obj.(*v1.ConfigMap), nil)
+			return Validate_ConfigMap(obj.(*corev1.ConfigMap), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ConfigMapList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ConfigMapList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ConfigMapList(obj.(*v1.ConfigMapList), nil)
+			return Validate_ConfigMapList(obj.(*corev1.ConfigMapList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Endpoints), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Endpoints), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Endpoints(obj.(*v1.Endpoints), nil)
+			return Validate_Endpoints(obj.(*corev1.Endpoints), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.EndpointsList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.EndpointsList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EndpointsList(obj.(*v1.EndpointsList), nil)
+			return Validate_EndpointsList(obj.(*corev1.EndpointsList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Event), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Event), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Event(obj.(*v1.Event), nil)
+			return Validate_Event(obj.(*corev1.Event), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.EventList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.EventList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_EventList(obj.(*v1.EventList), nil)
+			return Validate_EventList(obj.(*corev1.EventList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.LimitRange), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.LimitRange), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.LimitRange)
+			root := obj.(*corev1.LimitRange)
 			return Validate_LimitRangeSpec(&root.Spec, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.LimitRangeList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.LimitRangeList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_LimitRangeList(obj.(*v1.LimitRangeList), nil)
+			return Validate_LimitRangeList(obj.(*corev1.LimitRangeList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.List), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.List), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_List(obj.(*v1.List), nil)
+			return Validate_List(obj.(*corev1.List), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Namespace), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Namespace), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.Namespace)
+			root := obj.(*corev1.Namespace)
 			return Validate_NamespaceSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.Namespace)
+			root := obj.(*corev1.Namespace)
 			return Validate_NamespaceStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.NamespaceList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.NamespaceList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_NamespaceList(obj.(*v1.NamespaceList), nil)
+			return Validate_NamespaceList(obj.(*corev1.NamespaceList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Node), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Node), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.Node)
+			root := obj.(*corev1.Node)
 			return Validate_NodeSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.Node)
+			root := obj.(*corev1.Node)
 			return Validate_NodeStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.NodeList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.NodeList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_NodeList(obj.(*v1.NodeList), nil)
+			return Validate_NodeList(obj.(*corev1.NodeList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.NodeProxyOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.NodeProxyOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_NodeProxyOptions(obj.(*v1.NodeProxyOptions), nil)
+			return Validate_NodeProxyOptions(obj.(*corev1.NodeProxyOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PersistentVolume), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PersistentVolume), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.PersistentVolume)
+			root := obj.(*corev1.PersistentVolume)
 			return Validate_PersistentVolumeSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.PersistentVolume)
+			root := obj.(*corev1.PersistentVolume)
 			return Validate_PersistentVolumeStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PersistentVolumeClaim), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PersistentVolumeClaim), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.PersistentVolumeClaim)
+			root := obj.(*corev1.PersistentVolumeClaim)
 			return Validate_PersistentVolumeClaimSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.PersistentVolumeClaim)
+			root := obj.(*corev1.PersistentVolumeClaim)
 			return Validate_PersistentVolumeClaimStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PersistentVolumeClaimList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PersistentVolumeClaimList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PersistentVolumeClaimList(obj.(*v1.PersistentVolumeClaimList), nil)
+			return Validate_PersistentVolumeClaimList(obj.(*corev1.PersistentVolumeClaimList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PersistentVolumeList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PersistentVolumeList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PersistentVolumeList(obj.(*v1.PersistentVolumeList), nil)
+			return Validate_PersistentVolumeList(obj.(*corev1.PersistentVolumeList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Pod), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Pod), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.Pod)
+			root := obj.(*corev1.Pod)
 			return Validate_PodSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.Pod)
+			root := obj.(*corev1.Pod)
 			return Validate_PodStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodAttachOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodAttachOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodAttachOptions(obj.(*v1.PodAttachOptions), nil)
+			return Validate_PodAttachOptions(obj.(*corev1.PodAttachOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodExecOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodExecOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodExecOptions(obj.(*v1.PodExecOptions), nil)
+			return Validate_PodExecOptions(obj.(*corev1.PodExecOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodList(obj.(*v1.PodList), nil)
+			return Validate_PodList(obj.(*corev1.PodList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodLogOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodLogOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodLogOptions(obj.(*v1.PodLogOptions), nil)
+			return Validate_PodLogOptions(obj.(*corev1.PodLogOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodPortForwardOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodPortForwardOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodPortForwardOptions(obj.(*v1.PodPortForwardOptions), nil)
+			return Validate_PodPortForwardOptions(obj.(*corev1.PodPortForwardOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodProxyOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodProxyOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodProxyOptions(obj.(*v1.PodProxyOptions), nil)
+			return Validate_PodProxyOptions(obj.(*corev1.PodProxyOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodStatusResult), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodStatusResult), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodStatusResult(obj.(*v1.PodStatusResult), nil)
+			return Validate_PodStatusResult(obj.(*corev1.PodStatusResult), nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.PodStatusResult)
+			root := obj.(*corev1.PodStatusResult)
 			return Validate_PodStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodTemplate), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodTemplate), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodTemplate(obj.(*v1.PodTemplate), nil)
+			return Validate_PodTemplate(obj.(*corev1.PodTemplate), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.PodTemplateList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.PodTemplateList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_PodTemplateList(obj.(*v1.PodTemplateList), nil)
+			return Validate_PodTemplateList(obj.(*corev1.PodTemplateList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.RangeAllocation), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.RangeAllocation), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_RangeAllocation(obj.(*v1.RangeAllocation), nil)
+			return Validate_RangeAllocation(obj.(*corev1.RangeAllocation), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ReplicationController), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ReplicationController), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.ReplicationController)
+			root := obj.(*corev1.ReplicationController)
 			return Validate_ReplicationControllerSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.ReplicationController)
+			root := obj.(*corev1.ReplicationController)
 			return Validate_ReplicationControllerStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ReplicationControllerList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ReplicationControllerList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ReplicationControllerList(obj.(*v1.ReplicationControllerList), nil)
+			return Validate_ReplicationControllerList(obj.(*corev1.ReplicationControllerList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ResourceQuota), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ResourceQuota), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.ResourceQuota)
+			root := obj.(*corev1.ResourceQuota)
 			return Validate_ResourceQuotaSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.ResourceQuota)
+			root := obj.(*corev1.ResourceQuota)
 			return Validate_ResourceQuotaStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ResourceQuotaList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ResourceQuotaList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ResourceQuotaList(obj.(*v1.ResourceQuotaList), nil)
+			return Validate_ResourceQuotaList(obj.(*corev1.ResourceQuotaList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Secret), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Secret), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Secret(obj.(*v1.Secret), nil)
+			return Validate_Secret(obj.(*corev1.Secret), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.SecretList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.SecretList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_SecretList(obj.(*v1.SecretList), nil)
+			return Validate_SecretList(obj.(*corev1.SecretList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.SerializedReference), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.SerializedReference), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_SerializedReference(obj.(*v1.SerializedReference), nil)
+			return Validate_SerializedReference(obj.(*corev1.SerializedReference), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.Service), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.Service), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			root := obj.(*v1.Service)
+			root := obj.(*corev1.Service)
 			return Validate_ServiceSpec(&root.Spec, nil)
 		}
 		if len(subresources) == 1 && subresources[0] == "status" {
-			root := obj.(*v1.Service)
+			root := obj.(*corev1.Service)
 			return Validate_ServiceStatus(&root.Status, nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ServiceAccount), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ServiceAccount), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceAccount(obj.(*v1.ServiceAccount), nil)
+			return Validate_ServiceAccount(obj.(*corev1.ServiceAccount), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ServiceAccountList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ServiceAccountList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceAccountList(obj.(*v1.ServiceAccountList), nil)
+			return Validate_ServiceAccountList(obj.(*corev1.ServiceAccountList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ServiceList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ServiceList), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceList(obj.(*v1.ServiceList), nil)
+			return Validate_ServiceList(obj.(*corev1.ServiceList), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc(new(v1.ServiceProxyOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc(new(corev1.ServiceProxyOptions), func(obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ServiceProxyOptions(obj.(*v1.ServiceProxyOptions), nil)
+			return Validate_ServiceProxyOptions(obj.(*corev1.ServiceProxyOptions), nil)
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("No validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_Binding(obj *v1.Binding, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Binding.TypeMeta has no validation
-	// field v1.Binding.ObjectMeta has no validation
-	// field v1.Binding.Target has no validation
+func Validate_Binding(obj *corev1.Binding, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Binding.TypeMeta has no validation
+	// field corev1.Binding.ObjectMeta has no validation
+	// field corev1.Binding.Target has no validation
 	return errs
 }
 
-func Validate_ComponentStatus(obj *v1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ComponentStatus.TypeMeta has no validation
-	// field v1.ComponentStatus.ObjectMeta has no validation
-	// field v1.ComponentStatus.Conditions has no validation
+func Validate_ComponentStatus(obj *corev1.ComponentStatus, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ComponentStatus.TypeMeta has no validation
+	// field corev1.ComponentStatus.ObjectMeta has no validation
+	// field corev1.ComponentStatus.Conditions has no validation
 	return errs
 }
 
-func Validate_ComponentStatusList(obj *v1.ComponentStatusList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ComponentStatusList.TypeMeta has no validation
-	// field v1.ComponentStatusList.ListMeta has no validation
-	// field v1.ComponentStatusList.Items has no validation
+func Validate_ComponentStatusList(obj *corev1.ComponentStatusList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ComponentStatusList.TypeMeta has no validation
+	// field corev1.ComponentStatusList.ListMeta has no validation
+	// field corev1.ComponentStatusList.Items has no validation
 	return errs
 }
 
-func Validate_ConfigMap(obj *v1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ConfigMap.TypeMeta has no validation
-	// field v1.ConfigMap.ObjectMeta has no validation
-	// field v1.ConfigMap.Immutable has no validation
-	// field v1.ConfigMap.Data has no validation
-	// field v1.ConfigMap.BinaryData has no validation
+func Validate_ConfigMap(obj *corev1.ConfigMap, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ConfigMap.TypeMeta has no validation
+	// field corev1.ConfigMap.ObjectMeta has no validation
+	// field corev1.ConfigMap.Immutable has no validation
+	// field corev1.ConfigMap.Data has no validation
+	// field corev1.ConfigMap.BinaryData has no validation
 	return errs
 }
 
-func Validate_ConfigMapList(obj *v1.ConfigMapList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ConfigMapList.TypeMeta has no validation
-	// field v1.ConfigMapList.ListMeta has no validation
-	// field v1.ConfigMapList.Items has no validation
+func Validate_ConfigMapList(obj *corev1.ConfigMapList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ConfigMapList.TypeMeta has no validation
+	// field corev1.ConfigMapList.ListMeta has no validation
+	// field corev1.ConfigMapList.Items has no validation
 	return errs
 }
 
-func Validate_Endpoints(obj *v1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Endpoints.TypeMeta has no validation
-	// field v1.Endpoints.ObjectMeta has no validation
-	// field v1.Endpoints.Subsets has no validation
+func Validate_Endpoints(obj *corev1.Endpoints, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Endpoints.TypeMeta has no validation
+	// field corev1.Endpoints.ObjectMeta has no validation
+	// field corev1.Endpoints.Subsets has no validation
 	return errs
 }
 
-func Validate_EndpointsList(obj *v1.EndpointsList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.EndpointsList.TypeMeta has no validation
-	// field v1.EndpointsList.ListMeta has no validation
-	// field v1.EndpointsList.Items has no validation
+func Validate_EndpointsList(obj *corev1.EndpointsList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.EndpointsList.TypeMeta has no validation
+	// field corev1.EndpointsList.ListMeta has no validation
+	// field corev1.EndpointsList.Items has no validation
 	return errs
 }
 
-func Validate_Event(obj *v1.Event, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Event.TypeMeta has no validation
-	// field v1.Event.ObjectMeta has no validation
-	// field v1.Event.InvolvedObject has no validation
-	// field v1.Event.Reason has no validation
-	// field v1.Event.Message has no validation
-	// field v1.Event.Source has no validation
-	// field v1.Event.FirstTimestamp has no validation
-	// field v1.Event.LastTimestamp has no validation
-	// field v1.Event.Count has no validation
-	// field v1.Event.Type has no validation
-	// field v1.Event.EventTime has no validation
-	// field v1.Event.Series has no validation
-	// field v1.Event.Action has no validation
-	// field v1.Event.Related has no validation
-	// field v1.Event.ReportingController has no validation
-	// field v1.Event.ReportingInstance has no validation
+func Validate_Event(obj *corev1.Event, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Event.TypeMeta has no validation
+	// field corev1.Event.ObjectMeta has no validation
+	// field corev1.Event.InvolvedObject has no validation
+	// field corev1.Event.Reason has no validation
+	// field corev1.Event.Message has no validation
+	// field corev1.Event.Source has no validation
+	// field corev1.Event.FirstTimestamp has no validation
+	// field corev1.Event.LastTimestamp has no validation
+	// field corev1.Event.Count has no validation
+	// field corev1.Event.Type has no validation
+	// field corev1.Event.EventTime has no validation
+	// field corev1.Event.Series has no validation
+	// field corev1.Event.Action has no validation
+	// field corev1.Event.Related has no validation
+	// field corev1.Event.ReportingController has no validation
+	// field corev1.Event.ReportingInstance has no validation
 	return errs
 }
 
-func Validate_EventList(obj *v1.EventList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.EventList.TypeMeta has no validation
-	// field v1.EventList.ListMeta has no validation
-	// field v1.EventList.Items has no validation
+func Validate_EventList(obj *corev1.EventList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.EventList.TypeMeta has no validation
+	// field corev1.EventList.ListMeta has no validation
+	// field corev1.EventList.Items has no validation
 	return errs
 }
 
-func Validate_HostAlias(obj *v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.HostAlias.IP
+func Validate_HostAlias(obj *corev1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.HostAlias.IP
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
@@ -436,143 +436,143 @@ func Validate_HostAlias(obj *v1.HostAlias, fldPath *field.Path) (errs field.Erro
 			return
 		}(obj.IP, fldPath.Child("ip"))...)
 
-	// field v1.HostAlias.Hostnames has no validation
+	// field corev1.HostAlias.Hostnames has no validation
 	return errs
 }
 
-func Validate_LimitRange(obj *v1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.LimitRange.TypeMeta has no validation
-	// field v1.LimitRange.ObjectMeta has no validation
-	// field v1.LimitRange.Spec has no validation
+func Validate_LimitRange(obj *corev1.LimitRange, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.LimitRange.TypeMeta has no validation
+	// field corev1.LimitRange.ObjectMeta has no validation
+	// field corev1.LimitRange.Spec has no validation
 	return errs
 }
 
-func Validate_LimitRangeList(obj *v1.LimitRangeList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.LimitRangeList.TypeMeta has no validation
-	// field v1.LimitRangeList.ListMeta has no validation
-	// field v1.LimitRangeList.Items has no validation
+func Validate_LimitRangeList(obj *corev1.LimitRangeList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.LimitRangeList.TypeMeta has no validation
+	// field corev1.LimitRangeList.ListMeta has no validation
+	// field corev1.LimitRangeList.Items has no validation
 	return errs
 }
 
-func Validate_List(obj *v1.List, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.List.TypeMeta has no validation
-	// field v1.List.ListMeta has no validation
-	// field v1.List.Items has no validation
+func Validate_List(obj *corev1.List, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.List.TypeMeta has no validation
+	// field corev1.List.ListMeta has no validation
+	// field corev1.List.Items has no validation
 	return errs
 }
 
-func Validate_Namespace(obj *v1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Namespace.TypeMeta has no validation
-	// field v1.Namespace.ObjectMeta has no validation
-	// field v1.Namespace.Spec has no validation
-	// field v1.Namespace.Status has no validation
+func Validate_Namespace(obj *corev1.Namespace, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Namespace.TypeMeta has no validation
+	// field corev1.Namespace.ObjectMeta has no validation
+	// field corev1.Namespace.Spec has no validation
+	// field corev1.Namespace.Status has no validation
 	return errs
 }
 
-func Validate_NamespaceList(obj *v1.NamespaceList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.NamespaceList.TypeMeta has no validation
-	// field v1.NamespaceList.ListMeta has no validation
-	// field v1.NamespaceList.Items has no validation
+func Validate_NamespaceList(obj *corev1.NamespaceList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.NamespaceList.TypeMeta has no validation
+	// field corev1.NamespaceList.ListMeta has no validation
+	// field corev1.NamespaceList.Items has no validation
 	return errs
 }
 
-func Validate_Node(obj *v1.Node, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Node.TypeMeta has no validation
-	// field v1.Node.ObjectMeta has no validation
-	// field v1.Node.Spec has no validation
-	// field v1.Node.Status has no validation
+func Validate_Node(obj *corev1.Node, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Node.TypeMeta has no validation
+	// field corev1.Node.ObjectMeta has no validation
+	// field corev1.Node.Spec has no validation
+	// field corev1.Node.Status has no validation
 	return errs
 }
 
-func Validate_NodeList(obj *v1.NodeList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.NodeList.TypeMeta has no validation
-	// field v1.NodeList.ListMeta has no validation
-	// field v1.NodeList.Items has no validation
+func Validate_NodeList(obj *corev1.NodeList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.NodeList.TypeMeta has no validation
+	// field corev1.NodeList.ListMeta has no validation
+	// field corev1.NodeList.Items has no validation
 	return errs
 }
 
-func Validate_NodeProxyOptions(obj *v1.NodeProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.NodeProxyOptions.TypeMeta has no validation
-	// field v1.NodeProxyOptions.Path has no validation
+func Validate_NodeProxyOptions(obj *corev1.NodeProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.NodeProxyOptions.TypeMeta has no validation
+	// field corev1.NodeProxyOptions.Path has no validation
 	return errs
 }
 
-func Validate_PersistentVolume(obj *v1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolume.TypeMeta has no validation
-	// field v1.PersistentVolume.ObjectMeta has no validation
-	// field v1.PersistentVolume.Spec has no validation
-	// field v1.PersistentVolume.Status has no validation
+func Validate_PersistentVolume(obj *corev1.PersistentVolume, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PersistentVolume.TypeMeta has no validation
+	// field corev1.PersistentVolume.ObjectMeta has no validation
+	// field corev1.PersistentVolume.Spec has no validation
+	// field corev1.PersistentVolume.Status has no validation
 	return errs
 }
 
-func Validate_PersistentVolumeClaim(obj *v1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolumeClaim.TypeMeta has no validation
-	// field v1.PersistentVolumeClaim.ObjectMeta has no validation
-	// field v1.PersistentVolumeClaim.Spec has no validation
-	// field v1.PersistentVolumeClaim.Status has no validation
+func Validate_PersistentVolumeClaim(obj *corev1.PersistentVolumeClaim, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PersistentVolumeClaim.TypeMeta has no validation
+	// field corev1.PersistentVolumeClaim.ObjectMeta has no validation
+	// field corev1.PersistentVolumeClaim.Spec has no validation
+	// field corev1.PersistentVolumeClaim.Status has no validation
 	return errs
 }
 
-func Validate_PersistentVolumeClaimList(obj *v1.PersistentVolumeClaimList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolumeClaimList.TypeMeta has no validation
-	// field v1.PersistentVolumeClaimList.ListMeta has no validation
-	// field v1.PersistentVolumeClaimList.Items has no validation
+func Validate_PersistentVolumeClaimList(obj *corev1.PersistentVolumeClaimList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PersistentVolumeClaimList.TypeMeta has no validation
+	// field corev1.PersistentVolumeClaimList.ListMeta has no validation
+	// field corev1.PersistentVolumeClaimList.Items has no validation
 	return errs
 }
 
-func Validate_PersistentVolumeList(obj *v1.PersistentVolumeList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PersistentVolumeList.TypeMeta has no validation
-	// field v1.PersistentVolumeList.ListMeta has no validation
-	// field v1.PersistentVolumeList.Items has no validation
+func Validate_PersistentVolumeList(obj *corev1.PersistentVolumeList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PersistentVolumeList.TypeMeta has no validation
+	// field corev1.PersistentVolumeList.ListMeta has no validation
+	// field corev1.PersistentVolumeList.Items has no validation
 	return errs
 }
 
-func Validate_Pod(obj *v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Pod.TypeMeta has no validation
-	// field v1.Pod.ObjectMeta has no validation
+func Validate_Pod(obj *corev1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Pod.TypeMeta has no validation
+	// field corev1.Pod.ObjectMeta has no validation
 
-	// field v1.Pod.Spec
+	// field corev1.Pod.Spec
 	errs = append(errs,
-		func(obj v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj corev1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, Validate_PodSpec(&obj, fldPath)...)
 			return
 		}(obj.Spec, fldPath.Child("spec"))...)
 
-	// field v1.Pod.Status has no validation
+	// field corev1.Pod.Status has no validation
 	return errs
 }
 
-func Validate_PodAttachOptions(obj *v1.PodAttachOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodAttachOptions.TypeMeta has no validation
-	// field v1.PodAttachOptions.Stdin has no validation
-	// field v1.PodAttachOptions.Stdout has no validation
-	// field v1.PodAttachOptions.Stderr has no validation
-	// field v1.PodAttachOptions.TTY has no validation
-	// field v1.PodAttachOptions.Container has no validation
+func Validate_PodAttachOptions(obj *corev1.PodAttachOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodAttachOptions.TypeMeta has no validation
+	// field corev1.PodAttachOptions.Stdin has no validation
+	// field corev1.PodAttachOptions.Stdout has no validation
+	// field corev1.PodAttachOptions.Stderr has no validation
+	// field corev1.PodAttachOptions.TTY has no validation
+	// field corev1.PodAttachOptions.Container has no validation
 	return errs
 }
 
-func Validate_PodExecOptions(obj *v1.PodExecOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodExecOptions.TypeMeta has no validation
-	// field v1.PodExecOptions.Stdin has no validation
-	// field v1.PodExecOptions.Stdout has no validation
-	// field v1.PodExecOptions.Stderr has no validation
-	// field v1.PodExecOptions.TTY has no validation
-	// field v1.PodExecOptions.Container has no validation
-	// field v1.PodExecOptions.Command has no validation
+func Validate_PodExecOptions(obj *corev1.PodExecOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodExecOptions.TypeMeta has no validation
+	// field corev1.PodExecOptions.Stdin has no validation
+	// field corev1.PodExecOptions.Stdout has no validation
+	// field corev1.PodExecOptions.Stderr has no validation
+	// field corev1.PodExecOptions.TTY has no validation
+	// field corev1.PodExecOptions.Container has no validation
+	// field corev1.PodExecOptions.Command has no validation
 	return errs
 }
 
-func Validate_PodList(obj *v1.PodList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodList.TypeMeta has no validation
-	// field v1.PodList.ListMeta has no validation
+func Validate_PodList(obj *corev1.PodList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodList.TypeMeta has no validation
+	// field corev1.PodList.ListMeta has no validation
 
-	// field v1.PodList.Items
+	// field corev1.PodList.Items
 	errs = append(errs,
-		func(obj []v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj []corev1.Pod, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.Pod, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj corev1.Pod, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, Validate_Pod(&obj, fldPath)...)
 						return
 					}(val, fldPath.Index(i))...)
@@ -583,39 +583,39 @@ func Validate_PodList(obj *v1.PodList, fldPath *field.Path) (errs field.ErrorLis
 	return errs
 }
 
-func Validate_PodLogOptions(obj *v1.PodLogOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodLogOptions.TypeMeta has no validation
-	// field v1.PodLogOptions.Container has no validation
-	// field v1.PodLogOptions.Follow has no validation
-	// field v1.PodLogOptions.Previous has no validation
-	// field v1.PodLogOptions.SinceSeconds has no validation
-	// field v1.PodLogOptions.SinceTime has no validation
-	// field v1.PodLogOptions.Timestamps has no validation
-	// field v1.PodLogOptions.TailLines has no validation
-	// field v1.PodLogOptions.LimitBytes has no validation
-	// field v1.PodLogOptions.InsecureSkipTLSVerifyBackend has no validation
+func Validate_PodLogOptions(obj *corev1.PodLogOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodLogOptions.TypeMeta has no validation
+	// field corev1.PodLogOptions.Container has no validation
+	// field corev1.PodLogOptions.Follow has no validation
+	// field corev1.PodLogOptions.Previous has no validation
+	// field corev1.PodLogOptions.SinceSeconds has no validation
+	// field corev1.PodLogOptions.SinceTime has no validation
+	// field corev1.PodLogOptions.Timestamps has no validation
+	// field corev1.PodLogOptions.TailLines has no validation
+	// field corev1.PodLogOptions.LimitBytes has no validation
+	// field corev1.PodLogOptions.InsecureSkipTLSVerifyBackend has no validation
 	return errs
 }
 
-func Validate_PodPortForwardOptions(obj *v1.PodPortForwardOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodPortForwardOptions.TypeMeta has no validation
-	// field v1.PodPortForwardOptions.Ports has no validation
+func Validate_PodPortForwardOptions(obj *corev1.PodPortForwardOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodPortForwardOptions.TypeMeta has no validation
+	// field corev1.PodPortForwardOptions.Ports has no validation
 	return errs
 }
 
-func Validate_PodProxyOptions(obj *v1.PodProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodProxyOptions.TypeMeta has no validation
-	// field v1.PodProxyOptions.Path has no validation
+func Validate_PodProxyOptions(obj *corev1.PodProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodProxyOptions.TypeMeta has no validation
+	// field corev1.PodProxyOptions.Path has no validation
 	return errs
 }
 
-func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodSpec.Volumes
+func Validate_PodSpec(obj *corev1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodSpec.Volumes
 	errs = append(errs,
-		func(obj []v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj []corev1.Volume, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj corev1.Volume, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, Validate_Volume(&obj, fldPath)...)
 						return
 					}(val, fldPath.Index(i))...)
@@ -623,36 +623,36 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 			return
 		}(obj.Volumes, fldPath.Child("volumes"))...)
 
-	// field v1.PodSpec.InitContainers has no validation
-	// field v1.PodSpec.Containers has no validation
-	// field v1.PodSpec.EphemeralContainers has no validation
-	// field v1.PodSpec.RestartPolicy has no validation
-	// field v1.PodSpec.TerminationGracePeriodSeconds has no validation
-	// field v1.PodSpec.ActiveDeadlineSeconds has no validation
-	// field v1.PodSpec.DNSPolicy has no validation
-	// field v1.PodSpec.NodeSelector has no validation
-	// field v1.PodSpec.ServiceAccountName has no validation
-	// field v1.PodSpec.DeprecatedServiceAccount has no validation
-	// field v1.PodSpec.AutomountServiceAccountToken has no validation
-	// field v1.PodSpec.NodeName has no validation
-	// field v1.PodSpec.HostNetwork has no validation
-	// field v1.PodSpec.HostPID has no validation
-	// field v1.PodSpec.HostIPC has no validation
-	// field v1.PodSpec.ShareProcessNamespace has no validation
-	// field v1.PodSpec.SecurityContext has no validation
-	// field v1.PodSpec.ImagePullSecrets has no validation
-	// field v1.PodSpec.Hostname has no validation
-	// field v1.PodSpec.Subdomain has no validation
-	// field v1.PodSpec.Affinity has no validation
-	// field v1.PodSpec.SchedulerName has no validation
-	// field v1.PodSpec.Tolerations has no validation
+	// field corev1.PodSpec.InitContainers has no validation
+	// field corev1.PodSpec.Containers has no validation
+	// field corev1.PodSpec.EphemeralContainers has no validation
+	// field corev1.PodSpec.RestartPolicy has no validation
+	// field corev1.PodSpec.TerminationGracePeriodSeconds has no validation
+	// field corev1.PodSpec.ActiveDeadlineSeconds has no validation
+	// field corev1.PodSpec.DNSPolicy has no validation
+	// field corev1.PodSpec.NodeSelector has no validation
+	// field corev1.PodSpec.ServiceAccountName has no validation
+	// field corev1.PodSpec.DeprecatedServiceAccount has no validation
+	// field corev1.PodSpec.AutomountServiceAccountToken has no validation
+	// field corev1.PodSpec.NodeName has no validation
+	// field corev1.PodSpec.HostNetwork has no validation
+	// field corev1.PodSpec.HostPID has no validation
+	// field corev1.PodSpec.HostIPC has no validation
+	// field corev1.PodSpec.ShareProcessNamespace has no validation
+	// field corev1.PodSpec.SecurityContext has no validation
+	// field corev1.PodSpec.ImagePullSecrets has no validation
+	// field corev1.PodSpec.Hostname has no validation
+	// field corev1.PodSpec.Subdomain has no validation
+	// field corev1.PodSpec.Affinity has no validation
+	// field corev1.PodSpec.SchedulerName has no validation
+	// field corev1.PodSpec.Tolerations has no validation
 
-	// field v1.PodSpec.HostAliases
+	// field corev1.PodSpec.HostAliases
 	errs = append(errs,
-		func(obj []v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj []corev1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj corev1.HostAlias, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, Validate_HostAlias(&obj, fldPath)...)
 						return
 					}(val, fldPath.Index(i))...)
@@ -660,37 +660,37 @@ func Validate_PodSpec(obj *v1.PodSpec, fldPath *field.Path) (errs field.ErrorLis
 			return
 		}(obj.HostAliases, fldPath.Child("hostAliases"))...)
 
-	// field v1.PodSpec.PriorityClassName has no validation
-	// field v1.PodSpec.Priority has no validation
-	// field v1.PodSpec.DNSConfig has no validation
-	// field v1.PodSpec.ReadinessGates has no validation
-	// field v1.PodSpec.RuntimeClassName has no validation
-	// field v1.PodSpec.EnableServiceLinks has no validation
-	// field v1.PodSpec.PreemptionPolicy has no validation
-	// field v1.PodSpec.Overhead has no validation
-	// field v1.PodSpec.TopologySpreadConstraints has no validation
-	// field v1.PodSpec.SetHostnameAsFQDN has no validation
-	// field v1.PodSpec.OS has no validation
-	// field v1.PodSpec.HostUsers has no validation
-	// field v1.PodSpec.SchedulingGates has no validation
-	// field v1.PodSpec.ResourceClaims has no validation
+	// field corev1.PodSpec.PriorityClassName has no validation
+	// field corev1.PodSpec.Priority has no validation
+	// field corev1.PodSpec.DNSConfig has no validation
+	// field corev1.PodSpec.ReadinessGates has no validation
+	// field corev1.PodSpec.RuntimeClassName has no validation
+	// field corev1.PodSpec.EnableServiceLinks has no validation
+	// field corev1.PodSpec.PreemptionPolicy has no validation
+	// field corev1.PodSpec.Overhead has no validation
+	// field corev1.PodSpec.TopologySpreadConstraints has no validation
+	// field corev1.PodSpec.SetHostnameAsFQDN has no validation
+	// field corev1.PodSpec.OS has no validation
+	// field corev1.PodSpec.HostUsers has no validation
+	// field corev1.PodSpec.SchedulingGates has no validation
+	// field corev1.PodSpec.ResourceClaims has no validation
 	return errs
 }
 
-func Validate_PodStatusResult(obj *v1.PodStatusResult, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodStatusResult.TypeMeta has no validation
-	// field v1.PodStatusResult.ObjectMeta has no validation
-	// field v1.PodStatusResult.Status has no validation
+func Validate_PodStatusResult(obj *corev1.PodStatusResult, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodStatusResult.TypeMeta has no validation
+	// field corev1.PodStatusResult.ObjectMeta has no validation
+	// field corev1.PodStatusResult.Status has no validation
 	return errs
 }
 
-func Validate_PodTemplate(obj *v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodTemplate.TypeMeta has no validation
-	// field v1.PodTemplate.ObjectMeta has no validation
+func Validate_PodTemplate(obj *corev1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodTemplate.TypeMeta has no validation
+	// field corev1.PodTemplate.ObjectMeta has no validation
 
-	// field v1.PodTemplate.Template
+	// field corev1.PodTemplate.Template
 	errs = append(errs,
-		func(obj v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj corev1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, Validate_PodTemplateSpec(&obj, fldPath)...)
 			return
 		}(obj.Template, fldPath.Child("template"))...)
@@ -698,16 +698,16 @@ func Validate_PodTemplate(obj *v1.PodTemplate, fldPath *field.Path) (errs field.
 	return errs
 }
 
-func Validate_PodTemplateList(obj *v1.PodTemplateList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodTemplateList.TypeMeta has no validation
-	// field v1.PodTemplateList.ListMeta has no validation
+func Validate_PodTemplateList(obj *corev1.PodTemplateList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodTemplateList.TypeMeta has no validation
+	// field corev1.PodTemplateList.ListMeta has no validation
 
-	// field v1.PodTemplateList.Items
+	// field corev1.PodTemplateList.Items
 	errs = append(errs,
-		func(obj []v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj []corev1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
 			for i, val := range obj {
 				errs = append(errs,
-					func(obj v1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
+					func(obj corev1.PodTemplate, fldPath *field.Path) (errs field.ErrorList) {
 						errs = append(errs, Validate_PodTemplate(&obj, fldPath)...)
 						return
 					}(val, fldPath.Index(i))...)
@@ -718,12 +718,12 @@ func Validate_PodTemplateList(obj *v1.PodTemplateList, fldPath *field.Path) (err
 	return errs
 }
 
-func Validate_PodTemplateSpec(obj *v1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.PodTemplateSpec.ObjectMeta has no validation
+func Validate_PodTemplateSpec(obj *corev1.PodTemplateSpec, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.PodTemplateSpec.ObjectMeta has no validation
 
-	// field v1.PodTemplateSpec.Spec
+	// field corev1.PodTemplateSpec.Spec
 	errs = append(errs,
-		func(obj v1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
+		func(obj corev1.PodSpec, fldPath *field.Path) (errs field.ErrorList) {
 			errs = append(errs, Validate_PodSpec(&obj, fldPath)...)
 			return
 		}(obj.Spec, fldPath.Child("spec"))...)
@@ -731,106 +731,106 @@ func Validate_PodTemplateSpec(obj *v1.PodTemplateSpec, fldPath *field.Path) (err
 	return errs
 }
 
-func Validate_RangeAllocation(obj *v1.RangeAllocation, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.RangeAllocation.TypeMeta has no validation
-	// field v1.RangeAllocation.ObjectMeta has no validation
-	// field v1.RangeAllocation.Range has no validation
-	// field v1.RangeAllocation.Data has no validation
+func Validate_RangeAllocation(obj *corev1.RangeAllocation, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.RangeAllocation.TypeMeta has no validation
+	// field corev1.RangeAllocation.ObjectMeta has no validation
+	// field corev1.RangeAllocation.Range has no validation
+	// field corev1.RangeAllocation.Data has no validation
 	return errs
 }
 
-func Validate_ReplicationController(obj *v1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ReplicationController.TypeMeta has no validation
-	// field v1.ReplicationController.ObjectMeta has no validation
-	// field v1.ReplicationController.Spec has no validation
-	// field v1.ReplicationController.Status has no validation
+func Validate_ReplicationController(obj *corev1.ReplicationController, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ReplicationController.TypeMeta has no validation
+	// field corev1.ReplicationController.ObjectMeta has no validation
+	// field corev1.ReplicationController.Spec has no validation
+	// field corev1.ReplicationController.Status has no validation
 	return errs
 }
 
-func Validate_ReplicationControllerList(obj *v1.ReplicationControllerList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ReplicationControllerList.TypeMeta has no validation
-	// field v1.ReplicationControllerList.ListMeta has no validation
-	// field v1.ReplicationControllerList.Items has no validation
+func Validate_ReplicationControllerList(obj *corev1.ReplicationControllerList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ReplicationControllerList.TypeMeta has no validation
+	// field corev1.ReplicationControllerList.ListMeta has no validation
+	// field corev1.ReplicationControllerList.Items has no validation
 	return errs
 }
 
-func Validate_ResourceQuota(obj *v1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ResourceQuota.TypeMeta has no validation
-	// field v1.ResourceQuota.ObjectMeta has no validation
-	// field v1.ResourceQuota.Spec has no validation
-	// field v1.ResourceQuota.Status has no validation
+func Validate_ResourceQuota(obj *corev1.ResourceQuota, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ResourceQuota.TypeMeta has no validation
+	// field corev1.ResourceQuota.ObjectMeta has no validation
+	// field corev1.ResourceQuota.Spec has no validation
+	// field corev1.ResourceQuota.Status has no validation
 	return errs
 }
 
-func Validate_ResourceQuotaList(obj *v1.ResourceQuotaList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ResourceQuotaList.TypeMeta has no validation
-	// field v1.ResourceQuotaList.ListMeta has no validation
-	// field v1.ResourceQuotaList.Items has no validation
+func Validate_ResourceQuotaList(obj *corev1.ResourceQuotaList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ResourceQuotaList.TypeMeta has no validation
+	// field corev1.ResourceQuotaList.ListMeta has no validation
+	// field corev1.ResourceQuotaList.Items has no validation
 	return errs
 }
 
-func Validate_Secret(obj *v1.Secret, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Secret.TypeMeta has no validation
-	// field v1.Secret.ObjectMeta has no validation
-	// field v1.Secret.Immutable has no validation
-	// field v1.Secret.Data has no validation
-	// field v1.Secret.StringData has no validation
-	// field v1.Secret.Type has no validation
+func Validate_Secret(obj *corev1.Secret, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Secret.TypeMeta has no validation
+	// field corev1.Secret.ObjectMeta has no validation
+	// field corev1.Secret.Immutable has no validation
+	// field corev1.Secret.Data has no validation
+	// field corev1.Secret.StringData has no validation
+	// field corev1.Secret.Type has no validation
 	return errs
 }
 
-func Validate_SecretList(obj *v1.SecretList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.SecretList.TypeMeta has no validation
-	// field v1.SecretList.ListMeta has no validation
-	// field v1.SecretList.Items has no validation
+func Validate_SecretList(obj *corev1.SecretList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.SecretList.TypeMeta has no validation
+	// field corev1.SecretList.ListMeta has no validation
+	// field corev1.SecretList.Items has no validation
 	return errs
 }
 
-func Validate_SerializedReference(obj *v1.SerializedReference, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.SerializedReference.TypeMeta has no validation
-	// field v1.SerializedReference.Reference has no validation
+func Validate_SerializedReference(obj *corev1.SerializedReference, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.SerializedReference.TypeMeta has no validation
+	// field corev1.SerializedReference.Reference has no validation
 	return errs
 }
 
-func Validate_Service(obj *v1.Service, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Service.TypeMeta has no validation
-	// field v1.Service.ObjectMeta has no validation
-	// field v1.Service.Spec has no validation
-	// field v1.Service.Status has no validation
+func Validate_Service(obj *corev1.Service, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Service.TypeMeta has no validation
+	// field corev1.Service.ObjectMeta has no validation
+	// field corev1.Service.Spec has no validation
+	// field corev1.Service.Status has no validation
 	return errs
 }
 
-func Validate_ServiceAccount(obj *v1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceAccount.TypeMeta has no validation
-	// field v1.ServiceAccount.ObjectMeta has no validation
-	// field v1.ServiceAccount.Secrets has no validation
-	// field v1.ServiceAccount.ImagePullSecrets has no validation
-	// field v1.ServiceAccount.AutomountServiceAccountToken has no validation
+func Validate_ServiceAccount(obj *corev1.ServiceAccount, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ServiceAccount.TypeMeta has no validation
+	// field corev1.ServiceAccount.ObjectMeta has no validation
+	// field corev1.ServiceAccount.Secrets has no validation
+	// field corev1.ServiceAccount.ImagePullSecrets has no validation
+	// field corev1.ServiceAccount.AutomountServiceAccountToken has no validation
 	return errs
 }
 
-func Validate_ServiceAccountList(obj *v1.ServiceAccountList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceAccountList.TypeMeta has no validation
-	// field v1.ServiceAccountList.ListMeta has no validation
-	// field v1.ServiceAccountList.Items has no validation
+func Validate_ServiceAccountList(obj *corev1.ServiceAccountList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ServiceAccountList.TypeMeta has no validation
+	// field corev1.ServiceAccountList.ListMeta has no validation
+	// field corev1.ServiceAccountList.Items has no validation
 	return errs
 }
 
-func Validate_ServiceList(obj *v1.ServiceList, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceList.TypeMeta has no validation
-	// field v1.ServiceList.ListMeta has no validation
-	// field v1.ServiceList.Items has no validation
+func Validate_ServiceList(obj *corev1.ServiceList, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ServiceList.TypeMeta has no validation
+	// field corev1.ServiceList.ListMeta has no validation
+	// field corev1.ServiceList.Items has no validation
 	return errs
 }
 
-func Validate_ServiceProxyOptions(obj *v1.ServiceProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.ServiceProxyOptions.TypeMeta has no validation
-	// field v1.ServiceProxyOptions.Path has no validation
+func Validate_ServiceProxyOptions(obj *corev1.ServiceProxyOptions, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.ServiceProxyOptions.TypeMeta has no validation
+	// field corev1.ServiceProxyOptions.Path has no validation
 	return errs
 }
 
-func Validate_Volume(obj *v1.Volume, fldPath *field.Path) (errs field.ErrorList) {
-	// field v1.Volume.Name
+func Validate_Volume(obj *corev1.Volume, fldPath *field.Path) (errs field.ErrorList) {
+	// field corev1.Volume.Name
 	errs = append(errs,
 		func(obj string, fldPath *field.Path) (errs field.ErrorList) {
 			if e := validate.Required(fldPath, obj); len(e) != 0 {
@@ -841,6 +841,6 @@ func Validate_Volume(obj *v1.Volume, fldPath *field.Path) (errs field.ErrorList)
 			return
 		}(obj.Name, fldPath.Child("name"))...)
 
-	// field v1.Volume.VolumeSource has no validation
+	// field corev1.Volume.VolumeSource has no validation
 	return errs
 }

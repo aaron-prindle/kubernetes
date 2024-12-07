@@ -123,25 +123,28 @@ func (s *SnippetWriter) Do(format string, args interface{}) *SnippetWriter {
 // SnippetWriter.Do.
 type Args map[interface{}]interface{}
 
-// With makes a copy of a and adds the given key, value pair.
+// With makes a copy of a and adds the given key, value pair. If key overlaps,
+// the new value wins.
 func (a Args) With(key, value interface{}) Args {
-	a2 := Args{key: value}
+	result := Args{}
 	for k, v := range a {
-		a2[k] = v
+		result[k] = v
 	}
-	return a2
+	result[key] = value
+	return result
 }
 
-// WithArgs makes a copy of a and adds the given arguments.
+// WithArgs makes a copy of a and adds the given arguments. If any keys
+// overlap, the values from rhs win.
 func (a Args) WithArgs(rhs Args) Args {
-	a2 := Args{}
-	for k, v := range rhs {
-		a2[k] = v
-	}
+	result := Args{}
 	for k, v := range a {
-		a2[k] = v
+		result[k] = v
 	}
-	return a2
+	for k, v := range rhs {
+		result[k] = v
+	}
+	return result
 }
 
 func (s *SnippetWriter) Out() io.Writer {
@@ -160,7 +163,7 @@ func (s *SnippetWriter) Dup(w io.Writer) *SnippetWriter {
 	return &ret
 }
 
-// Append add the contents of the io.Reader to this SnippetWriter's buffer.
+// Append adds the contents of the io.Reader to this SnippetWriter's buffer.
 func (s *SnippetWriter) Append(r io.Reader) error {
 	_, err := io.Copy(s.w, r)
 	return err
