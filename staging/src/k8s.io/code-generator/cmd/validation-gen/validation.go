@@ -229,6 +229,9 @@ type childNode struct {
 	fieldValidations validators.Validations // validations on the field
 	keyValidations   validators.Validations // validations on each key of a map field
 	elemValidations  validators.Validations // validations on each value of a list or map
+
+	// struct fields can have per-child-member validations.
+	inner []*childNode
 }
 
 // typeNode represents a node in the type-graph, annotated with information
@@ -513,6 +516,11 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		if unicode.IsLower([]rune(name)[0]) {
 			continue
 		}
+		// ========
+		// If we are descending into a named type, reboot the field path.
+		fldPathFromParent := fldPath.Child(name)
+		// ========
+
 		// If we try to emit code for this field and find no JSON name, we
 		// will abort.
 		jsonName := ""
@@ -602,6 +610,51 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 						return fmt.Errorf("%v: variable generation is not supported for list value validations", childPath)
 					}
 				}
+			}
+		case types.Struct:
+			/////////////////////////////////////////
+			//FIXME: look for "inner" validations
+			//FIXME: use a JSON tagval {field: "name", validation=...} ?
+			for _, subfield := range childType.Members {
+				//FIXME: almost exact dup of above first-level struct logic, except doesn't call discover
+				name := subfield.Name
+				if len(name) == 0 {
+					// embedded fields
+					if memb.Type.Kind == types.Pointer {
+						name = subfield.Type.Elem.Name.Name
+					} else {
+						name = subfield.Type.Name.Name
+					}
+				}
+				// If we try to emit code for this field and find no JSON name, we
+				// will abort.
+				jsonName := ""
+				if tags, ok := lookupJSONTags(subfield); ok {
+					jsonName = tags.name
+				}
+				// Only do exported fields.
+				if unicode.IsLower([]rune(memb.Name)[0]) {
+					continue
+				}
+				klog.V(5).InfoS("  subfield", "name", memb.Name, name) //FIXME: we shadowed "name"
+
+				if validations, err := td.extractInnerValidations(&subfield, memb.CommentLines); err != nil {
+					return fmt.Errorf("%v: %w", fldPathFromParent.Child(name), err)
+				} else {
+					if validations.Empty() {
+						continue
+					}
+					klog.V(5).InfoS("  found field-attached inner-validations", "n", validations.Len())
+
+					subchild := &childNode{
+						name:     name,
+						jsonName: jsonName,
+						// underlyingType: subfield.Type,
+						// validations:    validations,
+					}
+					child.inner = append(child.inner, subchild)
+				}
+				////////////////////////////////////////
 			}
 		case types.Map:
 			// Extract any embedded key-validation rules.
@@ -932,9 +985,92 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 					g.emitValidationForChild(c, fld.node.underlying, bufsw)
 					// Call the type's validation function.
 					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+					// //FIXME: almost exact dup of above
+					// for _, subchild := range fld.inner {
+					// 	if len(subchild.name) == 0 {
+					// 		klog.Fatalf("missing child name for field in %v", thisNode)
+					// 	}
+					// 	if len(subchild.jsonName) == 0 {
+					// 		klog.Fatalf("missing child JSON name for field %v.%s", thisNode, subchild.name)
+					// 	}
+
+					// 	//FIXME: do we need the extra stuff from parent?
+					// 	targs := targs.WithArgs(generator.Args{
+					// 		"inType":    thisNode,
+					// 		"fieldName": subchild.name,
+					// 		"fieldJSON": subchild.jsonName,
+					// 		// "fieldType": subchild.underlyingType,
+					// 	})
+
+					// 	bufsw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+					// 	//TODO: pass val first or fldpath first?  validators do fldpath, why?
+					// 	bufsw.Do("errs = append(errs,\n", targs)
+					// 	bufsw.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+
+					// 	if !subchild.elemValidations.Empty() {
+					// 		// When calling registered validators, we always pass the
+					// 		// underlying value-type.  E.g. if the field's type is string,
+					// 		// we pass string, and if the field's type is *string, we also
+					// 		// pass string (checking for nil, first).  This means those
+					// 		// validators don't have to know the difference, but it also
+					// 		// means that large structs will be passed by value.  If this
+					// 		// turns out to be a real problem, we could change this to pass
+					// 		// everything by pointer.
+					// 		// subchildIsPtr := subchild.underlyingType.Kind == types.Pointer
+					// 		// g.emitCallsToValidators(c, subchild.validations, subchildIsPtr, bufsw)
+					// 	}
+					// 	bufsw.Do("    return\n", targs)
+					// 	bufsw.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+					// 	bufsw.Do("\n", nil)
+					// }
 				case types.Struct:
 					// Call the type's validation function.
 					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+					//FIXME: almost exact dup of above
+					// TODO(aaron-prindle) FIXME - this ACTUALLY GETS CALLED, REST DON'T
+					for _, subchild := range fld.inner {
+						if len(subchild.name) == 0 {
+							// FIXME
+							// continue
+							klog.Fatalf("missing child name for field in %v", thisNode)
+						}
+						// TODO(aaron-prindle) FIXME- ERRORING CURRENTLY AS THIS IS CALLED ON FIELDS IT SHOULDN'T BE
+						if len(subchild.jsonName) == 0 {
+							// FIXME
+							// continue
+							klog.Fatalf("missing child JSON name for field %v.%s", thisNode, subchild.name)
+						}
+
+						//FIXME: do we need the extra stuff from parent?
+						targs := targs.WithArgs(generator.Args{
+							"inType":    thisNode,
+							"fieldName": subchild.name,
+							"fieldJSON": subchild.jsonName,
+							// "fieldType": subchild.underlyingType,
+						})
+
+						bufsw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+						//TODO: pass val first or fldpath first?  validators do fldpath, why?
+						bufsw.Do("errs = append(errs,\n", targs)
+						bufsw.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+
+						if !subchild.elemValidations.Empty() {
+							// When calling registered validators, we always pass the
+							// underlying value-type.  E.g. if the field's type is string,
+							// we pass string, and if the field's type is *string, we also
+							// pass string (checking for nil, first).  This means those
+							// validators don't have to know the difference, but it also
+							// means that large structs will be passed by value.  If this
+							// turns out to be a real problem, we could change this to pass
+							// everything by pointer.
+							// subchildIsPtr := subchild.underlyingType.Kind == types.Pointer
+							// g.emitCallsToValidators(c, subchild.validations, subchildIsPtr, bufsw)
+						}
+						bufsw.Do("    return\n", targs)
+						bufsw.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+						bufsw.Do("\n", nil)
+					}
+
 				default:
 					// Descend into this field.
 					g.emitValidationForChild(c, fld, bufsw)
@@ -1004,6 +1140,44 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				// If this field is another type, call its validation function.
 				// Checking for nil is handled inside this call.
 				g.emitCallToOtherTypeFunc(c, thisNode.elem.node, elemSW)
+				// //FIXME: almost exact dup of above
+				// for _, subchild := range thisChild.inner {
+				// 	if len(subchild.name) == 0 {
+				// 		klog.Fatalf("missing child name for field in %v", thisNode)
+				// 	}
+				// 	if len(subchild.jsonName) == 0 {
+				// 		klog.Fatalf("missing child JSON name for field %v.%s", thisNode, subchild.name)
+				// 	}
+
+				// 	//FIXME: do we need the extra stuff from parent?
+				// 	targs := targs.WithArgs(generator.Args{
+				// 		"inType":    thisNode,
+				// 		"fieldName": subchild.name,
+				// 		"fieldJSON": subchild.jsonName,
+				// 		// "fieldType": subchild.underlyingType,
+				// 	})
+
+				// 	elemSW.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+				// 	//TODO: pass val first or fldpath first?  validators do fldpath, why?
+				// 	elemSW.Do("errs = append(errs,\n", targs)
+				// 	elemSW.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+
+				// 	if !subchild.elemValidations.Empty() {
+				// 		// When calling registered validators, we always pass the
+				// 		// underlying value-type.  E.g. if the field's type is string,
+				// 		// we pass string, and if the field's type is *string, we also
+				// 		// pass string (checking for nil, first).  This means those
+				// 		// validators don't have to know the difference, but it also
+				// 		// means that large structs will be passed by value.  If this
+				// 		// turns out to be a real problem, we could change this to pass
+				// 		// everything by pointer.
+				// 		// subchildIsPtr := subchild.underlyingType.Kind == types.Pointer
+				// 		// g.emitCallsToValidators(c, subchild.validations, subchildIsPtr, bufsw)
+				// 	}
+				// 	elemSW.Do("    return\n", targs)
+				// 	elemSW.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+				// 	elemSW.Do("\n", nil)
+				// }
 			default:
 				// No need to go further.  Struct- or alias-typed fields might have
 				// validations attached to the type, but anything else (e.g.
@@ -1073,6 +1247,44 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				// If this field is another type, call its validation function.
 				// Checking for nil is handled inside this call.
 				g.emitCallToOtherTypeFunc(c, thisNode.key.node, keySW)
+				// //FIXME: almost exact dup of above
+				// for _, subchild := range thisChild.inner {
+				// 	if len(subchild.name) == 0 {
+				// 		klog.Fatalf("missing child name for field in %v", thisNode)
+				// 	}
+				// 	if len(subchild.jsonName) == 0 {
+				// 		klog.Fatalf("missing child JSON name for field %v.%s", thisNode, subchild.name)
+				// 	}
+
+				// 	//FIXME: do we need the extra stuff from parent?
+				// 	targs := targs.WithArgs(generator.Args{
+				// 		"inType":    thisNode,
+				// 		"fieldName": subchild.name,
+				// 		"fieldJSON": subchild.jsonName,
+				// 		// "fieldType": subchild.underlyingType,
+				// 	})
+
+				// 	keySW.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+				// 	//TODO: pass val first or fldpath first?  validators do fldpath, why?
+				// 	keySW.Do("errs = append(errs,\n", targs)
+				// 	keySW.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+
+				// 	if !subchild.elemValidations.Empty() {
+				// 		// When calling registered validators, we always pass the
+				// 		// underlying value-type.  E.g. if the field's type is string,
+				// 		// we pass string, and if the field's type is *string, we also
+				// 		// pass string (checking for nil, first).  This means those
+				// 		// validators don't have to know the difference, but it also
+				// 		// means that large structs will be passed by value.  If this
+				// 		// turns out to be a real problem, we could change this to pass
+				// 		// everything by pointer.
+				// 		// subchildIsPtr := subchild.underlyingType.Kind == types.Pointer
+				// 		// g.emitCallsToValidators(c, subchild.validations, subchildIsPtr, bufsw)
+				// 	}
+				// 	keySW.Do("    return\n", targs)
+				// 	keySW.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+				// 	keySW.Do("\n", nil)
+				// }
 			default:
 				// No need to go further.  Struct- or alias-typed fields might have
 				// validations attached to the type, but anything else (e.g.
@@ -1106,6 +1318,44 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				// If this field is another type, call its validation function.
 				// Checking for nil is handled inside this call.
 				g.emitCallToOtherTypeFunc(c, thisNode.elem.node, valSW)
+				// //FIXME: almost exact dup of above
+				// for _, subchild := range thisChild.inner {
+				// 	if len(subchild.name) == 0 {
+				// 		klog.Fatalf("missing child name for field in %v", thisNode)
+				// 	}
+				// 	if len(subchild.jsonName) == 0 {
+				// 		klog.Fatalf("missing child JSON name for field %v.%s", thisNode, subchild.name)
+				// 	}
+
+				// 	//FIXME: do we need the extra stuff from parent?
+				// 	targs := targs.WithArgs(generator.Args{
+				// 		"inType":    thisNode,
+				// 		"fieldName": subchild.name,
+				// 		"fieldJSON": subchild.jsonName,
+				// 		// "fieldType": subchild.underlyingType,
+				// 	})
+
+				// 	valSW.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+				// 	//TODO: pass val first or fldpath first?  validators do fldpath, why?
+				// 	valSW.Do("errs = append(errs,\n", targs)
+				// 	valSW.Do("  func(obj $.fieldType|raw$, fldPath *$.fieldPath|raw$) (errs $.errorList|raw$) {\n", targs)
+
+				// 	if !subchild.elemValidations.Empty() {
+				// 		// When calling registered validators, we always pass the
+				// 		// underlying value-type.  E.g. if the field's type is string,
+				// 		// we pass string, and if the field's type is *string, we also
+				// 		// pass string (checking for nil, first).  This means those
+				// 		// validators don't have to know the difference, but it also
+				// 		// means that large structs will be passed by value.  If this
+				// 		// turns out to be a real problem, we could change this to pass
+				// 		// everything by pointer.
+				// 		// subchildIsPtr := subchild.underlyingType.Kind == types.Pointer
+				// 		// g.emitCallsToValidators(c, subchild.validations, subchildIsPtr, bufsw)
+				// 	}
+				// 	valSW.Do("    return\n", targs)
+				// 	valSW.Do("  }(obj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+				// 	valSW.Do("\n", nil)
+				// }
 			default:
 				// No need to go further.  Struct- or alias-typed fields might have
 				// validations attached to the type, but anything else (e.g.
@@ -1528,4 +1778,26 @@ func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 		sw.Do("}\n", nil)
 	}
 	return nil
+}
+
+func (td *typeDiscoverer) extractInnerValidations(subfield *types.Member, comments []string) (validators.Validations, error) {
+	var result validators.Validations
+	fieldTag := fmt.Sprintf("%s(%s)", "inner", subfield.Name)
+	if tagVals, found := gengo.ExtractCommentTags("+", comments)[fieldTag]; found {
+
+		for _, tagVal := range tagVals {
+			// Extract any embedded validation rules.
+			fakeComments := []string{tagVal}
+			//FIXME: pass in "parent.child" for name or just "child"?
+			if innerValidations, err := td.validator.ExtractValidations(subfield.Type, fakeComments); err != nil {
+				return result, err
+			} else {
+				if !innerValidations.Empty() {
+					klog.V(5).InfoS("  found inner-validations", "field", subfield.Name, "n", innerValidations.Len())
+					result.Add(innerValidations)
+				}
+			}
+		}
+	}
+	return result, nil
 }
