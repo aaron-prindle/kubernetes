@@ -1,0 +1,10 @@
+{
+    "*subField.T1": {
+      "": [
+        "type T1"
+      ],
+      "ObjectMeta.name": [
+        "subField T1.ObjectMeta.Name"
+      ]
+    }
+  }

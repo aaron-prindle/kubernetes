@@ -1,0 +1,45 @@
+{
+    "*subField.T1": {
+      "": [
+        "type T1"
+      ],
+      "pt2.mapField": [
+        "subField T1.PT2.MapField"
+      ],
+      "pt2.pointerField": [
+        "subField T1.PT2.PointerField"
+      ],
+      "pt2.sliceField": [
+        "subField T1.PT2.SliceField"
+      ],
+      "pt2.stringField": [
+        "subField T1.PT2.StringField"
+      ],
+      "pt2.stringFieldWithValidation": [
+        "field T2.StringFieldWithValidation",
+        "subField T1.PT2.StringFieldWithValidation"
+      ],
+      "pt2.structField": [
+        "subField T1.PT2.StructField"
+      ],
+      "t2.mapField": [
+        "subField T1.T2.MapField"
+      ],
+      "t2.pointerField": [
+        "subField T1.T2.PointerField"
+      ],
+      "t2.sliceField": [
+        "subField T1.T2.SliceField"
+      ],
+      "t2.stringField": [
+        "subField T1.T2.StringField"
+      ],
+      "t2.stringFieldWithValidation": [
+        "field T2.StringFieldWithValidation",
+        "subField T1.T2.StringFieldWithValidation"
+      ],
+      "t2.structField": [
+        "subField T1.T2.StructField"
+      ]
+    }
+  }
