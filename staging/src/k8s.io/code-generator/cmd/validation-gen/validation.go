@@ -229,6 +229,9 @@ type childNode struct {
 	fieldValidations validators.Validations // validations on the field
 	keyValidations   validators.Validations // validations on each key of a map field
 	elemValidations  validators.Validations // validations on each value of a list or map
+
+	// struct fields can have per-child-member validations.
+	inner []*childNode
 }
 
 // typeNode represents a node in the type-graph, annotated with information
@@ -331,6 +334,10 @@ const (
 	// This tag defines a validation which is to be run on each value in a map
 	// or slice.
 	eachValTag = "eachVal"
+	// This tag defines a validation which is to be run on an "inner" field of
+	// the struct tagged.
+	innerTag = "k8s:inner"
+
 	// This tag designates a child field as part of the list-map key for a list
 	// of structs.
 	listMapKeyTag = "listMapKey"
@@ -601,6 +608,46 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 					if len(validations.Variables) > 0 {
 						return fmt.Errorf("%v: variable generation is not supported for list value validations", childPath)
 					}
+				}
+			}
+		case types.Struct:
+			for _, subfield := range childType.Members {
+				name := subfield.Name
+				if len(name) == 0 {
+					// embedded fields
+					if memb.Type.Kind == types.Pointer {
+						name = subfield.Type.Elem.Name.Name
+					} else {
+						name = subfield.Type.Name.Name
+					}
+				}
+				// If we try to emit code for this field and find no JSON name, we
+				// will abort.
+				jsonName := ""
+				if commentTags, ok := tags.LookupJSON(subfield); ok {
+					jsonName = commentTags.Name
+				}
+				// Only do exported fields.
+				if unicode.IsLower([]rune(memb.Name)[0]) {
+					continue
+				}
+				klog.V(5).InfoS("  subfield", "name", memb.Name, name)
+
+				if validations, err := td.extractInnerValidations(&subfield, memb.CommentLines); err != nil {
+					return fmt.Errorf("%v: %w", childPath.Child(name), err)
+				} else {
+					if validations.Empty() {
+						continue
+					}
+					klog.V(5).InfoS("  found field-attached inner-validations", "n", validations.Len())
+
+					subchild := &childNode{
+						name:             name,
+						jsonName:         jsonName,
+						childType:        subfield.Type,
+						fieldValidations: validations,
+					}
+					child.inner = append(child.inner, subchild)
 				}
 			}
 		case types.Map:
@@ -935,6 +982,31 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				case types.Struct:
 					// Call the type's validation function.
 					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
+					for _, subchild := range fld.inner {
+						if len(subchild.name) == 0 {
+							klog.Fatalf("missing child name for field in %v", thisNode)
+						}
+						if len(subchild.jsonName) == 0 {
+							klog.Fatalf("missing child JSON name for field %v.%s", thisNode, subchild.name)
+						}
+						targs := targs.WithArgs(generator.Args{
+							"inType":    fld.childType,
+							"fieldName": subchild.name,
+							"fieldJSON": subchild.jsonName,
+							"fieldType": subchild.childType,
+						})
+						bufsw.Do("// field $.inType|raw$.$.fieldName$\n", targs)
+						bufsw.Do("errs = append(errs,\n", targs)
+						bufsw.Do("  func(obj, oldObj $.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
+
+						if !subchild.fieldValidations.Empty() {
+							emitCallsToValidators(c, subchild.fieldValidations.Functions, bufsw)
+						}
+						bufsw.Do("    return\n", targs)
+						bufsw.Do("  }(obj.$.fieldName$, oldObj.$.fieldName$, fldPath.Child(\"$.fieldJSON$\"))...)\n", targs)
+						bufsw.Do("\n", nil)
+					}
+
 				default:
 					// Descend into this field.
 					g.emitValidationForChild(c, fld, bufsw)
@@ -1528,4 +1600,25 @@ func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 		sw.Do("}\n", nil)
 	}
 	return nil
+}
+
+func (td *typeDiscoverer) extractInnerValidations(subfield *types.Member, comments []string) (validators.Validations, error) {
+	var result validators.Validations
+
+	fieldTag := fmt.Sprintf("%s(%s)", innerTag, subfield.Name)
+	if tagVals, found := gengo.ExtractCommentTags("+", comments)[fieldTag]; found {
+		for _, tagVal := range tagVals {
+			// Extract any embedded validation rules.
+			fakeComments := []string{tagVal}
+			if innerValidations, err := td.validator.ExtractValidations(subfield.Type, fakeComments); err != nil {
+				return result, err
+			} else {
+				if !innerValidations.Empty() {
+					klog.V(5).InfoS("  found inner-validations", "field", subfield.Name, "n", innerValidations.Len())
+					result.Add(innerValidations)
+				}
+			}
+		}
+	}
+	return result, nil
 }
