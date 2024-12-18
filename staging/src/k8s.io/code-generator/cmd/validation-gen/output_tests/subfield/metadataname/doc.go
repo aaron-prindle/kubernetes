@@ -30,6 +30,6 @@ var localSchemeBuilder = testscheme.New()
 
 // +k8s:validateFalse="type T1"
 type T1 struct {
-	// +k8s:subfield(Name)=+k8s:validateFalse="subfield T1.ObjectMeta.Name"
+	// +k8s:subfield(name)=+k8s:validateFalse="subfield T1.ObjectMeta.Name"
 	metav1.ObjectMeta
 }

@@ -44,19 +44,19 @@ type T1 struct {
 	TypeMeta int `json:"typeMeta"`
 
 	// T2 struct with subfield field validations
-	// +k8s:subfield(MapField)=+k8s:validateFalse="subfield T1.T2.MapField"
-	// +k8s:subfield(PointerField)=+k8s:validateFalse="subfield T1.T2.PointerField"
-	// +k8s:subfield(SliceField)=+k8s:validateFalse="subfield T1.T2.SliceField"
-	// +k8s:subfield(StringField)=+k8s:validateFalse="subfield T1.T2.StringField"
-	// +k8s:subfield(StringFieldWithValidation)=+k8s:validateFalse="subfield T1.T2.StringFieldWithValidation"
-	// +k8s:subfield(StructField)=+k8s:validateFalse="subfield T1.T2.StructField"
+	// +k8s:subfield(mapField)=+k8s:validateFalse="subfield T1.T2.MapField"
+	// +k8s:subfield(pointerField)=+k8s:validateFalse="subfield T1.T2.PointerField"
+	// +k8s:subfield(sliceField)=+k8s:validateFalse="subfield T1.T2.SliceField"
+	// +k8s:subfield(stringField)=+k8s:validateFalse="subfield T1.T2.StringField"
+	// +k8s:subfield(stringFieldWithValidation)=+k8s:validateFalse="subfield T1.T2.StringFieldWithValidation"
+	// +k8s:subfield(structField)=+k8s:validateFalse="subfield T1.T2.StructField"
 	T2 T2 `json:"t2"`
 
-	// +k8s:subfield(MapField)=+k8s:validateFalse="subfield T1.PT2.MapField"
-	// +k8s:subfield(PointerField)=+k8s:validateFalse="subfield T1.PT2.PointerField"
-	// +k8s:subfield(SliceField)=+k8s:validateFalse="subfield T1.PT2.SliceField"
-	// +k8s:subfield(StringField)=+k8s:validateFalse="subfield T1.PT2.StringField"
-	// +k8s:subfield(StringFieldWithValidation)=+k8s:validateFalse="subfield T1.PT2.StringFieldWithValidation"
-	// +k8s:subfield(StructField)=+k8s:validateFalse="subfield T1.PT2.StructField"
+	// +k8s:subfield(mapField)=+k8s:validateFalse="subfield T1.PT2.MapField"
+	// +k8s:subfield(pointerField)=+k8s:validateFalse="subfield T1.PT2.PointerField"
+	// +k8s:subfield(sliceField)=+k8s:validateFalse="subfield T1.PT2.SliceField"
+	// +k8s:subfield(stringField)=+k8s:validateFalse="subfield T1.PT2.StringField"
+	// +k8s:subfield(stringFieldWithValidation)=+k8s:validateFalse="subfield T1.PT2.StringFieldWithValidation"
+	// +k8s:subfield(structField)=+k8s:validateFalse="subfield T1.PT2.StructField"
 	PT2 *T2 `json:"pt2"`
 }
