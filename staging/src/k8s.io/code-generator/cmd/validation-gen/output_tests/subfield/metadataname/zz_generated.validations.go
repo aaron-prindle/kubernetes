@@ -47,9 +47,6 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 }
 
 func Validate_T1(opCtx operation.Context, obj, oldObj *T1, fldPath *field.Path) (errs field.ErrorList) {
-	// type T1
-	errs = append(errs, validate.FixedResult(opCtx, fldPath, obj, oldObj, false, "type T1")...)
-
 	// field T1.ObjectMeta
 	errs = append(errs,
 		func(obj, oldObj *v1.ObjectMeta, fldPath *field.Path) (errs field.ErrorList) {

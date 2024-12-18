@@ -17,70 +17,13 @@ limitations under the License.
 package subfield
 
 import (
-	"sort"
 	"testing"
-
-	operation "k8s.io/apimachinery/pkg/api/operation"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestSubfieldObjectMetaValidationWithValidateFalse(t *testing.T) {
-	cases := []struct {
-		name          string
-		obj           *T1
-		expectedPaths []string
-		expectErrors  bool
-	}{
-		{
-			name: "ObjectMeta.name subfield validation",
-			obj: &T1{
-				ObjectMeta: v1.ObjectMeta{
-					Name: "",
-				},
-			},
-			expectedPaths: []string{
-				"<nil>", // <nil> entry is for root validateFalse on "type T1"
-				"ObjectMeta.name",
-			},
-			expectErrors: true,
-		},
-	}
+	st := localSchemeBuilder.Test(t)
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			opCtx := operation.Context{}
-			errs := Validate_T1(opCtx, tc.obj, tc.obj, nil)
-			if tc.expectErrors && len(errs) == 0 {
-				t.Error("expected validation errors but got none")
-			}
-			if !tc.expectErrors && len(errs) > 0 {
-				t.Errorf("unexpected validation errors: %v", errs)
-			}
-
-			actualPaths := []string{}
-			for _, err := range errs {
-				actualPaths = append(actualPaths, err.Field)
-			}
-
-			sort.Strings(tc.expectedPaths)
-			sort.Strings(actualPaths)
-
-			if tc.expectErrors && !equalStringSlices(tc.expectedPaths, actualPaths) {
-				t.Errorf("expected error paths %q, but got %q", tc.expectedPaths, actualPaths)
-			}
-		})
-	}
-}
-
-// equalStringSlices compares if two string slices are equal
-func equalStringSlices(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
+	st.Value(&T1{}).
+		// check for subfield +k8s:validateFalse validation on T1.ObjectMeta.Name
+		ExpectValidateFalse("subfield T1.ObjectMeta.Name")
 }

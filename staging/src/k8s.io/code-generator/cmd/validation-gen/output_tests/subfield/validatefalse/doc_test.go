@@ -24,6 +24,44 @@ import (
 )
 
 func TestSubfieldValidationWithValidateFalse(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
+
+	st.Value(&T1{
+		T2: T2{
+			StringField:               "",
+			StringFieldWithValidation: "",
+			SliceField:                []string{},
+			PointerField:              nil,
+			MapField:                  map[string]string{},
+		},
+		PT2: &T2{
+			StringField:               "",
+			StringFieldWithValidation: "",
+			SliceField:                []string{},
+			PointerField:              nil,
+			MapField:                  map[string]string{},
+		},
+	}).
+		// All ifOptionDisabled validations should fail
+		ExpectValidateFalse(
+			"field T2.StringFieldWithValidation",
+			"subfield T1.PT2.MapField",
+			"subfield T1.PT2.PointerField",
+			"subfield T1.PT2.SliceField",
+			"subfield T1.PT2.StringField",
+			"subfield T1.PT2.StringFieldWithValidation",
+			"subfield T1.PT2.StructField",
+			"subfield T1.T2.MapField",
+			"subfield T1.T2.PointerField",
+			"subfield T1.T2.SliceField",
+			"subfield T1.T2.StringField",
+			"subfield T1.T2.StringFieldWithValidation",
+			"subfield T1.T2.StructField",
+			"type T1",
+		)
+}
+
+func TestSubfieldValidationWithValidateFalseCountDupeErrors(t *testing.T) {
 	cases := []struct {
 		name          string
 		obj           *T1
