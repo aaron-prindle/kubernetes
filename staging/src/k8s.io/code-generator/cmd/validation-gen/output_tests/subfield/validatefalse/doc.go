@@ -18,8 +18,8 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 // +k8s:validation-gen-test-fixture=validateFalse
 
-// Package subField contains test types for testing subField field validation tags.
-package subField
+// Package subfield contains test types for testing subfield field validation tags.
+package subfield
 
 import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
@@ -27,7 +27,7 @@ var localSchemeBuilder = testscheme.New()
 
 type StructField struct{}
 
-// T2 has string, slice, pointer and map fields to test subField field validations across types
+// T2 has string, slice, pointer and map fields to test subfield field validations across types
 type T2 struct {
 	MapField     map[string]string `json:"mapField"`
 	PointerField *string           `json:"pointerField"`
@@ -38,25 +38,25 @@ type T2 struct {
 	StructField               StructField `json:"structField"`
 }
 
-// T1 demonstrates validations for subField fields of structs.
+// T1 demonstrates validations for subfield fields of structs.
 // +k8s:validateFalse="type T1"
 type T1 struct {
 	TypeMeta int `json:"typeMeta"`
 
-	// T2 struct with subField field validations
-	// +k8s:subField(MapField)=+k8s:validateFalse="subField T1.T2.MapField"
-	// +k8s:subField(PointerField)=+k8s:validateFalse="subField T1.T2.PointerField"
-	// +k8s:subField(SliceField)=+k8s:validateFalse="subField T1.T2.SliceField"
-	// +k8s:subField(StringField)=+k8s:validateFalse="subField T1.T2.StringField"
-	// +k8s:subField(StringFieldWithValidation)=+k8s:validateFalse="subField T1.T2.StringFieldWithValidation"
-	// +k8s:subField(StructField)=+k8s:validateFalse="subField T1.T2.StructField"
+	// T2 struct with subfield field validations
+	// +k8s:subfield(MapField)=+k8s:validateFalse="subfield T1.T2.MapField"
+	// +k8s:subfield(PointerField)=+k8s:validateFalse="subfield T1.T2.PointerField"
+	// +k8s:subfield(SliceField)=+k8s:validateFalse="subfield T1.T2.SliceField"
+	// +k8s:subfield(StringField)=+k8s:validateFalse="subfield T1.T2.StringField"
+	// +k8s:subfield(StringFieldWithValidation)=+k8s:validateFalse="subfield T1.T2.StringFieldWithValidation"
+	// +k8s:subfield(StructField)=+k8s:validateFalse="subfield T1.T2.StructField"
 	T2 T2 `json:"t2"`
 
-	// +k8s:subField(MapField)=+k8s:validateFalse="subField T1.PT2.MapField"
-	// +k8s:subField(PointerField)=+k8s:validateFalse="subField T1.PT2.PointerField"
-	// +k8s:subField(SliceField)=+k8s:validateFalse="subField T1.PT2.SliceField"
-	// +k8s:subField(StringField)=+k8s:validateFalse="subField T1.PT2.StringField"
-	// +k8s:subField(StringFieldWithValidation)=+k8s:validateFalse="subField T1.PT2.StringFieldWithValidation"
-	// +k8s:subField(StructField)=+k8s:validateFalse="subField T1.PT2.StructField"
+	// +k8s:subfield(MapField)=+k8s:validateFalse="subfield T1.PT2.MapField"
+	// +k8s:subfield(PointerField)=+k8s:validateFalse="subfield T1.PT2.PointerField"
+	// +k8s:subfield(SliceField)=+k8s:validateFalse="subfield T1.PT2.SliceField"
+	// +k8s:subfield(StringField)=+k8s:validateFalse="subfield T1.PT2.StringField"
+	// +k8s:subfield(StringFieldWithValidation)=+k8s:validateFalse="subfield T1.PT2.StringFieldWithValidation"
+	// +k8s:subfield(StructField)=+k8s:validateFalse="subfield T1.PT2.StructField"
 	PT2 *T2 `json:"pt2"`
 }

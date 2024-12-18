@@ -195,10 +195,10 @@ func (g *genValidations) hasValidationsMiss(n *typeNode, seen map[*typeNode]bool
 		if g.hasValidationsImpl(c.node, seen) {
 			return true
 		}
-		for _, subField := range c.subField {
-			// c.subField is created during parsing when a +k8s:subField tag is found so we
+		for _, subfield := range c.subfieldValidations {
+			// c.subfield is created during parsing when a +k8s:subfield tag is found so we
 			// can assume there is a validation and don't need to recurse on the node
-			if !subField.fieldValidations.Empty() {
+			if !subfield.fieldValidations.Empty() {
 				return true
 			}
 		}
@@ -238,7 +238,8 @@ type childNode struct {
 	elemValidations  validators.Validations // validations on each value of a list or map
 
 	// struct fields can have per-child-member validations.
-	subField []*childNode
+	// REVIEW(DONE): super nit: all the others are somethingValidations so this should be subfieldValidations
+	subfieldValidations []*childNode
 }
 
 // typeNode represents a node in the type-graph, annotated with information
@@ -341,9 +342,10 @@ const (
 	// This tag defines a validation which is to be run on each value in a map
 	// or slice.
 	eachValTag = "k8s:eachVal"
-	// This tag defines a validation which is to be run on an "subField" field of
+	// This tag defines a validation which is to be run on a "subfield" of
 	// the struct tagged.
-	subFieldTag = "k8s:subField"
+	// REVIEW(DONE): ...which is to be run on a sub-field of...
+	subfieldTag = "k8s:subfield"
 	// This tag designates a child field as part of the list-map key for a list
 	// of structs.
 	listMapKeyTag = "k8s:listMapKey"
@@ -600,26 +602,27 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 		case types.Struct, types.Pointer:
 			if childType.Kind == types.Pointer {
 				if childType.Elem.Kind == types.Struct {
-					// set childType to underlying struct from struct spointer
+					// set childType to underlying struct from struct pointer
+					// REVIEW(DONE): "spointer" ?
 					childType = childType.Elem
 				} else {
 					break
 				}
 			}
-			// To support subField validations, here we build up childNode types have a +k8s:subField tag reference
-			// so that we can later generate calls to field specific validators from the child.subField information.
+			// To support subfield validations, here we build up childNode types have a +k8s:subfield tag reference
+			// so that we can later generate calls to field specific validators from the child.subfield information.
 			doOneChildField := func(subfield types.Member, name, jsonName string) error {
 				klog.V(5).InfoS("field", "name", name, "jsonName", jsonName, "type", memb.Type)
 
-				// Passing memb.CommentLines because subField validations are
-				// declared on the *parent* type (memb) field and not the *subField* type (subfield).
-				if validations, err := td.extractInnerValidations(&subfield, memb.CommentLines); err != nil {
+				// Passing memb.CommentLines because subfield validations are
+				// declared on the *parent* type (memb) field and not the *subfield* type (subfield).
+				if validations, err := td.extractSubfieldValidations(&subfield, memb.CommentLines); err != nil {
 					return fmt.Errorf("%v: %w", childPath.Child(name), err)
 				} else {
 					if validations.Empty() {
 						return nil
 					}
-					klog.V(5).InfoS("  found field-attached subField-validations", "n", validations.Len())
+					klog.V(5).InfoS("  found field-attached subfield-validations", "n", validations.Len())
 
 					subchild := &childNode{
 						name:             name,
@@ -627,7 +630,7 @@ func (td *typeDiscoverer) discoverStruct(thisNode *typeNode, fldPath *field.Path
 						childType:        subfield.Type,
 						fieldValidations: validations,
 					}
-					child.subField = append(child.subField, subchild)
+					child.subfieldValidations = append(child.subfieldValidations, subchild)
 				}
 				return nil
 			}
@@ -979,7 +982,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 				case types.Struct:
 					// Call the type's validation function.
 					g.emitCallToOtherTypeFunc(c, fld.node, bufsw)
-					for _, subchild := range fld.subField {
+					for _, subchild := range fld.subfieldValidations {
 						if len(subchild.name) == 0 {
 							panic(fmt.Sprintf("missing child name for field in %v", thisNode))
 						}
@@ -1004,7 +1007,7 @@ func (g *genValidations) emitValidationForChild(c *generator.Context, thisChild 
 						bufsw.Do("  func(obj, oldObj $.fieldTypePfx$$.fieldType|raw$, fldPath *$.field.Path|raw$) (errs $.field.ErrorList|raw$) {\n", targs)
 
 						if subchild.fieldValidations.Empty() {
-							panic(fmt.Sprintf("found non-empty field validations in node.subField for node: %v", subchild))
+							panic(fmt.Sprintf("found non-empty field validations in node.subfield for node: %v", subchild))
 						}
 
 						emitCallsToValidators(c, subchild.fieldValidations.Functions, bufsw)
@@ -1609,25 +1612,26 @@ func (g *fixtureTestGen) Init(c *generator.Context, w io.Writer) error {
 	return nil
 }
 
-// extractInnerValidations extracts all +k8s:subField validations for the given
+// extractSubfieldValidations extracts all +k8s:subfield validations for the given
 // subfield that were defined on the parent struct.The syntax for the tag is
-// +k8s:subField(subfield-go-name)=<validator-tag>=<args>
-func (td *typeDiscoverer) extractInnerValidations(subfield *types.Member, comments []string) (validators.Validations, error) {
+// +k8s:subfield(subfield-go-name)=<validator-tag>=<args>
+// REVIEW(DONE): s/Inner/Subfield/ ?
+func (td *typeDiscoverer) extractSubfieldValidations(subfield *types.Member, comments []string) (validators.Validations, error) {
 	var result validators.Validations
 
-	// Currently the format for +k8s:subField tag is:
-	// +k8s:subField(subfield-go-name)=<validator-tag>=<args> validator tag args..."
-	fieldTag := fmt.Sprintf("%s(%s)", subFieldTag, subfield.Name)
+	// Currently the format for +k8s:subfield tag is:
+	// +k8s:subfield(subfield-go-name)=<validator-tag>=<args> validator tag args..."
+	fieldTag := fmt.Sprintf("%s(%s)", subfieldTag, subfield.Name)
 	if tagVals, found := gengo.ExtractCommentTags("+", comments)[fieldTag]; found {
 		for _, tagVal := range tagVals {
 			// Extract any embedded validation rules.
 			fakeComments := []string{tagVal}
-			if subFieldValidations, err := td.validator.ExtractValidations(subfield.Type, fakeComments); err != nil {
+			if subfieldValidations, err := td.validator.ExtractValidations(subfield.Type, fakeComments); err != nil {
 				return result, err
 			} else {
-				if !subFieldValidations.Empty() {
-					klog.V(5).InfoS("  found subField-validations", "field", subfield.Name, "n", subFieldValidations.Len())
-					result.Add(subFieldValidations)
+				if !subfieldValidations.Empty() {
+					klog.V(5).InfoS("  found subfield-validations", "field", subfield.Name, "n", subfieldValidations.Len())
+					result.Add(subfieldValidations)
 				}
 			}
 		}

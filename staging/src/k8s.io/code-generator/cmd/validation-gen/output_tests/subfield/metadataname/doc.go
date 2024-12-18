@@ -18,8 +18,8 @@ limitations under the License.
 // +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 // +k8s:validation-gen-test-fixture=validateFalse
 
-// Package subField contains test types for testing subField field validation tags.
-package subField
+// Package subfield contains test types for testing subfield field validation tags.
+package subfield
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,6 +30,6 @@ var localSchemeBuilder = testscheme.New()
 
 // +k8s:validateFalse="type T1"
 type T1 struct {
-	// +k8s:subField(Name)=+k8s:validateFalse="subField T1.ObjectMeta.Name"
+	// +k8s:subfield(Name)=+k8s:validateFalse="subfield T1.ObjectMeta.Name"
 	metav1.ObjectMeta
 }

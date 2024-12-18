@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package subField
+package subfield
 
 import (
 	"sort"
@@ -24,7 +24,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestSubFieldObjectMetaValidationWithValidateFalse(t *testing.T) {
+func TestSubfieldObjectMetaValidationWithValidateFalse(t *testing.T) {
 	cases := []struct {
 		name          string
 		obj           *T1
@@ -32,7 +32,7 @@ func TestSubFieldObjectMetaValidationWithValidateFalse(t *testing.T) {
 		expectErrors  bool
 	}{
 		{
-			name: "ObjectMeta.name subField validation",
+			name: "ObjectMeta.name subfield validation",
 			obj: &T1{
 				ObjectMeta: v1.ObjectMeta{
 					Name: "",

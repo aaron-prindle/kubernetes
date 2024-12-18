@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package subField
+package subfield
 
 import (
 	"sort"
@@ -23,7 +23,7 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 )
 
-func TestSubFieldValidationWithValidateFalse(t *testing.T) {
+func TestSubfieldValidationWithValidateFalse(t *testing.T) {
 	cases := []struct {
 		name          string
 		obj           *T1
@@ -31,7 +31,7 @@ func TestSubFieldValidationWithValidateFalse(t *testing.T) {
 		expectErrors  bool
 	}{
 		{
-			name: "t2 subField validation",
+			name: "t2 subfield validation",
 			obj: &T1{
 				T2: T2{
 					StringField:               "",
