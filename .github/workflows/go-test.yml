@@ -1,0 +1,27 @@
+name: Go Test
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: "^1.20"
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Run tests
+      env:
+        UPDATE_VALIDATION_GEN_FIXTURE_DATA: "true"
+      run: go test ./staging/src/k8s.io/code-generator/cmd/validation-gen/...
