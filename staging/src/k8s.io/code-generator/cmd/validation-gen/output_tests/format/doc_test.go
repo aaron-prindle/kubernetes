@@ -30,11 +30,24 @@ func Test(t *testing.T) {
 	}).ExpectValid()
 
 	st.Value(&T{
+		IPField:       "abcd::1234",
+		DNSLabelField: "1234",
+	}).ExpectValid()
+
+	st.Value(&T{
 		IPField:       "",
 		DNSLabelField: "",
 	}).ExpectInvalid(
 		field.Invalid(field.NewPath("ipField"), "", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
-		field.Invalid(field.NewPath("dnsLabelField"), "", "must start and end with lower-case alphanumeric characters"),
-		field.Invalid(field.NewPath("dnsLabelField"), "", "must consist of lower-case alphanumeric characters or '-'"),
+		field.Invalid(field.NewPath("dnsLabelField"), "", "must contain at least 1 character"),
+	)
+
+	st.Value(&T{
+		IPField:       "Not an IP",
+		DNSLabelField: "Not a DNS label",
+	}).ExpectInvalid(
+		field.Invalid(field.NewPath("ipField"), "Not an IP", "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)"),
+		field.Invalid(field.NewPath("dnsLabelField"), "Not a DNS label", "must start and end with lower-case alphanumeric characters"),
+		field.Invalid(field.NewPath("dnsLabelField"), "Not a DNS label", "must contain only lower-case alphanumeric characters or '-'"),
 	)
 }

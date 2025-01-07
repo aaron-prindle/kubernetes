@@ -1,7 +1,7 @@
 {
-    "*subfield.T1": {
-      "ObjectMeta.name": [
-        "subfield T1.ObjectMeta.Name"
+    "*nonincluded.T1": {
+      "StructType.stringField": [
+        "subfield T1.(other.StructType).StringField"
       ]
     }
   }
