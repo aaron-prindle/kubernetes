@@ -6,7 +6,6 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,31 +17,58 @@ package validate
 
 import (
 	"context"
-	"net"
 
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	netutils "k8s.io/utils/net"
 )
 
-// IPSloppy verifies that the specified value is a valid IP address, but allows
-// leading zeros on each octet value.  This should not be used for new APIs.
-func IPSloppy[T ~string](ctx context.Context, op operation.Operation, fldPath *field.Path, value, _ *T) field.ErrorList {
-	vt := *value
-	vs := string(vt)
-	_, errs := ipSloppy(ctx, op, fldPath, &vs, nil)
-	return errs
-}
-
-func ipSloppy(ctx context.Context, op operation.Operation, fldPath *field.Path, value, _ *string) (net.IP, field.ErrorList) {
+// IPSloppy verifies that the specified value is a valid IP address,
+// but allows leading zeros on each octet value.
+// This should not be used for new APIs.
+//
+// `T` can be either ~string or ~*string. Requires Go 1.21+ for union constraints.
+func IPSloppy[T ~string | ~*string](
+	ctx context.Context,
+	op operation.Operation,
+	fldPath *field.Path,
+	value, _ *T,
+) field.ErrorList {
+	// If value is nil, skip
 	if value == nil {
-		return nil, nil
+		return nil
 	}
-	ip := netutils.ParseIPSloppy(*value)
-	if ip == nil {
-		return nil, field.ErrorList{
-			field.Invalid(fldPath, *value, "must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)").WithOrigin("format=ip-sloppy"),
+
+	// Switch on the underlying type
+	switch v := any(*value).(type) {
+	case string:
+		return validateIPSloppyString(ctx, op, fldPath, v)
+	case *string:
+		if v == nil {
+			return nil
+		}
+		return validateIPSloppyString(ctx, op, fldPath, *v)
+	default:
+		return field.ErrorList{
+			field.Invalid(fldPath, *value, "expected type ~string or ~*string for IP sloppy validation"),
 		}
 	}
-	return ip, nil
+}
+
+// validateIPSloppyString is a helper that runs the actual sloppy IP parse on a raw string.
+func validateIPSloppyString(
+	_ context.Context,
+	_ operation.Operation,
+	fldPath *field.Path,
+	s string,
+) field.ErrorList {
+	var errs field.ErrorList
+	ip := netutils.ParseIPSloppy(s)
+	if ip == nil {
+		errs = append(errs, field.Invalid(
+			fldPath, s,
+			"must be a valid IP address (e.g. 10.9.8.7 or 2001:db8::ffff)",
+		).WithOrigin("format=ip-sloppy"))
+	}
+	return errs
 }
