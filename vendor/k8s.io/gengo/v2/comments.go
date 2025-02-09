@@ -104,12 +104,16 @@ func ExtractSingleBoolCommentTag(marker string, key string, defaultVal bool, lin
 //   - 'marker' + "key=value"
 //   - 'marker' + "key()=value"
 //   - 'marker' + "key(arg)=value"
+//   - 'marker' + "key(arg1,arg2,...)=value"
 //
 // The arg is optional.  If not specified (either as "key=value" or as
 // "key()=value"), the resulting Tag will have an empty Args list.
 //
 // The value is optional.  If not specified, the resulting Tag will have "" as
 // the value.
+//
+// Multiple arguments can be specified, separated by commas. Whitespace is not allowed.
+// Only letters and digits are allowed in arguments.
 //
 // Tag comment-lines may have a trailing end-of-line comment.
 //
@@ -127,6 +131,7 @@ func ExtractSingleBoolCommentTag(marker string, key string, defaultVal bool, lin
 //	+foo=val2  // also foo
 //	+baz="qux"
 //	+foo(arg)  // still foo
+//	+foo(arg1,arg2)  // more foo with multiple args
 //
 // Then this function will return:
 //
@@ -142,6 +147,10 @@ func ExtractSingleBoolCommentTag(marker string, key string, defaultVal bool, lin
 //			}, {
 //				Name: "foo",
 //				Args: []string{"arg"},
+//				Value: "",
+//			}, {
+//				Name: "foo",
+//				Args: []string{"arg1", "arg2"},
 //				Value: "",
 //			}, {
 //				Name: "bar",
@@ -259,32 +268,39 @@ func parseTagKey(input string, tagNames []string) (string, []string, error) {
 // is assumed to be the entire text of the original input after the opening
 // '(', including the trailing ')'.
 //
-// At the moment this assumes that the entire string between the opening '('
-// and the trailing ')' is a single Go-style identifier token, but in the
-// future could be extended to have multiple arguments with actual syntax.  The
-// single token may consist only of letters and digits.  Whitespace is not
-// allowed.
+// This function supports comma-separated arguments. Each argument may consist
+// only of letters and digits. Whitespace is not allowed.
 func parseTagArgs(input string) ([]string, error) {
-	// This is really dumb, but should be extendable to a "real" parser if
-	// needed.
 	runes := []rune(input)
+	var args []string
+	startIndex := 0
+
 	for i, r := range runes {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) {
 			continue
 		}
 		if r == ',' {
-			return nil, fmt.Errorf("multiple arguments are not supported: %q", input)
-		}
-		if r == ')' {
+			// End the current argument and start a new one
+			if i > startIndex {
+				args = append(args, string(runes[startIndex:i]))
+			}
+			startIndex = i + 1
+		} else if r == ')' {
 			if i != len(runes)-1 {
 				return nil, fmt.Errorf("unexpected characters after ')': %q", string(runes[i:]))
 			}
+			// Add the final argument if there's anything to add
+			if i > startIndex {
+				args = append(args, string(runes[startIndex:i]))
+			}
+			// If the closing parenthesis is the first character, return nil
 			if i == 0 {
 				return nil, nil
 			}
-			return []string{string(runes[:i])}, nil
+			return args, nil
+		} else {
+			return nil, fmt.Errorf("unsupported character: %q", string(r))
 		}
-		return nil, fmt.Errorf("unsupported character: %q", string(r))
 	}
 	return nil, fmt.Errorf("no closing ')' found: %q", input)
 }

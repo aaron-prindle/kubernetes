@@ -6,7 +6,6 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,22 +23,54 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// DNSLabel verifies that the specified value is a valid DNS label.  It must:
+// DNSLabel verifies that the specified value is a valid DNS label. It must:
 //   - not be empty
-//   - start and end with lower-case alphanumeric characters
-//   - contain only lower-case alphanumeric characters or dashes
+//   - start/end with lower-case alphanumeric
+//   - contain only lower-case alphanumeric or dashes
 //   - be less than 64 characters long
 //
-// All errors returned by this function will be "invalid" type errors. If the
-// caller wants better errors, it must take responsibility for checking things
-// like required/optional and max-length.
-func DNSLabel[T ~string](_ context.Context, op operation.Operation, fldPath *field.Path, value, _ *T) field.ErrorList {
+// `T` can be either ~string or ~*string, which means:
+//   - A string-like type (e.g., string, type MyString string)
+//   - A pointer-to-string-like type (e.g., *string, type MyStringPtr *string)
+//
+// Requires Go 1.21 or newer for union constraints.
+func DNSLabel[T ~string | ~*string](
+	_ context.Context,
+	op operation.Operation,
+	fldPath *field.Path,
+	value, _ *T,
+) field.ErrorList {
+	// If value is nil, skip
 	if value == nil {
 		return nil
 	}
+
+	// Deref once => T is either "string-like" or "pointer-to-string-like"
+	switch v := any(*value).(type) {
+	case string:
+		// T is some ~string
+		return validateDNSLabelString(fldPath, v)
+	case *string:
+		// T is some ~*string
+		if v == nil {
+			// If the pointer is nil, treat as not specified => skip
+			return nil
+		}
+		return validateDNSLabelString(fldPath, *v)
+	default:
+		// Should be impossible if T is constrained to ~string|~*string,
+		// but we handle it for safety:
+		return field.ErrorList{
+			field.Invalid(fldPath, *value, "expected type is ~string or ~*string"),
+		}
+	}
+}
+
+// validateDNSLabelString is a small helper to run DNS1123 checks on a raw string.
+func validateDNSLabelString(fldPath *field.Path, s string) field.ErrorList {
 	var allErrs field.ErrorList
-	for _, msg := range content.IsDNS1123Label((string)(*value)) {
-		allErrs = append(allErrs, field.Invalid(fldPath, *value, msg).WithOrigin("format=dns-label"))
+	for _, msg := range content.IsDNS1123Label(s) {
+		allErrs = append(allErrs, field.Invalid(fldPath, s, msg).WithOrigin("format=dns-label"))
 	}
 	return allErrs
 }
