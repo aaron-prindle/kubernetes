@@ -77,11 +77,6 @@ func isFieldSpecifiedInternal(obj interface{}, fieldName string) bool {
 		v = v.Elem()
 	}
 
-	// If not a struct, we can't get fields
-	if v.Kind() != reflect.Struct {
-		return false
-	}
-
 	// If the fieldName contains L (our delimiter), split and traverse
 	if strings.Contains(fieldName, "L") {
 		parts := strings.Split(fieldName, "L")
@@ -96,6 +91,8 @@ func isFieldSpecifiedInternal(obj interface{}, fieldName string) bool {
 			for currentValue.Kind() == reflect.Ptr && !currentValue.IsNil() {
 				currentValue = currentValue.Elem()
 			}
+
+			// Must be a struct to navigate further
 			if currentValue.Kind() != reflect.Struct {
 				return false
 			}
@@ -112,6 +109,12 @@ func isFieldSpecifiedInternal(obj interface{}, fieldName string) bool {
 			}
 		}
 		return true
+	}
+
+	// If it's not a struct, it might be a field directly - check if it's specified
+	if v.Kind() != reflect.Struct {
+		// The obj itself might be the field value, so check if it's specified
+		return isSpecified(v)
 	}
 
 	// Simple field lookup
