@@ -23,110 +23,142 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// IfSpecified validates a field using the provided validator only if the referenced field is specified.
-// It follows the same pattern as Subfield but checks if the field is specified before applying validation.
+// IfSpecified validates a field using provided validator only if specified field path
+// is non-zero or non-nil.
 func IfSpecified[T any](ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj T,
-	fieldPath string, validator ValidateFunc[T]) field.ErrorList {
+	fieldPathStr string, validator ValidateFunc[T]) field.ErrorList {
 
-	if isNil(obj) {
-		return nil
-	}
-
-	// Check if the referenced field is specified
-	if !isFieldSpecified(obj, fieldPath) {
-		// Field not specified, skip validation
+	// Skip validation if the object is nil
+	if isNilValue(reflect.ValueOf(obj)) {
 		return field.ErrorList{}
 	}
 
-	// Field is specified, apply the validator
-	return validator(ctx, op, fldPath, obj, oldObj)
-}
-
-// isNil checks if a value is nil, handling both interface and non-interface types
-func isNil(v interface{}) bool {
-	if v == nil {
-		return true
+	// Special handling for parent references
+	if strings.HasPrefix(fieldPathStr, "parent") {
+		// For parentL references in generated code, we need special handling
+		// In practice, we won't have the parent object in the generated code context
+		// For the specific case of ChildLActive or similar checks, find in the current object
+		fieldPathWithoutPrefix := strings.TrimPrefix(fieldPathStr, "parentL")
+		if fieldPathWithoutPrefix != fieldPathStr {
+			// Handle parentL prefix by resolving within the top-level obj
+			if isFieldSpecifiedInternal(obj, fieldPathWithoutPrefix) {
+				return validator(ctx, op, fldPath, obj, oldObj)
+			}
+			return field.ErrorList{}
+		}
+	} else if strings.HasPrefix(fieldPathStr, "selfL") {
+		// For selfL references, resolve within the object itself
+		fieldName := strings.TrimPrefix(fieldPathStr, "selfL")
+		if fieldName != fieldPathStr && isFieldSpecifiedInternal(obj, fieldName) {
+			return validator(ctx, op, fldPath, obj, oldObj)
+		}
+		return field.ErrorList{}
+	} else {
+		// Regular field reference - check if the field is specified
+		if isFieldSpecifiedInternal(obj, fieldPathStr) {
+			return validator(ctx, op, fldPath, obj, oldObj)
+		}
+		return field.ErrorList{}
 	}
 
-	val := reflect.ValueOf(v)
-	switch val.Kind() {
-	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
-		return val.IsNil()
-	default:
-		return false
-	}
+	// If we can't determine field state, don't validate
+	return field.ErrorList{}
 }
 
-// isFieldSpecified checks if a field at the given path is specified (non-nil for pointers, non-zero for values)
-func isFieldSpecified(obj interface{}, fieldPath string) bool {
+// isFieldSpecifiedInternal checks if a field within an object is specified (non-nil for pointers, non-zero for values)
+func isFieldSpecifiedInternal(obj interface{}, fieldName string) bool {
 	if obj == nil {
 		return false
 	}
 
-	// Handle special references and field path traversal
-	parts := strings.Split(fieldPath, "L")
-
-	// Navigate through the object structure to find the referenced field
-	current := obj
-	for _, part := range parts {
-		if current == nil {
-			return false
-		}
-
-		// Special reference handling for 'self', 'this', 'parent'
-		if part == "self" || part == "this" {
-			continue // Stay at current object
-		}
-		if part == "parent" {
-			// In generated code, we don't have a parent reference
-			// For manual validation, parent should be passed separately
-			return false
-		}
-
-		// Use reflection to get the field
-		val := reflect.ValueOf(current)
-
-		// Dereference pointers
-		for val.Kind() == reflect.Ptr && !val.IsNil() {
-			val = val.Elem()
-		}
-
-		// Check if the value is a struct
-		if val.Kind() != reflect.Struct {
-			return false
-		}
-
-		// Get the field by name
-		field := val.FieldByName(part)
-		if !field.IsValid() {
-			return false
-		}
-
-		// Update current to the field value
-		if field.CanInterface() {
-			current = field.Interface()
-		} else {
-			return false
-		}
+	v := reflect.ValueOf(obj)
+	// Dereference pointers
+	for v.Kind() == reflect.Ptr && !v.IsNil() {
+		v = v.Elem()
 	}
 
-	// Check if the field is specified (non-nil for pointers, non-zero for values)
-	return isSpecified(current)
-}
-
-// isSpecified checks if a value is specified (non-nil for pointers, non-zero for values)
-func isSpecified(value interface{}) bool {
-	if value == nil {
+	// If not a struct, we can't get fields
+	if v.Kind() != reflect.Struct {
 		return false
 	}
 
-	v := reflect.ValueOf(value)
+	// If the fieldName contains L (our delimiter), split and traverse
+	if strings.Contains(fieldName, "L") {
+		parts := strings.Split(fieldName, "L")
+		currentObj := obj
+		for _, part := range parts {
+			if !isFieldSpecifiedInternal(currentObj, part) {
+				return false
+			}
+
+			// Advance to the next object in the path
+			currentValue := reflect.ValueOf(currentObj)
+			for currentValue.Kind() == reflect.Ptr && !currentValue.IsNil() {
+				currentValue = currentValue.Elem()
+			}
+			if currentValue.Kind() != reflect.Struct {
+				return false
+			}
+
+			field := currentValue.FieldByName(part)
+			if !field.IsValid() {
+				return false
+			}
+
+			if field.CanInterface() {
+				currentObj = field.Interface()
+			} else {
+				return false
+			}
+		}
+		return true
+	}
+
+	// Simple field lookup
+	field := v.FieldByName(fieldName)
+	if !field.IsValid() {
+		return false
+	}
+
+	// Check if field is specified (non-zero, non-nil)
+	return isSpecified(field)
+}
+
+// isSpecified checks if a reflect.Value is specified (non-nil for pointers, non-zero for values)
+func isSpecified(v reflect.Value) bool {
+	if !v.IsValid() {
+		return false
+	}
 
 	// For pointers, check if nil
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface ||
+		v.Kind() == reflect.Slice || v.Kind() == reflect.Map {
 		return !v.IsNil()
 	}
 
+	// For string check if empty
+	if v.Kind() == reflect.String {
+		return v.String() != ""
+	}
+
+	// For bool check if true (false is considered not specified)
+	if v.Kind() == reflect.Bool {
+		return v.Bool()
+	}
+
 	// For other types, check if zero value
-	return !reflect.DeepEqual(value, reflect.Zero(v.Type()).Interface())
+	return !v.IsZero()
+}
+
+// isNilValue checks if a reflect.Value is nil or represents a nil pointer
+func isNilValue(v reflect.Value) bool {
+	if !v.IsValid() {
+		return true
+	}
+	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface ||
+		v.Kind() == reflect.Slice || v.Kind() == reflect.Map ||
+		v.Kind() == reflect.Chan || v.Kind() == reflect.Func {
+		return v.IsNil()
+	}
+	return false
 }

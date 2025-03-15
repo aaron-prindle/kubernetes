@@ -37,96 +37,13 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*NestedStruct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_NestedStruct(ctx, op, nil /* fldPath */, obj.(*NestedStruct), safe.Cast[*NestedStruct](oldObj))
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
-	scheme.AddValidationFunc((*PointerStruct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_PointerStruct(ctx, op, nil /* fldPath */, obj.(*PointerStruct), safe.Cast[*PointerStruct](oldObj))
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	scheme.AddValidationFunc((*SimpleStruct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
 			return Validate_SimpleStruct(ctx, op, nil /* fldPath */, obj.(*SimpleStruct), safe.Cast[*SimpleStruct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
-	scheme.AddValidationFunc((*TypedefStruct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
-		if len(subresources) == 0 {
-			return Validate_TypedefStruct(ctx, op, nil /* fldPath */, obj.(*TypedefStruct), safe.Cast[*TypedefStruct](oldObj))
-		}
-		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
-	})
 	return nil
-}
-
-func Validate_ChildStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ChildStruct) (errs field.ErrorList) {
-	// field ChildStruct.Active has no validation
-
-	// field ChildStruct.ChildName
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "parentLParentIP", validate.DNSLabel)...)
-			return
-		}(fldPath.Child("childName"), &obj.ChildName, safe.Field(oldObj, func(oldObj *ChildStruct) *string { return &oldObj.ChildName }))...)
-
-	// field ChildStruct.Priority
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *int) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "selfLActive", func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
-				return validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "parentLParentIP", func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
-					return validate.Minimum(ctx, op, fldPath, obj, oldObj, 1)
-				})
-			})...)
-			return
-		}(fldPath.Child("priority"), &obj.Priority, safe.Field(oldObj, func(oldObj *ChildStruct) *int { return &oldObj.Priority }))...)
-
-	return errs
-}
-
-func Validate_NestedStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *NestedStruct) (errs field.ErrorList) {
-	// field NestedStruct.TypeMeta has no validation
-
-	// field NestedStruct.ParentIP
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "ChildLActive", validate.IPSloppy)...)
-			return
-		}(fldPath.Child("parentIP"), &obj.ParentIP, safe.Field(oldObj, func(oldObj *NestedStruct) *string { return &oldObj.ParentIP }))...)
-
-	// field NestedStruct.Child
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *ChildStruct) (errs field.ErrorList) {
-			errs = append(errs, Validate_ChildStruct(ctx, op, fldPath, obj, oldObj)...)
-			return
-		}(fldPath.Child("child"), &obj.Child, safe.Field(oldObj, func(oldObj *NestedStruct) *ChildStruct { return &oldObj.Child }))...)
-
-	return errs
-}
-
-func Validate_PointerStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *PointerStruct) (errs field.ErrorList) {
-	// field PointerStruct.TypeMeta has no validation
-	// field PointerStruct.Dependency has no validation
-
-	// field PointerStruct.IPAddress
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "Dependency", validate.IPSloppy)...)
-			return
-		}(fldPath.Child("ipAddress"), &obj.IPAddress, safe.Field(oldObj, func(oldObj *PointerStruct) *string { return &oldObj.IPAddress }))...)
-
-	// field PointerStruct.DNSName
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "Dependency", validate.DNSLabel)...)
-			return
-		}(fldPath.Child("dnsName"), obj.DNSName, safe.Field(oldObj, func(oldObj *PointerStruct) *string { return oldObj.DNSName }))...)
-
-	return errs
 }
 
 func Validate_SimpleStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *SimpleStruct) (errs field.ErrorList) {
@@ -155,20 +72,6 @@ func Validate_SimpleStruct(ctx context.Context, op operation.Operation, fldPath 
 			})...)
 			return
 		}(fldPath.Child("count"), &obj.Count, safe.Field(oldObj, func(oldObj *SimpleStruct) *int { return &oldObj.Count }))...)
-
-	return errs
-}
-
-func Validate_TypedefStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *TypedefStruct) (errs field.ErrorList) {
-	// field TypedefStruct.TypeMeta has no validation
-	// field TypedefStruct.Enabled has no validation
-
-	// field TypedefStruct.IPAddressType
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *IPAddress) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "Enabled", validate.IPSloppy)...)
-			return
-		}(fldPath.Child("ipAddressType"), &obj.IPAddressType, safe.Field(oldObj, func(oldObj *TypedefStruct) *IPAddress { return &oldObj.IPAddressType }))...)
 
 	return errs
 }
