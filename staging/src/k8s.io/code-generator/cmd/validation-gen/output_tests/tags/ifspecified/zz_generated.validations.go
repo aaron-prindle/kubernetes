@@ -49,20 +49,8 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 func Validate_SimpleStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *SimpleStruct) (errs field.ErrorList) {
 	// field SimpleStruct.TypeMeta has no validation
 	// field SimpleStruct.Dependency has no validation
-
-	// field SimpleStruct.IPAddress
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "Dependency", validate.IPSloppy)...)
-			return
-		}(fldPath.Child("ipAddress"), &obj.IPAddress, safe.Field(oldObj, func(oldObj *SimpleStruct) *string { return &oldObj.IPAddress }))...)
-
-	// field SimpleStruct.DNSName
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *string) (errs field.ErrorList) {
-			errs = append(errs, validate.IfSpecified(ctx, op, fldPath, obj, oldObj, "Dependency", validate.DNSLabel)...)
-			return
-		}(fldPath.Child("dnsName"), &obj.DNSName, safe.Field(oldObj, func(oldObj *SimpleStruct) *string { return &oldObj.DNSName }))...)
+	// field SimpleStruct.IPAddress has no validation
+	// field SimpleStruct.DNSName has no validation
 
 	// field SimpleStruct.Count
 	errs = append(errs,
