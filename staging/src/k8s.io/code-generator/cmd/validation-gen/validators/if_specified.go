@@ -53,50 +53,98 @@ var (
 )
 
 func (istv ifSpecifiedTagValidator) GetValidations(context Context, args []string, payload string) (Validations, error) {
-	if len(args) != 1 {
-		return Validations{}, fmt.Errorf("requires exactly one arg - the field path to check")
+	t := realType(context.Type)
+	if t.Kind != types.Struct {
+		return Validations{}, fmt.Errorf("can only be used on struct types")
 	}
 
-	fieldPath := args[0]
+	if len(args) != 2 {
+		return Validations{}, fmt.Errorf("requires exactly two args - the condition field and target field")
+	}
 
-	// Ensure the payload contains a conditional validator
+	// First arg is the condition field (the one that must be specified)
+	conditionField := args[0]
+
+	// Second arg is the target field (the one to validate)
+	targetField := args[1]
+
+	// Handle nested field paths with X delimiter
+	var condMemb *types.Member
+	if strings.Contains(conditionField, "X") {
+		parts := strings.Split(conditionField, "X")
+		// For nested fields, we can only access fields within the current struct hierarchy
+		// The validator cannot access parent structs in the hierarchy
+
+		// For now, just handle the simple case of a direct field reference
+		// In a real implementation, you would recursively resolve nested fields
+		condMemb = getMemberByJSON(t, parts[len(parts)-1])
+	} else {
+		condMemb = getMemberByJSON(t, conditionField)
+	}
+
+	if condMemb == nil {
+		return Validations{}, fmt.Errorf("no field for condition json name %q", conditionField)
+	}
+
+	// Handle nested field paths for target field
+	var targetMemb *types.Member
+	if strings.Contains(targetField, "X") {
+		parts := strings.Split(targetField, "X")
+		// For now, just handle the simple case of a direct field reference
+		targetMemb = getMemberByJSON(t, parts[len(parts)-1])
+	} else {
+		targetMemb = getMemberByJSON(t, targetField)
+	}
+
+	if targetMemb == nil {
+		return Validations{}, fmt.Errorf("no field for target json name %q", targetField)
+	}
+
+	// Ensure the payload contains a validator
 	if payload == "" {
-		return Validations{}, fmt.Errorf("requires a conditional validator payload")
+		return Validations{}, fmt.Errorf("requires a validator payload")
 	}
 
-	// The payload should be another validator tag with its args, parse it
-	// Example: +k8s:format=ip-sloppy
+	// Parse the payload to get the validator tag
 	payloadParts := strings.SplitN(payload, "=", 2)
 	if len(payloadParts) != 2 {
-		return Validations{}, fmt.Errorf("conditional validator must be in format tag=value")
+		return Validations{}, fmt.Errorf("validator must be in format tag=value")
 	}
 
 	conditionalTagName := strings.TrimPrefix(payloadParts[0], "+k8s:")
 	conditionalTagValue := payloadParts[1]
 
-	// Create a fake comment for the conditional validator
+	// Create a fake comment for the validator to apply to the target field
 	fakeComment := fmt.Sprintf("+k8s:%s=%s", conditionalTagName, conditionalTagValue)
 	fakeComments := []string{fakeComment}
 
-	// Get validations for the conditional validator
-	conditionalValidations, err := istv.validator.ExtractValidations(context, fakeComments)
+	// Create a subcontext for the target field
+	targetContext := Context{
+		Scope:  ScopeField,
+		Type:   targetMemb.Type,
+		Parent: t,
+		Path:   context.Path.Child(targetField),
+	}
+
+	// Extract validations for the target field validator
+	validations, err := istv.validator.ExtractValidations(targetContext, fakeComments)
 	if err != nil {
-		return Validations{}, fmt.Errorf("error extracting validations for conditional validator: %v", err)
+		return Validations{}, fmt.Errorf("error extracting validations for target field: %v", err)
 	}
 
 	result := Validations{}
 
-	// Create a function to check if the referenced field is specified
-	// and apply the conditional validator if it is
-	for _, vfn := range conditionalValidations.Functions {
-		// Similar to subfieldTagValidator, wrap the validation function in the IfSpecified function
-		f := Function(ifSpecifiedTagName, DefaultFlags, validateIfSpecified, fieldPath, WrapperFunction{vfn, context.Type})
-		// f := Function(ifSpecifiedTagName, vfn.Flags(), validateIfSpecified, fieldPath, WrapperFunction{vfn, context.Type})
+	// For each validation function extracted for the target field
+	for _, vfn := range validations.Functions {
+		// Create the IfSpecified validation function
+		// It will check if the condition field is specified before validating the target field
+		f := Function(ifSpecifiedTagName, DefaultFlags, validateIfSpecified, conditionField, targetField, WrapperFunction{vfn, targetMemb.Type})
+		// f := Function(ifSpecifiedTagName, vfn.Flags(), validateIfSpecified, conditionField, targetField, WrapperFunction{vfn, targetMemb.Type})
 		result.Functions = append(result.Functions, f)
 	}
 
 	// Include any variables from the conditional validator
-	result.Variables = append(result.Variables, conditionalValidations.Variables...)
+	result.Variables = append(result.Variables, validations.Variables...)
 
 	return result, nil
 }
@@ -105,15 +153,21 @@ func (istv ifSpecifiedTagValidator) Docs() TagDoc {
 	doc := TagDoc{
 		Tag:         istv.TagName(),
 		Scopes:      istv.ValidScopes().UnsortedList(),
-		Description: "Applies a validator only if another field is specified.",
-		Args: []TagArgDoc{{
-			Description: "<field-path>",
-			// Docs:        "The path to the field to check if specified. Can use special references like 'parent', 'self', etc. Fields are separated by 'L' (e.g., 'parentLChildLField').",
-		}},
-		Docs: "The referenced field must be specified (non-nil for pointer fields, non-zero for value fields) for the conditional validator to be applied. Field paths use 'L' as a delimiter.",
+		Description: "Conditionally validates a field if another field is specified.",
+		Args: []TagArgDoc{
+			{
+				Description: "<condition-field>",
+				// Docs:        "The field that must be specified (non-nil, non-zero) for validation to occur. For nested fields, use X as a delimiter (e.g., ChildXActive).",
+			},
+			{
+				Description: "<target-field>",
+				// Docs:        "The field to validate if the condition field is specified. For nested fields, use X as a delimiter (e.g., ChildXName).",
+			},
+		},
+		Docs: "The condition field must be specified (non-nil for pointer fields, non-zero for value fields) for the validator to be applied to the target field.",
 		Payloads: []TagPayloadDoc{{
-			Description: "<conditional-validator>",
-			Docs:        "The validator to apply if the referenced field is specified.",
+			Description: "<validator>",
+			Docs:        "The validator to apply to the target field if the condition field is specified.",
 		}},
 	}
 	return doc

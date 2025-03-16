@@ -16,7 +16,6 @@ package validate
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -24,122 +23,52 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// IfSpecified validates a field using the provided validator only if the specified field path
-// resolves to a specified (non-nil for pointers, non-zero for values) value.
-//
-// This function handles cases where:
-//   - In the generated code, obj is a pointer to the field being validated, but fieldPath refers
-//     to a different field in the parent struct.
-func IfSpecified[T any](ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj T,
-	fieldPathStr string, validator ValidateFunc[T]) field.ErrorList {
-
+// IfSpecified validates a field only if another field in the struct is specified.
+// Parameters:
+//   - conditionField: Name of the field that must be specified for validation to occur
+//     For nested fields, use X as a delimiter (e.g., ChildXActive)
+//   - targetField: Name of the field to validate
+//     For nested fields, use X as a delimiter (e.g., ChildXName)
+//   - validator: The validation function to apply to the target field
+func IfSpecified[T any](
+	ctx context.Context,
+	op operation.Operation,
+	fldPath *field.Path,
+	obj, oldObj T,
+	conditionField, targetField string,
+	validator ValidateFunc[T],
+) field.ErrorList {
 	// Skip validation if the object is nil
-	if isNilValue(reflect.ValueOf(obj)) {
+	if isNil(obj) {
 		return field.ErrorList{}
 	}
 
-	// First try direct field check in the case where obj is already a struct
-	objValue := reflect.ValueOf(obj)
-	if objValue.Kind() == reflect.Ptr {
-		objValue = objValue.Elem()
-	}
-
-	// If obj is a struct, try to find the field directly
-	if objValue.Kind() == reflect.Struct {
-		// For direct field checks, just look in the struct
-		pathParts := strings.Split(fieldPathStr, "L")
-		if len(pathParts) == 1 && !isSpecialPrefix(pathParts[0]) {
-			// Simple direct field check
-			if fieldIsSpecified(obj, fieldPathStr) {
-				return validator(ctx, op, fldPath, obj, oldObj)
-			}
-			return field.ErrorList{}
-		}
-	}
-
-	// The more common case in the generated code - obj is a pointer to a field
-	// We need to find the parent struct and check a different field
-	parentStruct, err := findParentStruct(obj)
-	if err != nil {
-		// If we can't find the parent, skip validation
+	// Check if the condition field is specified
+	if !isFieldSpecified(obj, conditionField) {
+		// Condition field not specified, skip validation
 		return field.ErrorList{}
 	}
 
-	// Now check the specified field in the parent struct
-	if fieldIsSpecifiedInParent(parentStruct, fieldPathStr) {
-		return validator(ctx, op, fldPath, obj, oldObj)
+	// For the target field path, use the last part after delimiter for the field path
+	var fieldPathChild string
+	if strings.Contains(targetField, "X") {
+		parts := strings.Split(targetField, "X")
+		fieldPathChild = parts[len(parts)-1]
+	} else {
+		fieldPathChild = targetField
 	}
 
-	return field.ErrorList{}
+	// Condition field is specified, apply the validator
+	return validator(ctx, op, fldPath.Child(fieldPathChild), obj, oldObj)
 }
 
-// isSpecialPrefix checks if a path part is a special prefix like "parent" or "self"
-func isSpecialPrefix(part string) bool {
-	return part == "parent" || part == "self" || part == "this"
-}
-
-// findParentStruct tries to find the parent struct of a field using pointer arithmetic
-func findParentStruct(obj interface{}) (interface{}, error) {
-	// Get the value of the object
-	objValue := reflect.ValueOf(obj)
-
-	// Must be a pointer for this approach
-	if objValue.Kind() != reflect.Ptr {
-		return nil, fmt.Errorf("object must be a pointer")
-	}
-
-	// Get pointer to the field
-	// fieldPtr := objValue.Pointer()
-
-	// In the generated code, the field is a pointer to a field in a struct
-	// We need to use the field's address to find the parent struct
-	// This is a common pattern in the Kubernetes validation code
-
-	// The parent struct should be accessible to us because in the generated code,
-	// the closure is capturing the parent struct (obj in Validate_SimpleStruct)
-
-	// We can't reliably find the exact parent struct without more context,
-	// but we can search for structs in the call stack that might contain our field
-
-	// Instead, we'll use a pragmatic approach: during validation, the field's value
-	// should be in the same package and near other fields in memory
-
-	// For now, let's make an assumption that works with the test cases:
-	// In the generated code, the validation calls IfSpecified on fields like &obj.Count,
-	// where obj is a SimpleStruct. But in our tests, we're checking for "Dependency"
-
-	// The simplest approach is to rely on the specific naming convention used in the tests:
-	// - If validating a field and checking "Dependency", assume it's checking the parent struct
-	// - For more complex cases (parent/self prefixes), interpret them accordingly
-
-	// This is a simplification that will work for the existing tests
-	// but might need to be refined for more complex real-world scenarios
-	parentStruct := obj
-
-	// For nested fields, we would need more complex traversal
-	return parentStruct, nil
-}
-
-// fieldIsSpecifiedInParent checks if a field is specified in the parent struct
-func fieldIsSpecifiedInParent(parentObj interface{}, fieldPath string) bool {
-	// Handle special prefixes
-	if strings.HasPrefix(fieldPath, "parent") {
-		fieldPath = strings.TrimPrefix(fieldPath, "parentL")
-	} else if strings.HasPrefix(fieldPath, "self") || strings.HasPrefix(fieldPath, "this") {
-		fieldPath = strings.TrimPrefix(fieldPath, "selfL")
-		fieldPath = strings.TrimPrefix(fieldPath, "thisL")
-	}
-
-	// Check in the struct containing the value
-	return fieldIsSpecified(parentObj, fieldPath)
-}
-
-// fieldIsSpecified checks if a field within an object is specified
-func fieldIsSpecified(obj interface{}, fieldName string) bool {
+// isFieldSpecified checks if a field in an object is specified (non-nil, non-zero)
+func isFieldSpecified(obj interface{}, fieldPath string) bool {
 	if obj == nil {
 		return false
 	}
 
+	// Get the value of the object
 	v := reflect.ValueOf(obj)
 
 	// Dereference pointers
@@ -147,56 +76,97 @@ func fieldIsSpecified(obj interface{}, fieldName string) bool {
 		v = v.Elem()
 	}
 
-	// If not a struct, can't get fields
+	// Must be a struct to access fields
 	if v.Kind() != reflect.Struct {
 		return false
 	}
 
-	// Check if field exists
-	field := v.FieldByName(fieldName)
+	// Handle nested fields with X delimiter
+	if strings.Contains(fieldPath, "X") {
+		parts := strings.Split(fieldPath, "X")
+		currentObj := v
+
+		// Reject any paths that include "parent" since we can't navigate up
+		for _, part := range parts {
+			if part == "parent" {
+				return false // Cannot navigate to parent objects
+			}
+		}
+
+		// Navigate through nested fields
+		for _, part := range parts {
+			// Try to find the field at current level
+			field := currentObj.FieldByName(part)
+			if !field.IsValid() {
+				return false
+			}
+
+			// If this is the last part, check if it's specified
+			if part == parts[len(parts)-1] {
+				return isSpecified(field)
+			}
+
+			// Otherwise, continue traversing if the field is a struct or pointer to struct
+			if field.Kind() == reflect.Ptr {
+				if field.IsNil() {
+					return false
+				}
+				field = field.Elem()
+			}
+
+			if field.Kind() != reflect.Struct {
+				return false
+			}
+
+			currentObj = field
+		}
+
+		return false // Should not reach here
+	}
+
+	// Simple non-nested field
+	field := v.FieldByName(fieldPath)
 	if !field.IsValid() {
 		return false
 	}
 
-	// Check if field is specified
+	// Check if the field is specified based on its type
 	return isSpecified(field)
 }
 
-// isSpecified checks if a reflect.Value is specified (non-nil, non-zero)
+// isSpecified checks if a reflect.Value is non-zero/non-nil
 func isSpecified(v reflect.Value) bool {
 	if !v.IsValid() {
 		return false
 	}
 
-	// For pointers, check if nil
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface ||
-		v.Kind() == reflect.Slice || v.Kind() == reflect.Map {
+	// For pointers, slices, maps, etc. - check if nil
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Func, reflect.Chan:
 		return !v.IsNil()
-	}
-
-	// For string check if empty
-	if v.Kind() == reflect.String {
+	case reflect.String:
+		// For strings, check if non-empty
 		return v.String() != ""
-	}
-
-	// For bool check if true (false is considered not specified)
-	if v.Kind() == reflect.Bool {
+	case reflect.Bool:
+		// For booleans, check if true
 		return v.Bool()
+	default:
+		// For all other types, check if non-zero
+		return !v.IsZero()
 	}
-
-	// For other types, check if zero value
-	return !v.IsZero()
 }
 
-// isNilValue checks if a reflect.Value is nil
-func isNilValue(v reflect.Value) bool {
-	if !v.IsValid() {
+// isNil checks if a value is nil
+func isNil(v interface{}) bool {
+	if v == nil {
 		return true
 	}
-	if v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface ||
-		v.Kind() == reflect.Slice || v.Kind() == reflect.Map ||
-		v.Kind() == reflect.Chan || v.Kind() == reflect.Func {
-		return v.IsNil()
+
+	val := reflect.ValueOf(v)
+	switch val.Kind() {
+	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map, reflect.Chan, reflect.Func:
+		return val.IsNil()
+	default:
+		return false
 	}
-	return false
 }
