@@ -31,11 +31,9 @@ type SimpleStruct struct {
 	Dependency string `json:"dependency"`
 
 	// This field should only be validated as an IP when Dependency is specified
-	// +k8s:ifSpecified(Dependency)=+k8s:format=ip-sloppy
 	IPAddress string `json:"ipAddress"`
 
 	// This field should only be validated as a DNS label when Dependency is specified
-	// +k8s:ifSpecified(Dependency)=+k8s:format=dns-label
 	DNSName string `json:"dnsName"`
 
 	// This field should only be validated for minimum when Dependency is specified
