@@ -23,10 +23,10 @@ import (
 )
 
 // GetFieldFunc is a function that extracts a field of type R from a struct of type T.
-type GetFieldFunc2[T any, R any] func(*T) R
+type GetFieldFuncPtr[T any, R any] func(*T) R
 
 // ValidateFunc is a function that validates a "new" and "old" value (both of type T).
-type ValidateFunc2[T any] func(
+type ValidateFuncPtr[T any] func(
 	ctx context.Context,
 	op operation.Operation,
 	fldPath *field.Path,
@@ -46,9 +46,9 @@ func IfSpecified[Tstruct any, Tcond any, Ttarget any](
 	fldPath *field.Path,
 	newStruct, oldStruct *Tstruct,
 	condFieldName, targetFieldName string,
-	getCondField GetFieldFunc2[Tstruct, Tcond],
-	getTargetField GetFieldFunc2[Tstruct, Ttarget],
-	validator ValidateFunc2[Ttarget],
+	getCondField GetFieldFuncPtr[Tstruct, Tcond],
+	getTargetField GetFieldFuncPtr[Tstruct, Ttarget],
+	validator ValidateFuncPtr[Ttarget],
 ) field.ErrorList {
 	// Skip validation if the object is nil
 	if newStruct == nil {
