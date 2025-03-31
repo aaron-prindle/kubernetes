@@ -24,7 +24,6 @@ package fieldcomparison
 import (
 	context "context"
 	fmt "fmt"
-	time "time"
 
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
@@ -38,31 +37,38 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*ExampleStruct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*Root)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_ExampleStruct(ctx, op, nil /* fldPath */, obj.(*ExampleStruct), safe.Cast[*ExampleStruct](oldObj))
+			return Validate_Root(ctx, op, nil /* fldPath */, obj.(*Root), safe.Cast[*Root](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ExampleStruct) (errs field.ErrorList) {
-	// type ExampleStruct
-	errs = append(errs, validate.FieldComparisonValidateField(ctx, op, fldPath, obj, oldObj, "EndTime", ">=", "StartTime", "Replicas", func(o *ExampleStruct) *time.Time { return o.EndTime }, func(o *ExampleStruct) *time.Time { return o.StartTime }, func(o *ExampleStruct) *int { return &o.Replicas }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
-		return validate.Minimum(ctx, op, fldPath, obj, oldObj, 1)
-	})...)
-	errs = append(errs, validate.FieldComparisonValidateField(ctx, op, fldPath, obj, oldObj, "NestedStruct.EndTime", ">=", "NestedStruct.StartTime", "NestedStruct.Replicas", func(o *ExampleStruct) *time.Time { return o.NestedStruct.EndTime }, func(o *ExampleStruct) *time.Time { return o.NestedStruct.StartTime }, func(o *ExampleStruct) *int { return &o.NestedStruct.Replicas }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
-		return validate.Minimum(ctx, op, fldPath, obj, oldObj, 1)
+func Validate_Root(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Root) (errs field.ErrorList) {
+	// field Root.TypeMeta has no validation
+
+	// field Root.Struct
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("struct"), &obj.Struct, safe.Field(oldObj, func(oldObj *Root) *Struct { return &oldObj.Struct }))...)
+
+	return errs
+}
+
+func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+	// type Struct
+	errs = append(errs, validate.FieldComparisonValidateField(ctx, op, fldPath, obj, oldObj, "minI", "<=", "i", "i", func(o *Struct) int { return o.MinI }, func(o *Struct) int { return o.I }, func(o *Struct) *int { return &o.I }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
+		return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "")
 	})...)
 
-	// field ExampleStruct.TypeMeta has no validation
-	// field ExampleStruct.Replicas has no validation
-	// field ExampleStruct.Selector has no validation
-	// field ExampleStruct.StartTime has no validation
-	// field ExampleStruct.EndTime has no validation
-	// field ExampleStruct.Mode has no validation
-	// field ExampleStruct.AdvancedSetting has no validation
-	// field ExampleStruct.NestedStruct has no validation
+	// field Struct.S has no validation
+	// field Struct.I has no validation
+	// field Struct.MinI has no validation
+	// field Struct.B has no validation
+	// field Struct.F has no validation
 	return errs
 }
