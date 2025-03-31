@@ -30,10 +30,11 @@ type Root struct {
 	Struct Struct `json:"struct"`
 }
 
-// +k8s:expression="self.s.size() < self.i"
+// +k8s:expression="self.minI <= self.i"
 type Struct struct {
-	S string  `json:"s"`
-	I int     `json:"i"`
-	B bool    `json:"b"`
-	F float64 `json:"f"`
+	S    string  `json:"s"`
+	I    int     `json:"i"`
+	MinI int     `json:"minI"` // Added field
+	B    bool    `json:"b"`
+	F    float64 `json:"f"`
 }

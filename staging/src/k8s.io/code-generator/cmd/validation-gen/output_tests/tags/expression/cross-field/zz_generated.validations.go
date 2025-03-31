@@ -59,7 +59,7 @@ func Validate_Root(ctx context.Context, op operation.Operation, fldPath *field.P
 	return errs
 }
 
-var programForStruct = validate.Compile("self.s.size() < self.i")
+var programForStruct = validate.Compile("self.minI <= self.i")
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
@@ -67,6 +67,7 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 
 	// field Struct.S has no validation
 	// field Struct.I has no validation
+	// field Struct.MinI has no validation
 	// field Struct.B has no validation
 	// field Struct.F has no validation
 	return errs
