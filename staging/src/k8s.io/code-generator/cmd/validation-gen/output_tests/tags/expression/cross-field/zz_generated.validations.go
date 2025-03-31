@@ -39,6 +39,12 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Root)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
 		return Validate_Root(ctx, op, nil /* fldPath */, obj.(*Root), safe.Cast[*Root](oldObj))
 	})
+	scheme.AddValidationFunc((*Root2)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		return Validate_Root2(ctx, op, nil /* fldPath */, obj.(*Root2), safe.Cast[*Root2](oldObj))
+	})
+	scheme.AddValidationFunc((*Root3)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		return Validate_Root3(ctx, op, nil /* fldPath */, obj.(*Root3), safe.Cast[*Root3](oldObj))
+	})
 	return nil
 }
 
@@ -55,7 +61,33 @@ func Validate_Root(ctx context.Context, op operation.Operation, fldPath *field.P
 	return errs
 }
 
-var programForStruct = validate.NewRule("self.s.size() < self.i", "", "", "Invalid")
+func Validate_Root2(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Root2) (errs field.ErrorList) {
+	// field Root2.TypeMeta has no validation
+
+	// field Root2.Struct
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct2) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct2(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("struct2"), &obj.Struct, safe.Field(oldObj, func(oldObj *Root2) *Struct2 { return &oldObj.Struct }))...)
+
+	return errs
+}
+
+func Validate_Root3(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Root3) (errs field.ErrorList) {
+	// field Root3.TypeMeta has no validation
+
+	// field Root3.Struct
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct3) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct3(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("struct3"), &obj.Struct, safe.Field(oldObj, func(oldObj *Root3) *Struct3 { return &oldObj.Struct }))...)
+
+	return errs
+}
+
+var programForStruct = validate.NewRule("self.minI <= self.i", "", "", "Invalid")
 
 func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
 	// type Struct
@@ -63,7 +95,190 @@ func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field
 
 	// field Struct.S has no validation
 	// field Struct.I has no validation
+	// field Struct.MinI has no validation
 	// field Struct.B has no validation
 	// field Struct.F has no validation
+	return errs
+}
+
+func Validate_Struct2(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct2) (errs field.ErrorList) {
+	// field Struct2.S has no validation
+	// field Struct2.I has no validation
+	// field Struct2.MinI has no validation
+	// field Struct2.B has no validation
+	// field Struct2.F has no validation
+	// field Struct2.Field6 has no validation
+	// field Struct2.Field7 has no validation
+	// field Struct2.Field8 has no validation
+	// field Struct2.Field9 has no validation
+	// field Struct2.Field10 has no validation
+	// field Struct2.Field11 has no validation
+	// field Struct2.Field12 has no validation
+	// field Struct2.Field13 has no validation
+	// field Struct2.Field14 has no validation
+
+	// field Struct2.Field15
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field15"), &obj.Field15, safe.Field(oldObj, func(oldObj *Struct2) *Struct { return &oldObj.Field15 }))...)
+
+	// field Struct2.Field16 has no validation
+	// field Struct2.Field17 has no validation
+	// field Struct2.Field18 has no validation
+	// field Struct2.Field19 has no validation
+	// field Struct2.Field20 has no validation
+	return errs
+}
+
+var programForStruct3 = validate.NewRule("self.minI <= self.i", "", "", "Invalid")
+
+func Validate_Struct3(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct3) (errs field.ErrorList) {
+	// type Struct3
+	errs = append(errs, validate.Expression(ctx, op, fldPath, obj, oldObj, programForStruct3)...)
+
+	// field Struct3.S has no validation
+	// field Struct3.I has no validation
+	// field Struct3.MinI has no validation
+	// field Struct3.B has no validation
+	// field Struct3.F has no validation
+	// field Struct3.Field6 has no validation
+	// field Struct3.Field7 has no validation
+	// field Struct3.Field8 has no validation
+	// field Struct3.Field9 has no validation
+	// field Struct3.Field10 has no validation
+	// field Struct3.Field11 has no validation
+	// field Struct3.Field12 has no validation
+	// field Struct3.Field13 has no validation
+	// field Struct3.Field14 has no validation
+
+	// field Struct3.Field15
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field15"), &obj.Field15, safe.Field(oldObj, func(oldObj *Struct3) *Struct { return &oldObj.Field15 }))...)
+
+	// field Struct3.Field16 has no validation
+	// field Struct3.Field17 has no validation
+	// field Struct3.Field18 has no validation
+	// field Struct3.Field19 has no validation
+	// field Struct3.Field20 has no validation
+	// field Struct3.Field21 has no validation
+	// field Struct3.Field22 has no validation
+	// field Struct3.Field23 has no validation
+	// field Struct3.Field24 has no validation
+	// field Struct3.Field25 has no validation
+	// field Struct3.Field26 has no validation
+	// field Struct3.Field27 has no validation
+	// field Struct3.Field28 has no validation
+	// field Struct3.Field29 has no validation
+
+	// field Struct3.Field30
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field30"), &obj.Field30, safe.Field(oldObj, func(oldObj *Struct3) *Struct { return &oldObj.Field30 }))...)
+
+	// field Struct3.Field31 has no validation
+	// field Struct3.Field32 has no validation
+	// field Struct3.Field33 has no validation
+	// field Struct3.Field34 has no validation
+	// field Struct3.Field35 has no validation
+	// field Struct3.Field36 has no validation
+	// field Struct3.Field37 has no validation
+	// field Struct3.Field38 has no validation
+	// field Struct3.Field39 has no validation
+	// field Struct3.Field40 has no validation
+	// field Struct3.Field41 has no validation
+	// field Struct3.Field42 has no validation
+	// field Struct3.Field43 has no validation
+	// field Struct3.Field44 has no validation
+
+	// field Struct3.Field45
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field45"), &obj.Field45, safe.Field(oldObj, func(oldObj *Struct3) *Struct { return &oldObj.Field45 }))...)
+
+	// field Struct3.Field46 has no validation
+	// field Struct3.Field47 has no validation
+	// field Struct3.Field48 has no validation
+	// field Struct3.Field49 has no validation
+	// field Struct3.Field50 has no validation
+	// field Struct3.Field51 has no validation
+	// field Struct3.Field52 has no validation
+	// field Struct3.Field53 has no validation
+	// field Struct3.Field54 has no validation
+	// field Struct3.Field55 has no validation
+	// field Struct3.Field56 has no validation
+	// field Struct3.Field57 has no validation
+	// field Struct3.Field58 has no validation
+	// field Struct3.Field59 has no validation
+
+	// field Struct3.Field60
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field60"), &obj.Field60, safe.Field(oldObj, func(oldObj *Struct3) *Struct { return &oldObj.Field60 }))...)
+
+	// field Struct3.Field61 has no validation
+	// field Struct3.Field62 has no validation
+	// field Struct3.Field63 has no validation
+	// field Struct3.Field64 has no validation
+	// field Struct3.Field65 has no validation
+	// field Struct3.Field66 has no validation
+	// field Struct3.Field67 has no validation
+	// field Struct3.Field68 has no validation
+	// field Struct3.Field69 has no validation
+	// field Struct3.Field70 has no validation
+	// field Struct3.Field71 has no validation
+	// field Struct3.Field72 has no validation
+	// field Struct3.Field73 has no validation
+	// field Struct3.Field74 has no validation
+
+	// field Struct3.Field75
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field75"), &obj.Field75, safe.Field(oldObj, func(oldObj *Struct3) *Struct { return &oldObj.Field75 }))...)
+
+	// field Struct3.Field76 has no validation
+	// field Struct3.Field77 has no validation
+	// field Struct3.Field78 has no validation
+	// field Struct3.Field79 has no validation
+	// field Struct3.Field80 has no validation
+	// field Struct3.Field81 has no validation
+	// field Struct3.Field82 has no validation
+	// field Struct3.Field83 has no validation
+	// field Struct3.Field84 has no validation
+	// field Struct3.Field85 has no validation
+	// field Struct3.Field86 has no validation
+	// field Struct3.Field87 has no validation
+	// field Struct3.Field88 has no validation
+	// field Struct3.Field89 has no validation
+
+	// field Struct3.Field90
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("field90"), &obj.Field90, safe.Field(oldObj, func(oldObj *Struct3) *Struct { return &oldObj.Field90 }))...)
+
+	// field Struct3.Field91 has no validation
+	// field Struct3.Field92 has no validation
+	// field Struct3.Field93 has no validation
+	// field Struct3.Field94 has no validation
+	// field Struct3.Field95 has no validation
+	// field Struct3.Field96 has no validation
+	// field Struct3.Field97 has no validation
+	// field Struct3.Field98 has no validation
+	// field Struct3.Field99 has no validation
+	// field Struct3.Field100 has no validation
 	return errs
 }
