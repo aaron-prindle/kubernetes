@@ -3,23 +3,38 @@ package validators
 
 import (
 	"fmt"
-	"strings"
+	"strings" // Import strings
 
-	// Ensure field path package is imported if needed
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/validation/field" // Standard field path package
 	"k8s.io/gengo/v2/types"
+	// field "k8s.io/apimachinery/pkg/util/validation/field" // Use field package alias
+	// "k8s.io/gengo/v2/generator" // No longer needed
+	// "k8s.io/gengo/v2/namer" // No longer needed
 )
-
-// Constants, supportedOperators, init, struct definition, Init, TagName, ValidScopes remain the same...
 
 const (
 	fieldComparisonTagName = "k8s:fieldComparison"
 )
 
+// Define supported operators
 var supportedOperators = sets.New(
 	"==", "!=", "<", "<=", ">", ">=",
 )
+
+// Helper to check if a type is numeric
+func isNumericType(t *types.Type) bool {
+	if t == nil {
+		return false
+	}
+	t = realType(t)
+	if t.Kind != types.Builtin {
+		return false
+	}
+	name := t.Name.Name
+	return strings.Contains(name, "int") || strings.Contains(name, "float") || strings.Contains(name, "byte") || strings.Contains(name, "rune")
+}
+
+// NOTE: generatePayloadCallString is NO LONGER NEEDED with WrapperFunction
 
 func init() {
 	RegisterTagValidator(&fieldComparisonTagValidator{})
@@ -43,200 +58,238 @@ func (fieldComparisonTagValidator) ValidScopes() sets.Set[Scope] {
 	return fieldComparisonTagValidScopes
 }
 
-// Reference the runtime validation function
+// Name of the runtime helper function we assume exists
 var (
-	validateFieldComparisonValidateField = types.Name{Package: libValidationPkg, Name: "FieldComparisonValidateField"}
+	validateFieldComparisonConditional = types.Name{Package: libValidationPkg, Name: "FieldComparisonConditional"}
 )
 
-// GetValidations parses the tag and generates the validation logic.
 func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []string, payload string) (Validations, error) {
-	// Ensure the tag is applied to a struct type
 	t := realType(context.Type)
 	if t == nil || t.Kind != types.Struct {
 		return Validations{}, fmt.Errorf("tag %q can only be used on struct types, got %v", fctv.TagName(), context.Type)
 	}
 
-	// Validate the number of arguments (expecting 4 paths/operators)
+	// --- Argument Parsing (Expecting 4 args) ---
 	if len(args) != 4 {
-		return Validations{}, fmt.Errorf("tag %q requires exactly four arguments: <field1Path>, <operator>, <field2Path>, <fieldToValidatePath>", fctv.TagName())
+		return Validations{}, fmt.Errorf("tag %q requires exactly four arguments: <field1Path>, <operator>, <field2Path>, <targetFieldPath>", fctv.TagName())
 	}
-
-	// Extract arguments
 	field1PathString := args[0]
 	operator := args[1]
 	field2PathString := args[2]
 	targetFieldPathString := args[3]
 
-	// Validate the operator
+	// --- Validation (Operator, Payload) ---
 	if !supportedOperators.Has(operator) {
-		return Validations{}, fmt.Errorf("invalid operator %q for tag %q. Supported operators are: %v", operator, fctv.TagName(), supportedOperators.UnsortedList())
+		return Validations{}, fmt.Errorf("invalid operator %q. Supported: %v", operator, supportedOperators.UnsortedList())
 	}
-
-	// Validate the payload (must be a +k8s validator tag)
 	if payload == "" || !strings.HasPrefix(payload, "+k8s:") {
-		return Validations{}, fmt.Errorf("tag %q requires a validator payload starting with '+k8s:' (e.g., =+k8s:minimum=1), got %q", fctv.TagName(), payload)
+		return Validations{}, fmt.Errorf("tag %q requires a payload starting with '+k8s:', got %q", fctv.TagName(), payload)
 	}
-	nestedValidatorComment := payload
+	payloadComment := payload
 
-	// --- Resolve field paths to member sequences ---
-	// These helpers find the sequence of Go struct members corresponding to the dot-path.
+	// --- Resolve Field Paths ---
 	field1Members, err := findMembersByPath(t, field1PathString)
 	if err != nil {
-		return Validations{}, fmt.Errorf("invalid field path %q for tag %q: %w", field1PathString, fctv.TagName(), err)
+		return Validations{}, fmt.Errorf("invalid field1 path %q: %w", field1PathString, err)
 	}
-	field1Memb := field1Members[len(field1Members)-1] // The final member in the path
-
+	field1Memb := field1Members[len(field1Members)-1]
+	field1OriginalType := field1Memb.Type
+	field1UnderlyingType := realType(field1OriginalType)
 	field2Members, err := findMembersByPath(t, field2PathString)
 	if err != nil {
-		return Validations{}, fmt.Errorf("invalid field path %q for tag %q: %w", field2PathString, fctv.TagName(), err)
+		return Validations{}, fmt.Errorf("invalid field2 path %q: %w", field2PathString, err)
 	}
 	field2Memb := field2Members[len(field2Members)-1]
-
+	field2OriginalType := field2Memb.Type
+	field2UnderlyingType := realType(field2OriginalType)
 	targetFieldMembers, err := findMembersByPath(t, targetFieldPathString)
 	if err != nil {
-		return Validations{}, fmt.Errorf("invalid target field path %q for tag %q: %w", targetFieldPathString, fctv.TagName(), err)
+		return Validations{}, fmt.Errorf("invalid target field path %q: %w", targetFieldPathString, err)
 	}
 	targetFieldMemb := targetFieldMembers[len(targetFieldMembers)-1]
+	targetFieldOriginalType := targetFieldMemb.Type
 
-	// --- Generate nested validator ---
-	// Construct the field.Path for the target field where the nested validator applies.
-	targetPathParts := strings.Split(targetFieldPathString, ".")
-	var nestedPath *field.Path
-
-	// Check if context.Path is nil (can happen at the root)
-	basePath := context.Path
-	if basePath == nil {
-		basePath = field.NewPath("") // Start with an empty root path if needed
+	// --- Type Compatibility Check (Comparison Fields) ---
+	canCompareDirectly := false
+	if field1UnderlyingType.Kind == field2UnderlyingType.Kind {
+		if field1UnderlyingType.Kind == types.Builtin {
+			isNumeric := isNumericType(field1UnderlyingType)
+			isString := field1UnderlyingType.Name.Name == "string"
+			isBool := field1UnderlyingType.Name.Name == "bool"
+			if isNumeric || isString {
+				canCompareDirectly = true
+			} else if isBool && (operator == "==" || operator == "!=") {
+				canCompareDirectly = true
+			}
+		}
+	}
+	if !canCompareDirectly && isNumericType(field1UnderlyingType) && isNumericType(field2UnderlyingType) {
+		canCompareDirectly = true
+	}
+	if !canCompareDirectly {
+		return Validations{}, fmt.Errorf("tag %q: cannot generate direct comparison for operator %q between types %s (%v) and %s (%v)", fctv.TagName(), operator, field1OriginalType.String(), field1UnderlyingType.Kind, field2OriginalType.String(), field2UnderlyingType.Kind)
 	}
 
-	if len(targetPathParts) > 0 && targetPathParts[0] != "" { // Ensure parts exist and aren't empty
-		firstPart := targetPathParts[0]
-		remainingParts := targetPathParts[1:]
-		nestedPath = basePath.Child(firstPart, remainingParts...) // Construct nested path correctly
-	} else {
-		// This indicates an invalid path string like "." or empty string, which findMembersByPath should ideally catch.
-		// If it reaches here, treat it as an error or default to the base path.
-		// Let's return an error for clarity.
-		return Validations{}, fmt.Errorf("internal error: target field path %q resulted in invalid parts for field.Path construction", targetFieldPathString)
-		// nestedPath = basePath // Fallback, less informative
-	}
-
-	// Define the context for extracting the nested validation function.
-	// The validation applies to the *type* of the final field in the target path.
-	nestedContext := Context{
-		Scope:  ScopeField,           // Validation applies to a field scope
-		Type:   targetFieldMemb.Type, // The Go type of the target field
-		Parent: t,                    // The parent struct type
-		Path:   nestedPath,           // The calculated field.Path
-	}
-
-	// Extract the validation function(s) defined by the payload tag.
-	nestedValidations, err := fctv.validator.ExtractValidations(nestedContext, []string{nestedValidatorComment})
+	// --- Extract Payload Validator (Applied to the *target* field) ---
+	targetFieldContext := Context{Scope: ScopeField, Type: targetFieldOriginalType, Parent: t, Member: targetFieldMemb, Path: context.Path.Child(targetFieldPathString)} // Path for context
+	payloadValidations, err := fctv.validator.ExtractValidations(targetFieldContext, []string{payloadComment})
 	if err != nil {
-		return Validations{}, fmt.Errorf("error extracting nested validations for payload %q on target field path %q: %w", nestedValidatorComment, targetFieldPathString, err)
+		return Validations{}, fmt.Errorf("error extracting payload validations for target field %q (%s): %w", targetFieldPathString, payloadComment, err)
 	}
-	// We currently assume the payload generates exactly one applicable function.
-	if len(nestedValidations.Functions) == 0 {
-		return Validations{}, fmt.Errorf("payload tag %q did not generate any validation functions applicable to the target field %q (type %s)", nestedValidatorComment, targetFieldPathString, targetFieldMemb.Type.String())
+	if len(payloadValidations.Functions) == 0 {
+		return Validations{}, fmt.Errorf("payload tag %q did not generate any validation functions for target field %q (type %s)", payloadComment, targetFieldPathString, targetFieldOriginalType.String())
 	}
-	if len(nestedValidations.Functions) > 1 {
-		return Validations{}, fmt.Errorf("payload tag %q generated multiple validation functions; %q currently supports only one nested validator for the target field %q", nestedValidatorComment, fctv.TagName(), targetFieldPathString)
+	if len(payloadValidations.Functions) > 1 {
+		return Validations{}, fmt.Errorf("payload tag %q generated multiple validation functions for target field %q; only one is supported", payloadComment, targetFieldPathString)
 	}
-	nestedValidatorFunc := nestedValidations.Functions[0] // The field-level validator function
+	payloadFuncInfo := payloadValidations.Functions[0]
 
-	// --- Generate FieldComparison call with nested accessors ---
+	// === Define FunctionLiteral for Comparison ===
+	var compBodyBuilder strings.Builder
+	compBodyBuilder.WriteString("  // Comparison Body\n")
+	field1Accessor := generateNestedFieldAccessor("obj", field1Members)
+	field2Accessor := generateNestedFieldAccessor("obj", field2Members)
+	needsNilCheck1 := field1OriginalType.Kind == types.Pointer
+	needsNilCheck2 := field2OriginalType.Kind == types.Pointer
+	val1Var := field1Memb.Name + "CompVal"
+	val2Var := field2Memb.Name + "CompVal"
+	comparisonExprString := ""
+	var conditionParts []string
+	var comparisonExpr strings.Builder
+	if needsNilCheck1 {
+		compBodyBuilder.WriteString(fmt.Sprintf("  %s := %s\n", val1Var, field1Accessor))
+	}
+	if needsNilCheck2 {
+		compBodyBuilder.WriteString(fmt.Sprintf("  %s := %s\n", val2Var, field2Accessor))
+	}
+	compPart1 := field1Accessor
+	if needsNilCheck1 {
+		compPart1 = "*" + val1Var
+	}
+	compPart2 := field2Accessor
+	if needsNilCheck2 {
+		compPart2 = "*" + val2Var
+	}
+	if operator == "==" {
+		if needsNilCheck1 && needsNilCheck2 {
+			comparisonExpr.WriteString(fmt.Sprintf("((%s == nil && %s == nil) || (%s != nil && %s != nil && %s == %s))", val1Var, val2Var, val1Var, val2Var, compPart1, compPart2))
+		} else if needsNilCheck1 {
+			comparisonExpr.WriteString(fmt.Sprintf("(%s != nil && %s == %s)", val1Var, compPart1, compPart2))
+		} else if needsNilCheck2 {
+			comparisonExpr.WriteString(fmt.Sprintf("(%s != nil && %s == %s)", val2Var, compPart1, compPart2))
+		} else {
+			comparisonExpr.WriteString(fmt.Sprintf("(%s == %s)", compPart1, compPart2))
+		}
+	} else if operator == "!=" {
+		if needsNilCheck1 && needsNilCheck2 {
+			comparisonExpr.WriteString(fmt.Sprintf("((%s == nil && %s != nil) || (%s != nil && %s == nil) || (%s != nil && %s != nil && %s != %s))", val1Var, val2Var, val1Var, val2Var, val1Var, val2Var, compPart1, compPart2))
+		} else if needsNilCheck1 {
+			comparisonExpr.WriteString(fmt.Sprintf("(%s == nil || %s != %s)", val1Var, compPart1, compPart2))
+		} else if needsNilCheck2 {
+			comparisonExpr.WriteString(fmt.Sprintf("(%s == nil || %s != %s)", val2Var, compPart1, compPart2))
+		} else {
+			comparisonExpr.WriteString(fmt.Sprintf("(%s != %s)", compPart1, compPart2))
+		}
+	} else {
+		if needsNilCheck1 {
+			conditionParts = append(conditionParts, fmt.Sprintf("%s != nil", val1Var))
+		}
+		if needsNilCheck2 {
+			conditionParts = append(conditionParts, fmt.Sprintf("%s != nil", val2Var))
+		}
+		comparisonExpr.WriteString(fmt.Sprintf("(%s %s %s)", compPart1, operator, compPart2))
+	}
+	comparisonExprString = comparisonExpr.String()
+	compBodyBuilder.WriteString("  comparisonHolds := false\n")
+	if len(conditionParts) > 0 {
+		compBodyBuilder.WriteString(fmt.Sprintf("  if %s {\n    comparisonHolds = %s\n  }\n", strings.Join(conditionParts, " && "), comparisonExprString))
+	} else {
+		compBodyBuilder.WriteString(fmt.Sprintf("  comparisonHolds = %s\n", comparisonExprString))
+	}
+	compBodyBuilder.WriteString("  return comparisonHolds\n")
+
+	nilableStructType := context.Type
+	if !isNilableType(nilableStructType) {
+		nilableStructType = types.PointerTo(nilableStructType)
+	}
+
+	comparisonFuncLiteral := FunctionLiteral{
+		Parameters: []ParamResult{{"obj", nilableStructType}},
+		Results:    []ParamResult{{"", types.Bool}},
+		Body:       compBodyBuilder.String(),
+	}
+
+	// === Define FunctionLiteral for Target Field Getter ===
+	nilableTargetFieldType := targetFieldOriginalType
+	targetFieldExprPrefix := ""
+	if !isNilableType(nilableTargetFieldType) {
+		nilableTargetFieldType = types.PointerTo(targetFieldOriginalType)
+		targetFieldExprPrefix = "&"
+	}
+	targetGetFnAccessor := generateNestedFieldAccessor("o", targetFieldMembers)
+	targetGetFnBody := fmt.Sprintf("return %s%s", targetFieldExprPrefix, targetGetFnAccessor)
+
+	targetGetFnLiteral := FunctionLiteral{
+		Parameters: []ParamResult{{"o", nilableStructType}},
+		Results:    []ParamResult{{"", nilableTargetFieldType}},
+		Body:       targetGetFnBody,
+	}
+
+	// === Create the Main FunctionGen calling the Runtime Helper ===
 	result := Validations{}
-	structPtrType := types.PointerTo(t) // e.g., *ExampleStruct
+	comparisonName := fmt.Sprintf("%s %s %s", field1PathString, operator, field2PathString)
 
-	// Generate Go code snippets to access the potentially nested fields from the base struct 'o'.
-	field1Accessor := generateNestedFieldAccessor("o", field1Members)
-	field2Accessor := generateNestedFieldAccessor("o", field2Members)
-	targetFieldAccessor := generateNestedFieldAccessor("o", targetFieldMembers)
-
-	// Getter function for field1 (returns value Tfield1)
-	getField1Fn := FunctionLiteral{
-		Parameters: []ParamResult{{"o", structPtrType}},
-		Results:    []ParamResult{{"", field1Memb.Type}}, // Result type is the type of the final field
-		Body:       fmt.Sprintf("return %s", field1Accessor),
-	}
-	// Getter function for field2 (returns value Tfield2)
-	getField2Fn := FunctionLiteral{
-		Parameters: []ParamResult{{"o", structPtrType}},
-		Results:    []ParamResult{{"", field2Memb.Type}},
-		Body:       fmt.Sprintf("return %s", field2Accessor),
-	}
-	// Getter function for the target field (returns pointer *Ttarget)
-	targetFieldPtrType := types.PointerTo(targetFieldMemb.Type)
-	getTargetFieldFn := FunctionLiteral{
-		Parameters: []ParamResult{{"o", structPtrType}},
-		Results:    []ParamResult{{"", targetFieldPtrType}},        // Returns pointer to the target field's type
-		Body:       fmt.Sprintf("return &%s", targetFieldAccessor), // Takes address of the nested field access
+	// Create FunctionGen - REMOVE TypeArgs
+	f := FunctionGen{
+		TagName:  fieldComparisonTagName,
+		Flags:    payloadFuncInfo.Flags,
+		Function: validateFieldComparisonConditional, // Just the function name
+		// TypeArgs: nil, // Rely on type inference by the generator << REMOVED
+		Args: []any{ // Set the regular arguments
+			comparisonName,
+			comparisonFuncLiteral,
+			targetFieldPathString,
+			targetGetFnLiteral,
+			WrapperFunction{payloadFuncInfo, targetFieldOriginalType},
+		},
 	}
 
-	// Create the call to the runtime validation function.
-	f := Function(
-		fieldComparisonTagName,               // Name for bookkeeping/debugging
-		DefaultFlags,                         // Use default generation flags
-		validateFieldComparisonValidateField, // The runtime function to call
-		field1PathString,                     // Pass original path string for runtime errors
-		operator,                             // The comparison operator
-		field2PathString,                     // Pass original path string
-		targetFieldPathString,                // Pass original path string
-		getField1Fn,                          // Generated getter func
-		getField2Fn,                          // Generated getter func
-		getTargetFieldFn,                     // Generated getter func (returns pointer)
-		// Wrap the nested validator function, specifying the type it operates on
-		WrapperFunction{nestedValidatorFunc, targetFieldMemb.Type},
-	)
 	result.Functions = append(result.Functions, f)
-
-	// Include any Go variables needed by the nested validator (e.g., sets for +k8s:enum)
-	result.Variables = append(result.Variables, nestedValidations.Variables...)
+	result.Variables = append(result.Variables, payloadValidations.Variables...)
 
 	return result, nil
 }
 
-// func (fctv fieldComparisonTagValidator) Docs() TagDoc {
-// 	doc := TagDoc{
-// 		Tag:    fctv.TagName(),
-// 		Scopes: fctv.ValidScopes().UnsortedList(),
-// 		Description: fmt.Sprintf("Conditionally runs a nested validation rule on a specific target field if the comparison between two other fields is true. "+
-// 			"Supported operators: %v.", supportedOperators.UnsortedList()),
-// 		Args: []TagArgDoc{
-// 			{Name: "<field1>", Description: "The JSON name of the first field in the comparison."},
-// 			{Name: "<operator>", Description: "The comparison operator (e.g., '==', '!=', '<', '<=', '>', '>=')."},
-// 			{Name: "<field2>", Description: "The JSON name of the second field in the comparison."},
-// 			{Name: "<fieldToValidate>", Description: "The JSON name of the field to apply the <validator> payload to if the comparison is true."}, // Added fourth arg
-// 		},
-// 		Payloads: []TagPayloadDoc{{
-// 			Name:        "<validator>",
-// 			Description: "The validation tag (including '+k8s:') to apply to the <fieldToValidate> if the comparison `field1 operator field2` evaluates to true.", // Updated description
-// 			Examples:    []string{"+k8s:minimum=1", "+k8s:maxLength=10"},
-// 		}},
-// 		Examples: []string{
-// 			"+k8s:fieldComparison(Replicas, >, 0, Selector)=+k8s:required", // If Replicas > 0, validate Selector with +k8s:required
-// 			"+k8s:fieldComparison(EndTime, >=, StartTime, Replicas)=+k8s:minimum=1", // If EndTime >= StartTime, validate Replicas with +k8s:minimum=1
-// 		},
-// 	}
-// 	return doc
-// }
-
-// TODO(aaron-prindle) FIXME - additional arg added
+// --- Docs ---
 func (fctv fieldComparisonTagValidator) Docs() TagDoc {
+	// ... Docs content remains the same ...
 	doc := TagDoc{
 		Tag:    fctv.TagName(),
 		Scopes: fctv.ValidScopes().UnsortedList(),
-		Description: fmt.Sprintf("Conditionally runs a nested validation rule on the struct if the comparison between two fields is true. "+
-			"Supported operators: %v.", supportedOperators.UnsortedList()),
+		Description: fmt.Sprintf("Generates code to conditionally run a payload validation rule on a specified *target field* if the comparison between two other fields (field1 operator field2) is true. "+
+			"If the comparison is false, an Invalid error is generated attached to the struct's path. "+
+			"Supported operators: %v. Handles basic numeric, string, bool types, and pointers. Requires the `validate.FieldComparisonConditional` runtime helper.", supportedOperators.UnsortedList()),
 		Args: []TagArgDoc{
-			{Description: "The JSON name of the first field in the comparison."},
-			{Description: "The comparison operator (e.g., '==', '!=', '<', '<=', '>', '>=')."},
-			{Description: "The JSON name of the second field in the comparison."},
+			// {Name: "<field1Path>", Description: "Dot-separated path to the first field in the comparison."},
+			// {Name: "<operator>", Description: "The comparison operator (e.g., '==', '!=', '<', '<=', '>', '>=')."},
+			// {Name: "<field2Path>", Description: "Dot-separated path to the second field in the comparison."},
+			// {Name: "<targetFieldPath>", Description: "Dot-separated path to the field to apply the <validator> payload to if the comparison is true."},
 		},
 		Payloads: []TagPayloadDoc{{
-			Description: "<validator>",
-			Docs:        "The validator to apply to the target field if the condition field is specified.",
+			// Name:        "<validator>",
+			Description: "The validation tag (including '+k8s:') to apply to the <targetFieldPath> if the comparison evaluates to true.",
+			// Examples:    []string{"+k8s:minimum=1", "+k8s:maxLength=10", "+k8s:required"},
 		}},
+		// Examples: []string{
+		// 	`// +k8s:fieldComparison(minI, <=, i, i)=+k8s:validateTrue`,
+		// 	`// +k8s:fieldComparison(replicas, >, 0, selector)=+k8s:required`,
+		// 	`// +k8s:fieldComparison(endTime, >=, startTime, duration)=+k8s:minimum=1`,
+		// 	`// +k8s:fieldComparison(spec.priority, ==, status.priority, status.message)=+k8s:maxLength=20`,
+		// 	`// +k8s:fieldComparison(optionalMax, >, count, count)=+k8s:minimum=0 // optionalMax is *int`,
+		// },
 	}
 	return doc
 }
+
+// --- Ensure necessary helper functions are available ---
+// ... (list of required helpers) ...

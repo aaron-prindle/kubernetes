@@ -24,17 +24,12 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
-type Root struct {
-	TypeMeta int
-
-	Struct Struct `json:"struct"`
-}
-
-// +k8s:fieldComparison(minI, <=, i, i)=+k8s:validateTrue
-type Struct struct {
-	S    string  `json:"s"`
-	I    int     `json:"i"`
-	MinI int     `json:"minI"` // Added field
-	B    bool    `json:"b"`
-	F    float64 `json:"f"`
+// +k8s:fieldComparison(minI, <=, i, b)=+k8s:validateFalse="field ExampleStruct.B"
+type ExampleStruct struct {
+	TypeMeta int     `json:"typeMeta"`
+	S        string  `json:"s"`
+	I        int     `json:"i"`
+	MinI     int     `json:"minI"` // Added field
+	B        bool    `json:"b"`
+	F        float64 `json:"f"`
 }

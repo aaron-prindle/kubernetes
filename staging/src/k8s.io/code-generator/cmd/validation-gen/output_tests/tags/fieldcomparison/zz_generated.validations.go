@@ -37,38 +37,30 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *testscheme.Scheme) error {
-	scheme.AddValidationFunc((*Root)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
+	scheme.AddValidationFunc((*ExampleStruct)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}, subresources ...string) field.ErrorList {
 		if len(subresources) == 0 {
-			return Validate_Root(ctx, op, nil /* fldPath */, obj.(*Root), safe.Cast[*Root](oldObj))
+			return Validate_ExampleStruct(ctx, op, nil /* fldPath */, obj.(*ExampleStruct), safe.Cast[*ExampleStruct](oldObj))
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresources: %v", obj, subresources))}
 	})
 	return nil
 }
 
-func Validate_Root(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Root) (errs field.ErrorList) {
-	// field Root.TypeMeta has no validation
-
-	// field Root.Struct
-	errs = append(errs,
-		func(fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
-			errs = append(errs, Validate_Struct(ctx, op, fldPath, obj, oldObj)...)
-			return
-		}(fldPath.Child("struct"), &obj.Struct, safe.Field(oldObj, func(oldObj *Root) *Struct { return &oldObj.Struct }))...)
-
-	return errs
-}
-
-func Validate_Struct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
-	// type Struct
-	errs = append(errs, validate.FieldComparisonValidateField(ctx, op, fldPath, obj, oldObj, "minI", "<=", "i", "i", func(o *Struct) int { return o.MinI }, func(o *Struct) int { return o.I }, func(o *Struct) *int { return &o.I }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *int) field.ErrorList {
-		return validate.FixedResult(ctx, op, fldPath, obj, oldObj, true, "")
+func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ExampleStruct) (errs field.ErrorList) {
+	// type ExampleStruct
+	errs = append(errs, validate.FieldComparisonConditional(ctx, op, fldPath, obj, oldObj, "minI <= i", func(obj *ExampleStruct) bool { // Comparison Body
+		comparisonHolds := false
+		comparisonHolds = (obj.MinI <= obj.I)
+		return comparisonHolds
+	}, "b", func(o *ExampleStruct) *bool { return &o.B }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *bool) field.ErrorList {
+		return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "")
 	})...)
 
-	// field Struct.S has no validation
-	// field Struct.I has no validation
-	// field Struct.MinI has no validation
-	// field Struct.B has no validation
-	// field Struct.F has no validation
+	// field ExampleStruct.TypeMeta has no validation
+	// field ExampleStruct.S has no validation
+	// field ExampleStruct.I has no validation
+	// field ExampleStruct.MinI has no validation
+	// field ExampleStruct.B has no validation
+	// field ExampleStruct.F has no validation
 	return errs
 }

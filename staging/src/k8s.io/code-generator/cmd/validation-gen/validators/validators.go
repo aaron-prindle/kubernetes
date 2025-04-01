@@ -1,3 +1,5 @@
+// staging/src/k8s.io/code-generator/cmd/validation-gen/validators/validators.go
+
 /*
 Copyright 2024 The Kubernetes Authors.
 
@@ -334,7 +336,8 @@ func Function(tagName string, flags FunctionFlags, function types.Name, extraArg
 	}
 }
 
-// FunctionGen describes a function call that should be generated.
+// FunctionGen describes a function call that should be generated, or provides raw
+// source code to be inserted directly.
 type FunctionGen struct {
 	// TagName is the tag which triggered this function.
 	TagName string
@@ -343,6 +346,7 @@ type FunctionGen struct {
 	Flags FunctionFlags
 
 	// Function is the name of the function to call.
+	// This is ignored if RawSource is non-empty.
 	Function types.Name
 
 	// Args holds arguments to pass to the function, and may conatin:
@@ -356,10 +360,12 @@ type FunctionGen struct {
 	// - validators.PrivateVar (to reference a variable)
 	//
 	// See toGolangSourceDataLiteral for details.
+	// This is ignored if RawSource is non-empty.
 	Args []any
 
 	// TypeArgs assigns types to the type parameters of the function, for
 	// generic function calls which require explicit type arguments.
+	// This is ignored if RawSource is non-empty.
 	TypeArgs []types.Name
 
 	// Conditions holds any conditions that must true for a field to be
@@ -367,12 +373,24 @@ type FunctionGen struct {
 	Conditions Conditions
 
 	// Comments holds optional comments that should be added to the generated
-	// code (without the leading "//").
+	// code (without the leading "//"). These apply whether using Function/Args
+	// or RawSource.
 	Comments []string
+
+	// RawSource holds a raw Go code snippet to be inserted directly into the
+	// generated validation function. If this field is non-empty, the Function,
+	// Args, and TypeArgs fields are ignored, and this snippet is used instead.
+	// The snippet should typically be a valid Go statement or series of
+	// statements, like `errs = append(errs, myHelper(ctx, op, fldPath, obj, oldObj)...)`.
+	RawSource string // <<< ADDED FIELD
 }
 
 // WithTypeArgs returns a derived FunctionGen with type arguments.
+// Does nothing if RawSource is set.
 func (fg FunctionGen) WithTypeArgs(typeArgs ...types.Name) FunctionGen {
+	if fg.RawSource != "" {
+		return fg // RawSource overrides Function/Args/TypeArgs
+	}
 	fg.TypeArgs = typeArgs
 	return fg
 }
