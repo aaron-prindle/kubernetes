@@ -87,7 +87,7 @@ func BenchmarkNative2(b *testing.B) {
 	}
 }
 
-// -- Struct3 (~100 fields) --
+// -- Struct3 (~100 fields, primitives) --
 
 // Benchmark results are placeholders, update after running
 func BenchmarkExpression3(b *testing.B) {
@@ -95,12 +95,29 @@ func BenchmarkExpression3(b *testing.B) {
 	// force compile and then reset to ignore compilation cost
 	errs := Validate_Struct3(ctx, opCreate, nil, &obj, nil) // Use generated function
 	if len(errs) != 0 {
-		panic("expected no errs")
+		panic(fmt.Sprintf("expected no errs, got: %v", errs))
 	}
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
 		_ = Validate_Struct3(ctx, opCreate, nil, &obj, nil) // Use generated function
+	}
+}
+
+// -- Struct4 (~100 field, primitives+complex-types) --
+
+// Benchmark results are placeholders, update after running
+func BenchmarkExpression4(b *testing.B) {
+	obj := Struct4{S: "x", I: 10, Field100: "bench"}
+	// force compile and then reset to ignore compilation cost
+	errs := Validate_Struct4(ctx, opCreate, nil, &obj, nil) // Use generated function
+	if len(errs) != 0 {
+		panic(fmt.Sprintf("expected no errs, got: %v", errs))
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = Validate_Struct4(ctx, opCreate, nil, &obj, nil) // Use generated function
 	}
 }
 

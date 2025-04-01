@@ -45,6 +45,9 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 	scheme.AddValidationFunc((*Root3)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
 		return Validate_Root3(ctx, op, nil /* fldPath */, obj.(*Root3), safe.Cast[*Root3](oldObj))
 	})
+	scheme.AddValidationFunc((*Root4)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		return Validate_Root4(ctx, op, nil /* fldPath */, obj.(*Root4), safe.Cast[*Root4](oldObj))
+	})
 	return nil
 }
 
@@ -83,6 +86,19 @@ func Validate_Root3(ctx context.Context, op operation.Operation, fldPath *field.
 			errs = append(errs, Validate_Struct3(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}(fldPath.Child("struct3"), &obj.Struct, safe.Field(oldObj, func(oldObj *Root3) *Struct3 { return &oldObj.Struct }))...)
+
+	return errs
+}
+
+func Validate_Root4(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Root4) (errs field.ErrorList) {
+	// field Root4.TypeMeta has no validation
+
+	// field Root4.Struct
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *Struct4) (errs field.ErrorList) {
+			errs = append(errs, Validate_Struct4(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}(fldPath.Child("struct4"), &obj.Struct, safe.Field(oldObj, func(oldObj *Root4) *Struct4 { return &oldObj.Struct }))...)
 
 	return errs
 }
@@ -235,5 +251,114 @@ func Validate_Struct3(ctx context.Context, op operation.Operation, fldPath *fiel
 	// field Struct3.Field98 has no validation
 	// field Struct3.Field99 has no validation
 	// field Struct3.Field100 has no validation
+	return errs
+}
+
+var programForStruct4 = validate.NewRule("self.s.size() < self.i", "'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])", "", "Invalid")
+
+func Validate_Struct4(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct4) (errs field.ErrorList) {
+	// type Struct4
+	errs = append(errs, validate.Expression(ctx, op, fldPath, obj, oldObj, programForStruct4)...)
+
+	// field Struct4.S has no validation
+	// field Struct4.I has no validation
+	// field Struct4.B has no validation
+	// field Struct4.F has no validation
+	// field Struct4.Field5 has no validation
+	// field Struct4.Field6 has no validation
+	// field Struct4.Field7 has no validation
+	// field Struct4.Field8 has no validation
+	// field Struct4.Field9 has no validation
+	// field Struct4.Field10 has no validation
+	// field Struct4.Field11 has no validation
+	// field Struct4.Field12 has no validation
+	// field Struct4.Field13 has no validation
+	// field Struct4.Field14 has no validation
+	// field Struct4.Field15 has no validation
+	// field Struct4.Field16 has no validation
+	// field Struct4.Field17 has no validation
+	// field Struct4.Field18 has no validation
+	// field Struct4.Field19 has no validation
+	// field Struct4.Field20 has no validation
+	// field Struct4.Field21 has no validation
+	// field Struct4.Field22 has no validation
+	// field Struct4.Field23 has no validation
+	// field Struct4.Field24 has no validation
+	// field Struct4.Field25 has no validation
+	// field Struct4.Field26 has no validation
+	// field Struct4.Field27 has no validation
+	// field Struct4.Field28 has no validation
+	// field Struct4.Field29 has no validation
+	// field Struct4.Field30 has no validation
+	// field Struct4.Field31 has no validation
+	// field Struct4.Field32 has no validation
+	// field Struct4.Field33 has no validation
+	// field Struct4.Field34 has no validation
+	// field Struct4.Field35 has no validation
+	// field Struct4.Field36 has no validation
+	// field Struct4.Field37 has no validation
+	// field Struct4.Field38 has no validation
+	// field Struct4.Field39 has no validation
+	// field Struct4.Field40 has no validation
+	// field Struct4.Field41 has no validation
+	// field Struct4.Field42 has no validation
+	// field Struct4.Field43 has no validation
+	// field Struct4.Field44 has no validation
+	// field Struct4.Field45 has no validation
+	// field Struct4.Field46 has no validation
+	// field Struct4.Field47 has no validation
+	// field Struct4.Field48 has no validation
+	// field Struct4.Field49 has no validation
+	// field Struct4.Field50 has no validation
+	// field Struct4.Field51 has no validation
+	// field Struct4.Field52 has no validation
+	// field Struct4.Field53 has no validation
+	// field Struct4.Field54 has no validation
+	// field Struct4.Field55 has no validation
+	// field Struct4.Field56 has no validation
+	// field Struct4.Field57 has no validation
+	// field Struct4.Field58 has no validation
+	// field Struct4.Field59 has no validation
+	// field Struct4.Field60 has no validation
+	// field Struct4.Field61 has no validation
+	// field Struct4.Field62 has no validation
+	// field Struct4.Field63 has no validation
+	// field Struct4.Field64 has no validation
+	// field Struct4.Field65 has no validation
+	// field Struct4.Field66 has no validation
+	// field Struct4.Field67 has no validation
+	// field Struct4.Field68 has no validation
+	// field Struct4.Field69 has no validation
+	// field Struct4.Field70 has no validation
+	// field Struct4.Field71 has no validation
+	// field Struct4.Field72 has no validation
+	// field Struct4.Field73 has no validation
+	// field Struct4.Field74 has no validation
+	// field Struct4.Field75 has no validation
+	// field Struct4.Field76 has no validation
+	// field Struct4.Field77 has no validation
+	// field Struct4.Field78 has no validation
+	// field Struct4.Field79 has no validation
+	// field Struct4.Field80 has no validation
+	// field Struct4.Field81 has no validation
+	// field Struct4.Field82 has no validation
+	// field Struct4.Field83 has no validation
+	// field Struct4.Field84 has no validation
+	// field Struct4.Field85 has no validation
+	// field Struct4.Field86 has no validation
+	// field Struct4.Field87 has no validation
+	// field Struct4.Field88 has no validation
+	// field Struct4.Field89 has no validation
+	// field Struct4.Field90 has no validation
+	// field Struct4.Field91 has no validation
+	// field Struct4.Field92 has no validation
+	// field Struct4.Field93 has no validation
+	// field Struct4.Field94 has no validation
+	// field Struct4.Field95 has no validation
+	// field Struct4.Field96 has no validation
+	// field Struct4.Field97 has no validation
+	// field Struct4.Field98 has no validation
+	// field Struct4.Field99 has no validation
+	// field Struct4.Field100 has no validation
 	return errs
 }
