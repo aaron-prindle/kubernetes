@@ -25,47 +25,161 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-func Test(t *testing.T) {
+var ctx = context.Background()
+var opCreate = operation.Operation{Type: operation.Create}
+
+// --- Tests ---
+
+func TestStruct(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 
 	// Valid case: minI (5) <= i (10)
 	st.Value(&Root{Struct: Struct{S: "x", MinI: 5, I: 10}}).ExpectValid()
 
 	// Invalid case: minI (5) > i (2)
-	st.Value(&Root{Struct: Struct{S: "xyz", MinI: 5, I: 2}}).ExpectInvalid(
-		field.Invalid(field.NewPath("struct"), Struct{S: "xyz", I: 2, MinI: 5, B: false, F: 0}, "expression returned false"),
+	invalidStruct := Struct{S: "xyz", MinI: 5, I: 2}
+	st.Value(&Root{Struct: invalidStruct}).ExpectInvalid(
+		field.Invalid(field.NewPath("struct"), invalidStruct, "expression returned false"),
 	)
 }
 
-// Benchmarks need adjustment based on actual performance, but update struct definition
-// 4394 ns/op (cost disabled, I think?)
-func BenchmarkExpression(b *testing.B) {
-	// Use a valid struct for benchmarking
-	obj := Struct{S: "x", MinI: 5, I: 10}
+func TestStruct2(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
 
+	// Valid case: minI (5) <= i (10)
+	st.Value(&Root2{Struct: Struct2{S: "x", MinI: 5, I: 10, Field20: "valid"}}).ExpectValid()
+
+	// Invalid case: minI (5) > i (2)
+	invalidStruct := Struct2{S: "xyz", MinI: 5, I: 2, Field20: "invalid"}
+	st.Value(&Root2{Struct: invalidStruct}).ExpectInvalid(
+		field.Invalid(field.NewPath("struct2"), invalidStruct, "expression returned false"),
+	)
+}
+
+func TestStruct3(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
+
+	// Valid case: minI (5) <= i (10)
+	st.Value(&Root3{Struct: Struct3{S: "x", MinI: 5, I: 10, Field100: "valid"}}).ExpectValid()
+
+	// Invalid case: minI (5) > i (2)
+	invalidStruct := Struct3{S: "xyz", MinI: 5, I: 2, Field100: "invalid"}
+	st.Value(&Root3{Struct: invalidStruct}).ExpectInvalid(
+		field.Invalid(field.NewPath("struct3"), invalidStruct, "expression returned false"),
+	)
+}
+
+// --- Benchmarks ---
+
+// -- Struct (Original) --
+
+// Benchmark results are placeholders, update after running
+// Example: 4394 ns/op (cost disabled, I think?)
+func BenchmarkExpression(b *testing.B) {
+	obj := Struct{S: "x", MinI: 5, I: 10}
 	// force compile and then reset to ignore compilation cost
-	Validate_Struct(context.Background(), operation.Operation{Type: operation.Create}, nil, &obj, nil)
+	_ = Validate_Struct(ctx, opCreate, nil, &obj, nil) // Use generated function
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		Validate_Struct(context.Background(), operation.Operation{Type: operation.Create}, nil, &obj, nil)
+		_ = Validate_Struct(ctx, opCreate, nil, &obj, nil) // Use generated function
 	}
 }
 
-// 2.5 ns/op -> Placeholder comment, update if needed
+// Example: 2.5 ns/op
 func BenchmarkNative(b *testing.B) {
-	// Use a valid struct for benchmarking
 	obj := Struct{S: "x", MinI: 5, I: 10}
+	b.ResetTimer() // No compilation cost for native
 	for i := 0; i < b.N; i++ {
-		Validate_Struct_Native(context.Background(), operation.Operation{Type: operation.Create}, nil, &obj, nil)
+		_ = Validate_Struct_Native(ctx, opCreate, nil, &obj, nil)
 	}
 }
+
+// -- Struct2 (~20 fields) --
+
+// Placeholder benchmark result
+func BenchmarkExpression2(b *testing.B) {
+	obj := Struct2{S: "x", MinI: 5, I: 10, Field20: "bench"}
+	// force compile and then reset to ignore compilation cost
+	_ = Validate_Struct2(ctx, opCreate, nil, &obj, nil) // Use generated function
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = Validate_Struct2(ctx, opCreate, nil, &obj, nil) // Use generated function
+	}
+}
+
+// Placeholder benchmark result
+func BenchmarkNative2(b *testing.B) {
+	obj := Struct2{S: "x", MinI: 5, I: 10, Field20: "bench"}
+	b.ResetTimer() // No compilation cost for native
+	for i := 0; i < b.N; i++ {
+		_ = Validate_Struct2_Native(ctx, opCreate, nil, &obj, nil)
+	}
+}
+
+// -- Struct3 (~100 fields) --
+
+// Placeholder benchmark result
+func BenchmarkExpression3(b *testing.B) {
+	obj := Struct3{S: "x", MinI: 5, I: 10, Field100: "bench"}
+	// force compile and then reset to ignore compilation cost
+	_ = Validate_Struct3(ctx, opCreate, nil, &obj, nil) // Use generated function
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = Validate_Struct3(ctx, opCreate, nil, &obj, nil) // Use generated function
+	}
+}
+
+// Placeholder benchmark result
+func BenchmarkNative3(b *testing.B) {
+	obj := Struct3{S: "x", MinI: 5, I: 10, Field100: "bench"}
+	b.ResetTimer() // No compilation cost for native
+	for i := 0; i < b.N; i++ {
+		_ = Validate_Struct3_Native(ctx, opCreate, nil, &obj, nil)
+	}
+}
+
+// --- Native Validation Implementations ---
 
 // Validate_Struct_Native implements the equivalent Go logic for the expression: self.minI <= self.i
-// It should return an error if the expression evaluates to false.
 func Validate_Struct_Native(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct) (errs field.ErrorList) {
+	// If fldPath is nil, create a root path. Adjust if validation needs specific paths.
+	if fldPath == nil {
+		fldPath = field.NewPath("struct") // Match the path used in TestStruct
+	}
 	if !(obj.MinI <= obj.I) {
-		errs = field.ErrorList{field.Invalid(nil, obj, "expression returned false")}
+		// Use fldPath in the error. Pass obj as the value.
+		errs = field.ErrorList{field.Invalid(fldPath, obj, "expression returned false")}
 	}
 	return errs
 }
+
+// Validate_Struct2_Native implements the equivalent Go logic for Struct2
+func Validate_Struct2_Native(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct2) (errs field.ErrorList) {
+	if fldPath == nil {
+		fldPath = field.NewPath("struct2") // Match the path used in TestStruct2
+	}
+	if !(obj.MinI <= obj.I) {
+		errs = field.ErrorList{field.Invalid(fldPath, obj, "expression returned false")}
+	}
+	return errs
+}
+
+// Validate_Struct3_Native implements the equivalent Go logic for Struct3
+func Validate_Struct3_Native(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *Struct3) (errs field.ErrorList) {
+	if fldPath == nil {
+		fldPath = field.NewPath("struct3") // Match the path used in TestStruct3
+	}
+	if !(obj.MinI <= obj.I) {
+		errs = field.ErrorList{field.Invalid(fldPath, obj, "expression returned false")}
+	}
+	return errs
+}
+
+// Note: The generated validation functions (Validate_Struct, Validate_Struct2, Validate_Struct3)
+// are assumed to be created by the `validation-gen` tool based on the +k8s:expression tags.
+// You need to run the generator before these benchmarks will compile and run correctly.
+// Example command (adjust paths as needed):
+// validation-gen --input-dirs ./... --output-package ./ --output-file-base zz_generated.validation --go-header-file hack/boilerplate.go.txt
