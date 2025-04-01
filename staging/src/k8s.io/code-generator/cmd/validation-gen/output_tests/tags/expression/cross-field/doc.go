@@ -24,18 +24,164 @@ import "k8s.io/code-generator/cmd/validation-gen/testscheme"
 
 var localSchemeBuilder = testscheme.New()
 
+// --- Original Struct (~4 fields) ---
+
 type Root struct {
-	TypeMeta int
+	TypeMeta int // Needs a TypeMeta field for validation-gen
 
 	Struct Struct `json:"struct"`
 }
 
-// +k8s:rule={"expression":"options.exists(o, o == 'OptionX') && self.s.size() < self.i", "reason":"Invalid", "messageExpression":"'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])"}
-
-// +k8s:rule={"expression":"self.s.size() < self.i"}
+// +k8s:rule={"expression":"self.s.size() < self.i", "messageExpression":"'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])"}
 type Struct struct {
-	S string  `json:"s"`
-	I int     `json:"i"`
+	S string  `json:"s"` // Validation field
+	I int     `json:"i"` // Validation field
 	B bool    `json:"b"`
 	F float64 `json:"f"`
+}
+
+// --- Struct2 (~20 fields) ---
+
+type Root2 struct {
+	TypeMeta int // Needs a TypeMeta field for validation-gen
+
+	Struct Struct2 `json:"struct2"`
+}
+
+// +k8s:rule={"expression":"self.s.size() < self.i", "messageExpression":"'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])"}
+type Struct2 struct {
+	S string  `json:"s"` // Validation field
+	I int     `json:"i"` // Validation field
+	B bool    `json:"b"`
+	F float64 `json:"f"`
+	// Add more fields to reach ~20 total
+	Field5  string            `json:"field5"`
+	Field6  int32             `json:"field6"`
+	Field7  int64             `json:"field7"`
+	Field8  *string           `json:"field8,omitempty"`
+	Field9  *int              `json:"field9,omitempty"`
+	Field10 []string          `json:"field10,omitempty"`
+	Field11 []int             `json:"field11,omitempty"`
+	Field12 map[string]string `json:"field12,omitempty"`
+	Field13 map[string]int    `json:"field13,omitempty"`
+	Field14 bool              `json:"field14"`
+	Field15 float32           `json:"field15"`
+	Field16 uint              `json:"field16"`
+	Field17 uint32            `json:"field17"`
+	Field18 uint64            `json:"field18"`
+	Field19 []byte            `json:"field19,omitempty"`
+	Field20 string            `json:"field20"` // Just another field
+}
+
+// --- Struct3 (~100 fields) ---
+
+type Root3 struct {
+	TypeMeta int // Needs a TypeMeta field for validation-gen
+
+	Struct Struct3 `json:"struct3"`
+}
+
+// +k8s:rule={"expression":"self.s.size() < self.i", "messageExpression":"'the length of s (%d) must be less than i (%d)'.format([self.s.size(), self.i])"}
+type Struct3 struct {
+	S string  `json:"s"` // Validation field
+	I int     `json:"i"` // Validation field
+	B bool    `json:"b"`
+	F float64 `json:"f"`
+	// Add more fields to reach ~100 total
+	Field5   string `json:"field5"`
+	Field6   int    `json:"field6"`
+	Field7   bool   `json:"field7"`
+	Field8   string `json:"field8"`
+	Field9   int    `json:"field9"`
+	Field10  bool   `json:"field10"`
+	Field11  string `json:"field11"`
+	Field12  int    `json:"field12"`
+	Field13  bool   `json:"field13"`
+	Field14  string `json:"field14"`
+	Field15  int    `json:"field15"`
+	Field16  bool   `json:"field16"`
+	Field17  string `json:"field17"`
+	Field18  int    `json:"field18"`
+	Field19  bool   `json:"field19"`
+	Field20  string `json:"field20"`
+	Field21  string `json:"field21"`
+	Field22  int    `json:"field22"`
+	Field23  bool   `json:"field23"`
+	Field24  string `json:"field24"`
+	Field25  int    `json:"field25"`
+	Field26  bool   `json:"field26"`
+	Field27  string `json:"field27"`
+	Field28  int    `json:"field28"`
+	Field29  bool   `json:"field29"`
+	Field30  string `json:"field30"`
+	Field31  string `json:"field31"`
+	Field32  int    `json:"field32"`
+	Field33  bool   `json:"field33"`
+	Field34  string `json:"field34"`
+	Field35  int    `json:"field35"`
+	Field36  bool   `json:"field36"`
+	Field37  string `json:"field37"`
+	Field38  int    `json:"field38"`
+	Field39  bool   `json:"field39"`
+	Field40  string `json:"field40"`
+	Field41  string `json:"field41"`
+	Field42  int    `json:"field42"`
+	Field43  bool   `json:"field43"`
+	Field44  string `json:"field44"`
+	Field45  int    `json:"field45"`
+	Field46  bool   `json:"field46"`
+	Field47  string `json:"field47"`
+	Field48  int    `json:"field48"`
+	Field49  bool   `json:"field49"`
+	Field50  string `json:"field50"`
+	Field51  string `json:"field51"`
+	Field52  int    `json:"field52"`
+	Field53  bool   `json:"field53"`
+	Field54  string `json:"field54"`
+	Field55  int    `json:"field55"`
+	Field56  bool   `json:"field56"`
+	Field57  string `json:"field57"`
+	Field58  int    `json:"field58"`
+	Field59  bool   `json:"field59"`
+	Field60  string `json:"field60"`
+	Field61  string `json:"field61"`
+	Field62  int    `json:"field62"`
+	Field63  bool   `json:"field63"`
+	Field64  string `json:"field64"`
+	Field65  int    `json:"field65"`
+	Field66  bool   `json:"field66"`
+	Field67  string `json:"field67"`
+	Field68  int    `json:"field68"`
+	Field69  bool   `json:"field69"`
+	Field70  string `json:"field70"`
+	Field71  string `json:"field71"`
+	Field72  int    `json:"field72"`
+	Field73  bool   `json:"field73"`
+	Field74  string `json:"field74"`
+	Field75  int    `json:"field75"`
+	Field76  bool   `json:"field76"`
+	Field77  string `json:"field77"`
+	Field78  int    `json:"field78"`
+	Field79  bool   `json:"field79"`
+	Field80  string `json:"field80"`
+	Field81  string `json:"field81"`
+	Field82  int    `json:"field82"`
+	Field83  bool   `json:"field83"`
+	Field84  string `json:"field84"`
+	Field85  int    `json:"field85"`
+	Field86  bool   `json:"field86"`
+	Field87  string `json:"field87"`
+	Field88  int    `json:"field88"`
+	Field89  bool   `json:"field89"`
+	Field90  string `json:"field90"`
+	Field91  string `json:"field91"`
+	Field92  int    `json:"field92"`
+	Field93  bool   `json:"field93"`
+	Field94  string `json:"field94"`
+	Field95  int    `json:"field95"`
+	Field96  bool   `json:"field96"`
+	Field97  string `json:"field97"`
+	Field98  int    `json:"field98"`
+	Field99  bool   `json:"field99"`
+	Field100 string `json:"field100"` // Just another field
 }

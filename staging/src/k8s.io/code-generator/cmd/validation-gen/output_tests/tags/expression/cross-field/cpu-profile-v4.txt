@@ -1,0 +1,189 @@
+File: cross-field.test
+Build ID: dc2f0ad40e434d85c8ca7fcd426a7777123ea5dc
+Type: cpu
+Time: 2025-04-01 21:41:54 UTC
+Duration: 16.99s, Total samples = 36.11s (212.48%)
+Showing nodes accounting for 29.52s, 81.75% of 36.11s total
+Dropped 312 nodes (cum <= 0.18s)
+      flat  flat%   sum%        cum   cum%
+     2.73s  7.56%  7.56%      2.73s  7.56%  runtime.tgkill
+     1.96s  5.43% 12.99%      8.57s 23.73%  runtime.scanobject
+     1.69s  4.68% 17.67%      1.73s  4.79%  runtime.(*gcBits).bitp (inline)
+     1.68s  4.65% 22.32%      1.68s  4.65%  runtime.nextFreeFast (inline)
+     1.39s  3.85% 26.17%      1.39s  3.85%  runtime.memclrNoHeapPointers
+     1.38s  3.82% 29.99%      6.89s 19.08%  runtime.mallocgcSmallScanNoHeader
+     1.26s  3.49% 33.48%      2.16s  5.98%  runtime.findObject
+     1.11s  3.07% 36.55%     14.61s 40.46%  runtime.gcDrain
+     0.99s  2.74% 39.30%      0.99s  2.74%  runtime.futex
+     0.85s  2.35% 41.65%      0.85s  2.35%  runtime.(*mspan).base (inline)
+     0.83s  2.30% 43.95%      0.88s  2.44%  runtime.(*mspan).writeHeapBitsSmall
+     0.80s  2.22% 46.16%      0.85s  2.35%  runtime.spanOf (inline)
+     0.60s  1.66% 47.83%      0.60s  1.66%  runtime.typePointers.nextFast (inline)
+     0.57s  1.58% 49.40%      2.68s  7.42%  github.com/google/cel-go/interpreter.(*planner).decorate
+     0.57s  1.58% 50.98%      8.64s 23.93%  runtime.mallocgc
+     0.54s  1.50% 52.48%      0.55s  1.52%  runtime.(*lfstack).pop (inline)
+     0.45s  1.25% 53.72%      0.47s  1.30%  runtime.pageIndexOf (inline)
+     0.41s  1.14% 54.86%      2.15s  5.95%  github.com/google/cel-go/cel.newProgram.func1.CostObserver.2
+     0.40s  1.11% 55.97%      0.41s  1.14%  runtime.(*lfstack).push
+     0.34s  0.94% 56.91%      0.38s  1.05%  runtime.(*mspan).heapBitsSmallForAddr
+     0.33s  0.91% 57.82%      0.38s  1.05%  github.com/google/cel-go/cel.newProgram.Optimize.decOptimize.func4
+     0.33s  0.91% 58.74%      0.49s  1.36%  runtime.typePointers.next
+     0.31s  0.86% 59.60%      0.31s  0.86%  runtime.(*sweepLocker).tryAcquire
+     0.30s  0.83% 60.43%      0.30s  0.83%  runtime.getMCache (inline)
+     0.30s  0.83% 61.26%      0.30s  0.83%  runtime.getpid
+     0.28s  0.78% 62.03%      0.28s  0.78%  runtime.madvise
+     0.26s  0.72% 62.75%      0.62s  1.72%  runtime.scanblock
+     0.25s  0.69% 63.45%      4.04s 11.19%  github.com/google/cel-go/interpreter.(*planner).planSelect
+     0.25s  0.69% 64.14%      1.16s  3.21%  runtime.growslice
+     0.23s  0.64% 64.77%      3.43s  9.50%  runtime.greyobject
+     0.23s  0.64% 65.41%      0.23s  0.64%  runtime.memmove
+     0.22s  0.61% 66.02%      0.22s  0.61%  aeshashbody
+     0.21s  0.58% 66.60%      5.30s 14.68%  runtime.newobject
+     0.20s  0.55% 67.16%      0.74s  2.05%  github.com/google/cel-go/cel.newProgram.func1.Observe.decObserveEval.9
+     0.19s  0.53% 67.68%      0.61s  1.69%  runtime.mapaccess2_faststr
+     0.17s  0.47% 68.15%      0.55s  1.52%  runtime.getempty
+     0.16s  0.44% 68.60%      6.62s 18.33%  github.com/google/cel-go/interpreter.(*planner).planCall
+     0.16s  0.44% 69.04%      0.76s  2.10%  github.com/google/cel-go/interpreter.newQualifier
+     0.16s  0.44% 69.48%      0.23s  0.64%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.16s  0.44% 69.93%      1.17s  3.24%  runtime.sweepone
+     0.14s  0.39% 70.31%      0.32s  0.89%  github.com/google/cel-go/cel.newProgram.CompileRegexConstants.decRegexOptimizer.func5
+     0.14s  0.39% 70.70%      7.43s 20.58%  github.com/google/cel-go/interpreter.(*planner).Plan
+     0.14s  0.39% 71.09%      0.50s  1.38%  github.com/google/cel-go/interpreter.(*refValStack).dropArgs
+     0.13s  0.36% 71.45%      4.05s 11.22%  github.com/google/cel-go/interpreter.(*evalBinary).Eval
+     0.13s  0.36% 71.81%      0.53s  1.47%  runtime.(*sweepLocked).sweep
+     0.11s   0.3% 72.11%      5.02s 13.90%  github.com/google/cel-go/cel.(*prog).ContextEval
+     0.11s   0.3% 72.42%      0.33s  0.91%  k8s.io/apiserver/pkg/cel/common/reflect/internal.(*FieldsCache).lookup
+     0.11s   0.3% 72.72%      0.20s  0.55%  runtime.(*spanSet).push
+     0.11s   0.3% 73.03%      0.41s  1.14%  runtime.lock2
+     0.10s  0.28% 73.30%      7.68s 21.27%  github.com/google/cel-go/cel.(*prog).initInterpretable
+     0.10s  0.28% 73.58%      0.29s   0.8%  github.com/google/cel-go/interpreter.(*CostTracker).costCall
+     0.10s  0.28% 73.86%      2.62s  7.26%  github.com/google/cel-go/interpreter.(*evalAttr).Eval
+     0.10s  0.28% 74.13%      1.85s  5.12%  github.com/google/cel-go/interpreter.(*evalUnary).Eval
+     0.10s  0.28% 74.41%      0.56s  1.55%  runtime.mapassign_faststr
+     0.09s  0.25% 74.66%      9.57s 26.50%  github.com/google/cel-go/cel.newProgram.func1
+     0.09s  0.25% 74.91%      1.56s  4.32%  github.com/google/cel-go/interpreter.refQualify
+     0.09s  0.25% 75.16%      1.52s  4.21%  k8s.io/apiserver/pkg/cel/common/reflect.TypedToVal
+     0.09s  0.25% 75.41%      1.60s  4.43%  reflect.packEface
+     0.09s  0.25% 75.66%      0.86s  2.38%  runtime.(*mcentral).cacheSpan
+     0.09s  0.25% 75.91%      0.19s  0.53%  runtime.stealWork
+     0.08s  0.22% 76.13%      2.47s  6.84%  github.com/google/cel-go/interpreter.applyQualifiers
+     0.08s  0.22% 76.35%      0.96s  2.66%  runtime.heapSetTypeNoHeader (inline)
+     0.07s  0.19% 76.54%      0.53s  1.47%  github.com/google/cel-go/cel.decorateOptionalOr
+     0.07s  0.19% 76.74%     17.43s 48.27%  k8s.io/apimachinery/pkg/api/validate.Expression[go.shape.c93bc77cf2b2a2b5e5c6ecd1398a07d11cf0409fb91d6e1cefbd54788fda3ec4]
+     0.07s  0.19% 76.93%      0.45s  1.25%  k8s.io/apiserver/pkg/cel/common/reflect/internal.(*FieldsCache).Get
+     0.06s  0.17% 77.10%     15.90s 44.03%  github.com/google/cel-go/cel.(*progGen).ContextEval
+     0.06s  0.17% 77.26%      2.37s  6.56%  github.com/google/cel-go/interpreter.(*evalWatchConstQual).Qualify
+     0.06s  0.17% 77.43%      7.58s 20.99%  github.com/google/cel-go/interpreter.(*exprInterpreter).NewInterpretable
+     0.06s  0.17% 77.60%      0.56s  1.55%  github.com/google/cel-go/interpreter.(*refValStack).push
+     0.06s  0.17% 77.76%      1.62s  4.49%  github.com/google/cel-go/interpreter.(*stringQualifier).qualifyInternal
+     0.06s  0.17% 77.93%      1.21s  3.35%  runtime.(*mcache).refill
+     0.06s  0.17% 78.09%     16.58s 45.92%  runtime.systemstack
+     0.06s  0.17% 78.26%      0.19s  0.53%  runtime.wbBufFlush1
+     0.05s  0.14% 78.40%      1.20s  3.32%  github.com/google/cel-go/interpreter.(*planner).planCheckedIdent
+     0.05s  0.14% 78.54%     17.49s 48.44%  k8s.io/code-generator/cmd/validation-gen/output_tests/tags/expression/cross-field.BenchmarkExpression3
+     0.05s  0.14% 78.68%      0.67s  1.86%  runtime.convTstring
+     0.05s  0.14% 78.81%      0.68s  1.88%  runtime.mallocgcSmallScanHeader
+     0.04s  0.11% 78.93%      4.78s 13.24%  github.com/google/cel-go/cel.(*prog).Eval
+     0.04s  0.11% 79.04%      0.31s  0.86%  github.com/google/cel-go/interpreter.(*absoluteAttribute).AddQualifier
+     0.04s  0.11% 79.15%      0.35s  0.97%  github.com/google/cel-go/interpreter.(*evalAttr).AddQualifier
+     0.04s  0.11% 79.26%      4.71s 13.04%  github.com/google/cel-go/interpreter.(*evalWatch).Eval
+     0.04s  0.11% 79.37%      0.64s  1.77%  github.com/google/cel-go/interpreter.(*evalWatchAttr).AddQualifier
+     0.04s  0.11% 79.48%      0.64s  1.77%  github.com/google/cel-go/interpreter.NewCostTracker
+     0.04s  0.11% 79.59%      3.03s  8.39%  runtime.(*gcControllerState).enlistWorker
+     0.04s  0.11% 79.70%      3.85s 10.66%  runtime.(*gcWork).balance
+     0.04s  0.11% 79.81%      0.22s  0.61%  runtime.(*mheap).initSpan
+     0.04s  0.11% 79.92%      0.47s  1.30%  runtime.(*mspan).typePointersOfUnchecked
+     0.04s  0.11% 80.03%      0.29s   0.8%  runtime.typedmemmove
+     0.03s 0.083% 80.12%      2.50s  6.92%  github.com/google/cel-go/interpreter.(*absoluteAttribute).Resolve
+     0.03s 0.083% 80.20%      0.79s  2.19%  github.com/google/cel-go/interpreter.(*attrFactory).NewQualifier
+     0.03s 0.083% 80.28%      0.36s     1%  github.com/google/cel-go/interpreter.(*evalUnary).Args
+     0.03s 0.083% 80.37%      2.99s  8.28%  github.com/google/cel-go/interpreter.(*evalWatchAttr).Eval
+     0.03s 0.083% 80.45%      1.26s  3.49%  github.com/google/cel-go/interpreter.(*planner).planIdent
+     0.03s 0.083% 80.53%      1.29s  3.57%  runtime.(*mcache).nextFree
+     0.03s 0.083% 80.61%      0.50s  1.38%  runtime.(*mheap).allocSpan
+     0.03s 0.083% 80.70%      0.19s  0.53%  runtime.forEachPInternal
+     0.03s 0.083% 80.78%     15.11s 41.84%  runtime.gcBgMarkWorker
+     0.03s 0.083% 80.86%      0.21s  0.58%  runtime.mapaccess2
+     0.03s 0.083% 80.95%      0.42s  1.16%  runtime.notesleep
+     0.02s 0.055% 81.00%      0.20s  0.55%  github.com/google/cel-go/common/types.(*Registry).NativeToValue
+     0.02s 0.055% 81.06%      0.47s  1.30%  k8s.io/apiserver/pkg/cel/common/reflect.(*structVal).getField
+     0.02s 0.055% 81.11%      1.63s  4.51%  reflect.valueInterface
+     0.02s 0.055% 81.17%      1.19s  3.30%  runtime.bgsweep
+     0.02s 0.055% 81.22%      0.70s  1.94%  runtime.makeslice
+     0.02s 0.055% 81.28%      1.67s  4.62%  runtime.schedule
+     0.01s 0.028% 81.31%      0.38s  1.05%  github.com/google/cel-go/ext.setsLib.ProgramOptions.OverloadCostTracker.func2
+     0.01s 0.028% 81.33%      0.45s  1.25%  github.com/google/cel-go/interpreter.(*attrFactory).AbsoluteAttribute
+     0.01s 0.028% 81.36%      0.43s  1.19%  github.com/google/cel-go/interpreter.NewEvalState (inline)
+     0.01s 0.028% 81.39%      0.20s  0.55%  github.com/google/cel-go/interpreter.Observe (inline)
+     0.01s 0.028% 81.42%      0.22s  0.61%  internal/runtime/maps.newarray
+     0.01s 0.028% 81.45%     17.44s 48.30%  k8s.io/code-generator/cmd/validation-gen/output_tests/tags/expression/cross-field.Validate_Struct3 (inline)
+     0.01s 0.028% 81.47%      0.30s  0.83%  reflect.typedmemmove
+     0.01s 0.028% 81.50%      0.22s  0.61%  runtime.(*sweepLocked).sweep.(*mheap).freeSpan.func2
+     0.01s 0.028% 81.53%      1.27s  3.52%  runtime.findRunnable
+     0.01s 0.028% 81.56%      0.54s  1.50%  runtime.futexsleep
+     0.01s 0.028% 81.58%      0.26s  0.72%  runtime.goschedImpl
+     0.01s 0.028% 81.61%      0.42s  1.16%  runtime.lock (inline)
+     0.01s 0.028% 81.64%      0.94s  2.60%  runtime.markroot
+     0.01s 0.028% 81.67%      1.64s  4.54%  runtime.park_m
+     0.01s 0.028% 81.69%      3.04s  8.42%  runtime.preemptone
+     0.01s 0.028% 81.72%      0.35s  0.97%  runtime.scanstack
+     0.01s 0.028% 81.75%      0.43s  1.19%  runtime.wakep
+         0     0% 81.75%      0.52s  1.44%  github.com/google/cel-go/cel.(*prog).clone (inline)
+         0     0% 81.75%      0.32s  0.89%  github.com/google/cel-go/interpreter.(*defaultDispatcher).FindOverload
+         0     0% 81.75%      0.44s  1.22%  github.com/google/cel-go/interpreter.(*evalBinary).Args
+         0     0% 81.75%      1.62s  4.49%  github.com/google/cel-go/interpreter.(*stringQualifier).Qualify
+         0     0% 81.75%      0.19s  0.53%  github.com/google/cel-go/interpreter.decObserveEval (inline)
+         0     0% 81.75%      0.22s  0.61%  internal/runtime/maps.(*Map).growToSmall
+         0     0% 81.75%      0.57s  1.58%  internal/runtime/maps.NewEmptyMap (inline)
+         0     0% 81.75%      0.22s  0.61%  internal/runtime/maps.newGroups (inline)
+         0     0% 81.75%      1.35s  3.74%  k8s.io/apiserver/pkg/cel/common/reflect.(*structVal).Find
+         0     0% 81.75%      1.63s  4.51%  reflect.Value.Interface (inline)
+         0     0% 81.75%      1.20s  3.32%  reflect.unsafe_New
+         0     0% 81.75%      0.30s  0.83%  runtime.(*gcWork).tryGet
+         0     0% 81.75%      0.65s  1.80%  runtime.(*mcentral).grow
+         0     0% 81.75%      0.47s  1.30%  runtime.(*mheap).alloc
+         0     0% 81.75%      0.46s  1.27%  runtime.(*mheap).alloc.func1
+         0     0% 81.75%      0.22s  0.61%  runtime.(*mheap).freeSpan (inline)
+         0     0% 81.75%      1.73s  4.79%  runtime.(*mspan).markBitsForIndex (inline)
+         0     0% 81.75%      0.29s   0.8%  runtime.(*pageAlloc).scavenge
+         0     0% 81.75%      0.29s   0.8%  runtime.(*pageAlloc).scavenge.func1
+         0     0% 81.75%      0.29s   0.8%  runtime.(*pageAlloc).scavengeOne
+         0     0% 81.75%      0.29s   0.8%  runtime.(*scavengerState).init.func2
+         0     0% 81.75%      0.29s   0.8%  runtime.(*scavengerState).run
+         0     0% 81.75%      0.29s   0.8%  runtime.bgscavenge
+         0     0% 81.75%      0.31s  0.86%  runtime.deductAssistCredit
+         0     0% 81.75%      0.19s  0.53%  runtime.forEachP (inline)
+         0     0% 81.75%      0.46s  1.27%  runtime.futexwakeup
+         0     0% 81.75%      0.31s  0.86%  runtime.gcAssistAlloc
+         0     0% 81.75%      0.31s  0.86%  runtime.gcAssistAlloc.func2
+         0     0% 81.75%      0.31s  0.86%  runtime.gcAssistAlloc1
+         0     0% 81.75%     14.61s 40.46%  runtime.gcBgMarkWorker.func2
+         0     0% 81.75%     14.31s 39.63%  runtime.gcDrainMarkWorkerDedicated (inline)
+         0     0% 81.75%      0.30s  0.83%  runtime.gcDrainMarkWorkerIdle (inline)
+         0     0% 81.75%      0.30s  0.83%  runtime.gcDrainN
+         0     0% 81.75%      0.37s  1.02%  runtime.gcMarkDone
+         0     0% 81.75%      0.19s  0.53%  runtime.gcMarkTermination
+         0     0% 81.75%      0.25s  0.69%  runtime.gopreempt_m (inline)
+         0     0% 81.75%      0.75s  2.08%  runtime.handoff
+         0     0% 81.75%      0.41s  1.14%  runtime.lockWithRank (inline)
+         0     0% 81.75%      0.42s  1.16%  runtime.mPark (inline)
+         0     0% 81.75%      0.57s  1.58%  runtime.makemap_small
+         0     0% 81.75%      0.39s  1.08%  runtime.markroot.func1
+         0     0% 81.75%      0.51s  1.41%  runtime.markrootBlock
+         0     0% 81.75%      1.65s  4.57%  runtime.mcall
+         0     0% 81.75%      0.24s  0.66%  runtime.morestack
+         0     0% 81.75%      0.21s  0.58%  runtime.newarray
+         0     0% 81.75%      0.28s  0.78%  runtime.newstack
+         0     0% 81.75%      0.38s  1.05%  runtime.notewakeup
+         0     0% 81.75%      3.05s  8.45%  runtime.preemptM (inline)
+         0     0% 81.75%      0.30s  0.83%  runtime.putfull
+         0     0% 81.75%      0.34s  0.94%  runtime.resetspinning
+         0     0% 81.75%      0.23s  0.64%  runtime.scanframeworker
+         0     0% 81.75%      3.03s  8.39%  runtime.signalM
+         0     0% 81.75%      0.37s  1.02%  runtime.startm
+         0     0% 81.75%      0.54s  1.50%  runtime.stopm
+         0     0% 81.75%      0.28s  0.78%  runtime.sysUnused (inline)
+         0     0% 81.75%      0.28s  0.78%  runtime.sysUnusedOS
+         0     0% 81.75%      0.23s  0.64%  runtime.trygetfull
+         0     0% 81.75%     17.48s 48.41%  testing.(*B).launch
+         0     0% 81.75%     17.49s 48.44%  testing.(*B).runN
