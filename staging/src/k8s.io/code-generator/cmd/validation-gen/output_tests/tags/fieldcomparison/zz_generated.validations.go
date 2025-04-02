@@ -53,7 +53,7 @@ func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath
 		comparisonHolds = (obj.MinI <= obj.I)
 		return comparisonHolds
 	}, "b", func(o *ExampleStruct) *bool { return &o.B }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *bool) field.ErrorList {
-		return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "")
+		return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field ExampleStruct.B")
 	})...)
 
 	// field ExampleStruct.TypeMeta has no validation
