@@ -27,7 +27,6 @@ func FieldComparisonConditional[Tstruct any, TfieldPtr any](
 	op operation.Operation,
 	fldPath *field.Path, // Path to the *struct* being validated
 	newObj, oldObj *Tstruct, // The struct instances (oldObj can be nil)
-	comparisonName string, // User-friendly name of the comparison (e.g., "minI <= i")
 	compareFn func(obj *Tstruct) bool, // Function that performs the comparison logic on the new object
 	targetFieldPathString string, // Dot-separated path string *relative* to the struct for the target field
 	getTargetFieldFn func(o *Tstruct) TfieldPtr, // Function to extract the target field value
@@ -41,31 +40,30 @@ func FieldComparisonConditional[Tstruct any, TfieldPtr any](
 		return errs
 	}
 
-	// --- Step 1: Run the Comparison ---
-	comparisonHolds := compareFn(newObj)
-
-	// --- Step 2: Conditional Validation ---
-	if comparisonHolds {
-		// --- Step 2a: Comparison True - Run Payload Validation ---
+	// --- Step 1: Conditional Validation ---
+	if compareFn(newObj) {
+		// --- Step 1a: Comparison True - Run Payload Validation ---
 
 		// Calculate the full path to the target field
-		targetPath := fldPath
+		// fldPath := fldPath
+
 		for _, part := range strings.Split(targetFieldPathString, ".") {
 			// Avoid adding empty segments if path starts/ends with '.' or has '..'
 			if part != "" {
-				targetPath = targetPath.Child(part)
+				fldPath = fldPath.Child(part)
 			}
 		}
 
 		// Get the new and old values of the *target* field
-		newTargetVal := getTargetFieldFn(newObj)
+		// newTargetVal := getTargetFieldFn(newObj)
+
 		var oldTargetVal TfieldPtr
 		if oldObj != nil {
 			oldTargetVal = getTargetFieldFn(oldObj)
 		}
 
 		// Run the payload validator on the target field
-		errs = append(errs, payloadValidator(ctx, op, targetPath, newTargetVal, oldTargetVal)...)
+		errs = append(errs, payloadValidator(ctx, op, fldPath, getTargetFieldFn(newObj), oldTargetVal)...)
 
 	}
 	return errs

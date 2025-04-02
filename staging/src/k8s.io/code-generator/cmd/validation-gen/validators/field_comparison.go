@@ -237,16 +237,13 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 
 	// === Create the Main FunctionGen calling the Runtime Helper ===
 	result := Validations{}
-	comparisonName := fmt.Sprintf("%s %s %s", field1PathString, operator, field2PathString)
 
-	// Create FunctionGen - REMOVE TypeArgs
+	// Create FunctionGen
 	f := FunctionGen{
 		TagName:  fieldComparisonTagName,
 		Flags:    payloadFuncInfo.Flags,
-		Function: validateFieldComparisonConditional, // Just the function name
-		// TypeArgs: nil, // Rely on type inference by the generator << REMOVED
+		Function: validateFieldComparisonConditional,
 		Args: []any{ // Set the regular arguments
-			comparisonName,
 			comparisonFuncLiteral,
 			targetFieldPathString,
 			targetGetFnLiteral,
@@ -260,36 +257,17 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 	return result, nil
 }
 
-// --- Docs ---
 func (fctv fieldComparisonTagValidator) Docs() TagDoc {
-	// ... Docs content remains the same ...
 	doc := TagDoc{
 		Tag:    fctv.TagName(),
 		Scopes: fctv.ValidScopes().UnsortedList(),
 		Description: fmt.Sprintf("Generates code to conditionally run a payload validation rule on a specified *target field* if the comparison between two other fields (field1 operator field2) is true. "+
 			"If the comparison is false, an Invalid error is generated attached to the struct's path. "+
 			"Supported operators: %v. Handles basic numeric, string, bool types, and pointers. Requires the `validate.FieldComparisonConditional` runtime helper.", supportedOperators.UnsortedList()),
-		Args: []TagArgDoc{
-			// {Name: "<field1Path>", Description: "Dot-separated path to the first field in the comparison."},
-			// {Name: "<operator>", Description: "The comparison operator (e.g., '==', '!=', '<', '<=', '>', '>=')."},
-			// {Name: "<field2Path>", Description: "Dot-separated path to the second field in the comparison."},
-			// {Name: "<targetFieldPath>", Description: "Dot-separated path to the field to apply the <validator> payload to if the comparison is true."},
-		},
+		Args: []TagArgDoc{},
 		Payloads: []TagPayloadDoc{{
-			// Name:        "<validator>",
 			Description: "The validation tag (including '+k8s:') to apply to the <targetFieldPath> if the comparison evaluates to true.",
-			// Examples:    []string{"+k8s:minimum=1", "+k8s:maxLength=10", "+k8s:required"},
 		}},
-		// Examples: []string{
-		// 	`// +k8s:fieldComparison(minI, <=, i, i)=+k8s:validateTrue`,
-		// 	`// +k8s:fieldComparison(replicas, >, 0, selector)=+k8s:required`,
-		// 	`// +k8s:fieldComparison(endTime, >=, startTime, duration)=+k8s:minimum=1`,
-		// 	`// +k8s:fieldComparison(spec.priority, ==, status.priority, status.message)=+k8s:maxLength=20`,
-		// 	`// +k8s:fieldComparison(optionalMax, >, count, count)=+k8s:minimum=0 // optionalMax is *int`,
-		// },
 	}
 	return doc
 }
-
-// --- Ensure necessary helper functions are available ---
-// ... (list of required helpers) ...

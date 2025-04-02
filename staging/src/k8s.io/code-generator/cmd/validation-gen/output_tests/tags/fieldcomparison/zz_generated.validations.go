@@ -48,7 +48,7 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ExampleStruct) (errs field.ErrorList) {
 	// type ExampleStruct
-	errs = append(errs, validate.FieldComparisonConditional(ctx, op, fldPath, obj, oldObj, "minI <= i", func(obj *ExampleStruct) bool { // Comparison Body
+	errs = append(errs, validate.FieldComparisonConditional(ctx, op, fldPath, obj, oldObj, func(obj *ExampleStruct) bool { // Comparison Body
 		comparisonHolds := false
 		comparisonHolds = (obj.MinI <= obj.I)
 		return comparisonHolds
