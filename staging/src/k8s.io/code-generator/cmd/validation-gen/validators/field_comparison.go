@@ -63,9 +63,6 @@ func (fieldComparisonTagValidator) ValidScopes() sets.Set[Scope] {
 var (
 	validateFieldComparisonConditional = types.Name{Package: libValidationPkg, Name: "FieldComparisonConditional"}
 	// Types needed for the generated function literal signature
-	contextType   = types.Name{Package: libContextPkg, Name: "Context"}
-	operationType = types.Name{Package: libOperationPkg, Name: "Operation"}
-	fieldPathType = types.Name{Package: libFieldPathPkg, Name: "Path"}
 	errorListType = types.Name{Package: libFieldPathPkg, Name: "ErrorList"}
 	fieldInvalid  = types.Name{Package: libFieldPathPkg, Name: "Invalid"} // For error generation
 	fmtSprintf    = types.Name{Package: libFmtPkg, Name: "Sprintf"}       // For error message
@@ -342,15 +339,24 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 	logicBodyBuilder.WriteString("  return errs\n")
 
 	// === Define the FunctionLiteral ===
+	// Define the parameter types using ParseFullyQualifiedName
+	ctxType := &types.Type{Name: types.ParseFullyQualifiedName(libContextPkg + ".Context")}
+	opType := &types.Type{Name: types.ParseFullyQualifiedName(libOperationPkg + ".Operation")}
+	// Define the Path type *before* taking its pointer
+	pathType := &types.Type{Name: types.ParseFullyQualifiedName(libFieldPathPkg + ".Path")}
+	// Define the ErrorList type
+	errListType := &types.Type{Name: types.ParseFullyQualifiedName(libFieldPathPkg + ".ErrorList")}
+
 	combinedLogicFuncLiteral := FunctionLiteral{
 		Parameters: []ParamResult{
-			{"ctx", contextType},
-			{"op", operationType},
-			{"fldPath", types.PointerTo(fieldPathType)},
+			{"ctx", ctxType},
+			{"op", opType},
+			// Correctly pass a POINTER to field.Path type
+			{"fldPath", types.PointerTo(pathType)},
 			{"newObj", ptrStructType}, // Pass pointer to struct
 			{"oldObj", ptrStructType}, // Pass pointer to struct
 		},
-		Results: []ParamResult{{"", errorListType}},
+		Results: []ParamResult{{"", errListType}},
 		Body:    logicBodyBuilder.String(),
 	}
 
@@ -370,9 +376,6 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 	result.Functions = append(result.Functions, f)
 	// Propagate variables and imports from the payload validator
 	result.Variables = append(result.Variables, payloadValidations.Variables...)
-	// Add imports needed by the generated function body and the helper call
-	// result.Imports.Insert(libFieldPathPkg, libOperationPkg, libContextPkg, libFmtPkg, libValidationPkg)
-	// result.Imports.Insert(payloadValidations.Imports.UnsortedList()...)
 
 	return result, nil
 }

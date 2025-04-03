@@ -48,12 +48,31 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 
 func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *ExampleStruct) (errs field.ErrorList) {
 	// type ExampleStruct
-	errs = append(errs, validate.FieldComparisonConditional(ctx, op, fldPath, obj, oldObj, func(obj *ExampleStruct) bool { // Comparison Body
-		comparisonHolds := false
-		comparisonHolds = (obj.MinI <= obj.I)
-		return comparisonHolds
-	}, "b", func(o *ExampleStruct) *bool { return &o.B }, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *bool) field.ErrorList {
-		return validate.FixedResult(ctx, op, fldPath, obj, oldObj, false, "field ExampleStruct.B")
+	errs = append(errs, validate.FieldComparisonConditional(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, newObj *ExampleStruct, oldObj *ExampleStruct) field.ErrorList {
+		var errs field.ErrorList
+
+		// --- Field Comparison Logic ---
+		if newObj.MinI <= newObj.I {
+			// --- Comparison True: Validate Target Field ---
+
+			targetPath := fldPath.Child("b")
+
+			var newTargetFieldValue *bool
+			newTargetFieldValue = &newObj.B
+
+			var oldTargetFieldValue *bool
+			if oldObj != nil {
+				oldTargetFieldValue = &oldObj.B
+			}
+
+			// Call payload validator
+			errs = append(errs, validate.FixedResult(ctx, op, targetPath, newTargetFieldValue, oldTargetFieldValue)...)
+		} else {
+			// --- Comparison False: Generate Invalid Error ---
+			errs = append(errs, field.Invalid(fldPath, newObj, fmt.Sprintf("comparison failed: minI <= i requires b to be valid")))
+		}
+
+		return errs
 	})...)
 
 	// field ExampleStruct.TypeMeta has no validation
