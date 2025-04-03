@@ -51,10 +51,7 @@ func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath
 	errs = append(errs, validate.FieldComparisonConditional(ctx, op, fldPath, obj, oldObj, func(ctx context.Context, op operation.Operation, fldPath *field.Path, newObj *ExampleStruct, oldObj *ExampleStruct) field.ErrorList {
 		var errs field.ErrorList
 
-		// --- Field Comparison Logic ---
 		if newObj.MinI <= newObj.I {
-			// --- Comparison True: Validate Target Field ---
-
 			targetPath := fldPath.Child("b")
 
 			var newTargetFieldValue *bool
@@ -66,7 +63,10 @@ func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath
 			}
 
 			// Call payload validator
-			errs = append(errs, validate.FixedResult(ctx, op, targetPath, newTargetFieldValue, oldTargetFieldValue, false, "field ExampleStruct.B")...)
+			errs = append(errs, validate.FixedResult(ctx, op, targetPath, newTargetFieldValue, oldTargetFieldValue)...)
+		} else {
+			// --- Comparison False: Generate Invalid Error ---
+			errs = append(errs, field.Invalid(fldPath, newObj, fmt.Sprintf("comparison failed: minI <= i requires b to be valid")))
 		}
 
 		return errs

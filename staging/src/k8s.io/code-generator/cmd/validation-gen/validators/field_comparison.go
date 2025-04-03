@@ -3,6 +3,7 @@ package validators
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -181,8 +182,8 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 
 	// === Build the Body of the Combined Validation Logic Function ===
 	var logicBodyBuilder strings.Builder
-	logicBodyBuilder.WriteString(fmt.Sprintf("  var errs %s\n\n", errorListType.Name)) // Use qualified name? Assuming import.
-	logicBodyBuilder.WriteString("  // --- Field Comparison Logic ---\n")
+	// TODO(aaron-prindle) FIXME - using fieldpath hack for now
+	logicBodyBuilder.WriteString(fmt.Sprintf("  var errs %s\n\n", filepath.Base(errorListType.String()))) // Use qualified name? Assuming import.
 
 	// 1. Generate Comparison Condition String
 	field1Accessor := generateNestedFieldAccessor("newObj", field1Members)
@@ -262,7 +263,6 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 	}
 
 	logicBodyBuilder.WriteString(fmt.Sprintf("  if %s {\n", comparisonConditionBuilder.String()))
-	logicBodyBuilder.WriteString("    // --- Comparison True: Validate Target Field ---\n\n")
 
 	// 2. Calculate Target Field Path
 	targetPathVar := "targetPath" // Local var name for the path
@@ -323,7 +323,7 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 
 	logicBodyBuilder.WriteString("    // Call payload validator\n")
 	logicBodyBuilder.WriteString(fmt.Sprintf("    errs = append(errs, %s(%s)...)\n",
-		payloadFuncName, // Use the qualified name
+		filepath.Base(payloadFuncName), // Use the qualified name
 		strings.Join(payloadArgs, ", ")))
 
 	logicBodyBuilder.WriteString("  } else {\n")
@@ -331,8 +331,8 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 	errorDetail := fmt.Sprintf("comparison failed: %s %s %s requires %s to be valid", field1PathString, operator, field2PathString, targetFieldPathString)
 	// field.Invalid(fldPath *Path, value interface{}, detail string)
 	logicBodyBuilder.WriteString(fmt.Sprintf("    errs = append(errs, %s(fldPath, newObj, %s(%q)))\n",
-		fieldInvalid.String(), // Use qualified name
-		fmtSprintf.String(),   // Use qualified name
+		filepath.Base(fieldInvalid.String()), // Use qualified name
+		fmtSprintf.String(),                  // Use qualified name
 		errorDetail))
 	logicBodyBuilder.WriteString("  }\n\n")
 
