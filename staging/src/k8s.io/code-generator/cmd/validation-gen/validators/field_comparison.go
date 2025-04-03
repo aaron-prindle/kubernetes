@@ -311,17 +311,38 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 	// 4. Call the Payload Validator
 	// Construct the arguments for the payload validator function
 	// Assumes signature: func(ctx, op, fldPath, new, old) errs
+	// payloadArgs := []string{
+	// 	"ctx",           // from wrapper func param
+	// 	"op",            // from wrapper func param
+	// 	targetPathVar,   // calculated path
+	// 	newTargetValVar, // retrieved new value
+	// 	oldTargetValVar, // retrieved old value
+	// 	// TODO(aaron-prindle) need to add stuff here
+	// 	// TODO(aaron-prindle) FIXME, HACK - hardcoded for now
+	// 	"false",
+	// 	"\"field ExampleStruct.B\"",
+	// }
+
+	// --- START DYNAMIC ARGUMENT GENERATION ---
 	payloadArgs := []string{
-		"ctx",           // from wrapper func param
-		"op",            // from wrapper func param
-		targetPathVar,   // calculated path
-		newTargetValVar, // retrieved new value
-		oldTargetValVar, // retrieved old value
-		// TODO(aaron-prindle) need to add stuff here
-		// TODO(aaron-prindle) FIXME, HACK - hardcoded for now
-		"false",
-		"\"field ExampleStruct.B\"",
+		"ctx",           // Standard arg
+		"op",            // Standard arg
+		targetPathVar,   // Use the calculated path
+		newTargetValVar, // Use the retrieved new value
+		oldTargetValVar, // Use the retrieved old value
 	}
+
+	// Append the *specific* arguments extracted from the payload tag
+	// These are stored in payloadFuncInfo.Args by the validator that
+	// processed the payload (e.g., FixedResult validator stored [false, "..."]).
+	for _, arg := range payloadFuncInfo.Args {
+		// Use fmt.Sprintf with %#v to get the Go literal representation
+		// This handles strings (adds quotes), bools, numbers correctly.
+		// More complex types might require custom formatting if they appear here.
+		payloadArgs = append(payloadArgs, fmt.Sprintf("%#v", arg))
+	}
+	// --- END DYNAMIC ARGUMENT GENERATION ---
+
 	// Use the FunctionGen Name information directly
 	payloadFuncName := payloadFuncInfo.Function.String() // Assumes Function is types.Name{Package, Name}
 
