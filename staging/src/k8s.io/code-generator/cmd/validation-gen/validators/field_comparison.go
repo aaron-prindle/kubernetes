@@ -317,6 +317,10 @@ func (fctv fieldComparisonTagValidator) GetValidations(context Context, args []s
 		targetPathVar,   // calculated path
 		newTargetValVar, // retrieved new value
 		oldTargetValVar, // retrieved old value
+		// TODO(aaron-prindle) need to add stuff here
+		// TODO(aaron-prindle) FIXME, HACK - hardcoded for now
+		"false",
+		"\"field ExampleStruct.B\"",
 	}
 	// Use the FunctionGen Name information directly
 	payloadFuncName := payloadFuncInfo.Function.String() // Assumes Function is types.Name{Package, Name}

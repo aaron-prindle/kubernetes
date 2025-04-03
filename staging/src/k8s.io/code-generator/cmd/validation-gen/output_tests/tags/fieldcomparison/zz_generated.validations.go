@@ -63,7 +63,7 @@ func Validate_ExampleStruct(ctx context.Context, op operation.Operation, fldPath
 			}
 
 			// Call payload validator
-			errs = append(errs, validate.FixedResult(ctx, op, targetPath, newTargetFieldValue, oldTargetFieldValue)...)
+			errs = append(errs, validate.FixedResult(ctx, op, targetPath, newTargetFieldValue, oldTargetFieldValue, false, "field ExampleStruct.B")...)
 		} else {
 			// --- Comparison False: Generate Invalid Error ---
 			errs = append(errs, field.Invalid(fldPath, newObj, fmt.Sprintf("comparison failed: minI <= i requires b to be valid")))
