@@ -36,7 +36,7 @@ func TestFieldComparisonExampleStruct(t *testing.T) {
 			I:    10,
 			B:    true,
 		}).ExpectValidateFalseByPath(map[string][]string{
-			"b": {""},
+			"b": {"field ExampleStruct.B"},
 		})
 
 		st.Value(&ExampleStruct{
@@ -44,7 +44,7 @@ func TestFieldComparisonExampleStruct(t *testing.T) {
 			I:    5,
 			B:    true,
 		}).ExpectValidateFalseByPath(map[string][]string{
-			"b": {""},
+			"b": {"field ExampleStruct.B"},
 		})
 	})
 	// Case 2: Condition FALSE (minI > i), Validation Skipped -> VALID
