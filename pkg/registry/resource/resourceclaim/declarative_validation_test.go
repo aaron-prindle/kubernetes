@@ -238,7 +238,7 @@ func testDeclarativeValidate(t *testing.T, apiVersion string) {
 					field.NewPath("spec", "devices", "requests").Index(0).Child("exactly", "allocationMode"),
 					resource.DeviceAllocationMode("InvalidMode"),
 					[]string{"All", "ExactCount"},
-				).WithOrigin("enum"),
+				),
 			},
 		},
 		"valid DeviceAllocationMode - FirstAvailable": {
@@ -251,7 +251,7 @@ func testDeclarativeValidate(t *testing.T, apiVersion string) {
 					field.NewPath("spec", "devices", "requests").Index(0).Child("firstAvailable").Index(0).Child("allocationMode"),
 					resource.DeviceAllocationMode("InvalidMode"),
 					[]string{"All", "ExactCount"},
-				).WithOrigin("enum"),
+				),
 			},
 		},
 		// TODO: Add more test cases
