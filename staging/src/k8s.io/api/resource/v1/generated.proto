@@ -995,6 +995,7 @@ message DeviceSubRequest {
   // requests with unknown modes.
   //
   // +optional
+  // +default="ExactCount"
   optional string allocationMode = 4;
 
   // Count is used only when the count mode is "ExactCount". Must be greater than zero.
@@ -1170,6 +1171,7 @@ message ExactDeviceRequest {
   // requests with unknown modes.
   //
   // +optional
+  // +default="ExactCount"
   // +k8s:optional
   optional string allocationMode = 3;
 

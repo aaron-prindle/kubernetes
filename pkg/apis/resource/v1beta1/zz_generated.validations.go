@@ -720,6 +720,16 @@ func Validate_DeviceSubRequest(ctx context.Context, op operation.Operation, fldP
 			if op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
 				return nil
 			}
+			// call field-attached validations
+			earlyReturn := false
+			// optional fields with default values are effectively required
+			if e := validate.RequiredValue(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
 			// call the type's validation function
 			errs = append(errs, Validate_DeviceAllocationMode(ctx, op, fldPath, obj, oldObj)...)
 			return

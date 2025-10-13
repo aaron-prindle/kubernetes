@@ -48,6 +48,9 @@ func SetObjectDefaults_ResourceClaim(in *resourcev1beta2.ResourceClaim) {
 		a := &in.Spec.Devices.Requests[i]
 		if a.Exactly != nil {
 			SetDefaults_ExactDeviceRequest(a.Exactly)
+			if a.Exactly.AllocationMode == "" {
+				a.Exactly.AllocationMode = "ExactCount"
+			}
 			for j := range a.Exactly.Tolerations {
 				b := &a.Exactly.Tolerations[j]
 				if b.Operator == "" {
@@ -58,6 +61,9 @@ func SetObjectDefaults_ResourceClaim(in *resourcev1beta2.ResourceClaim) {
 		for j := range a.FirstAvailable {
 			b := &a.FirstAvailable[j]
 			SetDefaults_DeviceSubRequest(b)
+			if b.AllocationMode == "" {
+				b.AllocationMode = "ExactCount"
+			}
 			for k := range b.Tolerations {
 				c := &b.Tolerations[k]
 				if c.Operator == "" {
@@ -91,6 +97,9 @@ func SetObjectDefaults_ResourceClaimTemplate(in *resourcev1beta2.ResourceClaimTe
 		a := &in.Spec.Spec.Devices.Requests[i]
 		if a.Exactly != nil {
 			SetDefaults_ExactDeviceRequest(a.Exactly)
+			if a.Exactly.AllocationMode == "" {
+				a.Exactly.AllocationMode = "ExactCount"
+			}
 			for j := range a.Exactly.Tolerations {
 				b := &a.Exactly.Tolerations[j]
 				if b.Operator == "" {
@@ -101,6 +110,9 @@ func SetObjectDefaults_ResourceClaimTemplate(in *resourcev1beta2.ResourceClaimTe
 		for j := range a.FirstAvailable {
 			b := &a.FirstAvailable[j]
 			SetDefaults_DeviceSubRequest(b)
+			if b.AllocationMode == "" {
+				b.AllocationMode = "ExactCount"
+			}
 			for k := range b.Tolerations {
 				c := &b.Tolerations[k]
 				if c.Operator == "" {

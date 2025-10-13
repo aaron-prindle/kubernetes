@@ -36,6 +36,7 @@ func SetDefaults_DeviceRequest(obj *resourceapi.DeviceRequest) {
 		return
 	}
 	if obj.AllocationMode == "" {
+		// TODO: retain this until the ordering between declarative and manual defaulting is solved.
 		obj.AllocationMode = resourceapi.DeviceAllocationModeExactCount
 	}
 
@@ -46,6 +47,7 @@ func SetDefaults_DeviceRequest(obj *resourceapi.DeviceRequest) {
 
 func SetDefaults_DeviceSubRequest(obj *resourceapi.DeviceSubRequest) {
 	if obj.AllocationMode == "" {
+		// TODO: retain this until the ordering between declarative and manual defaulting is solved.
 		obj.AllocationMode = resourceapi.DeviceAllocationModeExactCount
 	}
 

@@ -30,6 +30,7 @@ func addDefaultingFuncs(scheme *runtime.Scheme) error {
 
 func SetDefaults_ExactDeviceRequest(obj *resourceapi.ExactDeviceRequest) {
 	if obj.AllocationMode == "" {
+		// TODO: retain this until the ordering between declarative and manual defaulting is solved.
 		obj.AllocationMode = resourceapi.DeviceAllocationModeExactCount
 	}
 
@@ -40,6 +41,7 @@ func SetDefaults_ExactDeviceRequest(obj *resourceapi.ExactDeviceRequest) {
 
 func SetDefaults_DeviceSubRequest(obj *resourceapi.DeviceSubRequest) {
 	if obj.AllocationMode == "" {
+		// TODO: retain this until the ordering between declarative and manual defaulting is solved.
 		obj.AllocationMode = resourceapi.DeviceAllocationModeExactCount
 	}
 

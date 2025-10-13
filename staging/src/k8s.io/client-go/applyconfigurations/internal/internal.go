@@ -13192,6 +13192,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allocationMode
       type:
         scalar: string
+      default: ExactCount
     - name: capacity
       type:
         namedType: io.k8s.api.resource.v1.CapacityRequirements
@@ -13263,6 +13264,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allocationMode
       type:
         scalar: string
+      default: ExactCount
     - name: capacity
       type:
         namedType: io.k8s.api.resource.v1.CapacityRequirements
@@ -13978,6 +13980,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allocationMode
       type:
         scalar: string
+      default: ExactCount
     - name: capacity
       type:
         namedType: io.k8s.api.resource.v1beta1.CapacityRequirements
@@ -14624,6 +14627,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allocationMode
       type:
         scalar: string
+      default: ExactCount
     - name: capacity
       type:
         namedType: io.k8s.api.resource.v1beta2.CapacityRequirements
@@ -14695,6 +14699,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: allocationMode
       type:
         scalar: string
+      default: ExactCount
     - name: capacity
       type:
         namedType: io.k8s.api.resource.v1beta2.CapacityRequirements
