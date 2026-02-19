@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" style="background-color: white; font-family: sans-serif;">
+    <!-- Title -->
+    <text x="300.0" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">Pine Simulation: Retained Memory (200,000 Replicas)</text>
+    
+    <!-- Y Axis Label -->
+    <text x="-200.0" y="25" transform="rotate(-90)" text-anchor="middle" font-size="14" fill="#666">Retained Heap Memory (MB)</text>
+    
+    <!-- Axes -->
+    <line x1="80" y1="340" x2="580" y2="340" stroke="#ccc" stroke-width="2"/>
+    <line x1="80" y1="60" x2="80" y2="340" stroke="#ccc" stroke-width="2"/>
+    <rect x="142.5" y="106.66666666666666" width="125.0" height="233.33333333333334" fill="#E24A33" rx="4" ry="4"/>
+<text x="205.0" y="96.66666666666666" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">61.2 MB</text>
+<text x="205.0" y="365" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Baseline ([]byte)</text>
+<rect x="392.5" y="322.08061002178647" width="125.0" height="17.91938997821351" fill="#348ABD" rx="4" ry="4"/>
+<text x="455.0" y="312.08061002178647" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">4.7 MB</text>
+<text x="455.0" y="365" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Optimized (String Interning)</text>
+</svg>
