@@ -1,0 +1,40 @@
+File: kube-apiserver
+Build ID: d198ca032d735c06e85bd3fc2536dac9cb1e3602
+Type: inuse_space
+Time: 2026-02-12 16:30:00 PST
+Showing nodes accounting for 83.15MB, 100% of 83.15MB total
+      flat  flat%   sum%        cum   cum%
+    5.43MB  6.54%  6.54%     5.43MB  6.54%  bytes.growSlice
+       5MB  6.02% 12.55%        5MB  6.02%  k8s.io/kube-openapi/pkg/builder3.(*openAPI).buildParameter
+    4.66MB  5.60% 18.15%     9.59MB 11.54%  encoding/json.Marshal
+    2.06MB  2.48% 20.63%     2.06MB  2.48%  google.golang.org/grpc/internal/transport.newBufWriter (inline)
+    2.02MB  2.43% 23.06%     2.02MB  2.43%  regexp/syntax.(*compiler).inst (inline)
+    2.02MB  2.43% 25.49%     3.02MB  3.63%  k8s.io/apiserver/pkg/storage/cacher.NewCacherFromConfig
+    2.01MB  2.41% 27.90%     2.01MB  2.41%  regexp.onePassCopy
+       2MB  2.41% 30.31%        2MB  2.41%  k8s.io/kubernetes/pkg/printers/internalversion.AddHandlers
+       2MB  2.41% 32.72%        2MB  2.41%  github.com/emicklei/go-restful/v3.QueryParameter (inline)
+       2MB  2.41% 35.12%        2MB  2.41%  k8s.io/apiserver/pkg/endpoints/openapi.groupVersionKinds.JSON (inline)
+    1.50MB  1.81% 36.93%        3MB  3.61%  k8s.io/kube-openapi/pkg/builder.(*openAPI).buildOperations
+    1.50MB  1.81% 38.73%     1.50MB  1.81%  k8s.io/kube-openapi/pkg/builder.(*openAPI).toSchema
+    1.50MB  1.81% 40.54%        8MB  9.63%  k8s.io/kube-openapi/pkg/builder3.(*openAPI).toSchema
+    1.50MB  1.81% 42.34%     2.50MB  3.01%  k8s.io/kube-openapi/pkg/builder3/util.WrapRefs.func1
+    1.50MB  1.80% 44.15%     1.50MB  1.80%  regexp.mergeRuneSets.func2 (inline)
+    1.03MB  1.24% 45.39%     1.03MB  1.24%  bufio.NewReaderSize (inline)
+    1.03MB  1.24% 46.63%     1.03MB  1.24%  k8s.io/apimachinery/pkg/watch.(*Broadcaster).Watch.func1
+       1MB  1.20% 47.83%        1MB  1.20%  k8s.io/kube-openapi/pkg/builder3/util.WrapRefs.func1.1 (inline)
+       1MB  1.20% 49.04%        1MB  1.20%  k8s.io/kube-openapi/pkg/handler.PruneDefaultsSchema
+       1MB  1.20% 50.24%        1MB  1.20%  k8s.io/kube-openapi/pkg/schemamutation.(*Walker).WalkSchema.func1 (inline)
+       1MB  1.20% 51.44%        1MB  1.20%  k8s.io/kubernetes/pkg/generated/openapi.schema_k8sio_api_core_v1_ServiceSpec
+       1MB  1.20% 52.65%        1MB  1.20%  runtime.malg
+       1MB  1.20% 53.85%     1.51MB  1.81%  encoding/json.typeFields
+       1MB  1.20% 55.05%        6MB  7.22%  k8s.io/kube-openapi/pkg/builder3.(*openAPI).buildResponse
+    0.75MB   0.9% 55.95%     0.75MB   0.9%  go.uber.org/zap/zapcore.newCounters (inline)
+    0.54MB  0.64% 56.60%     1.04MB  1.25%  k8s.io/apimachinery/pkg/runtime.(*Scheme).AddKnownTypeWithName
+    0.52MB  0.63% 57.22%     0.52MB  0.63%  google.golang.org/protobuf/reflect/protoregistry.(*Files).RegisterFile.func2
+    0.51MB  0.62% 57.84%     5.52MB  6.64%  github.com/emicklei/go-restful/v3.(*WebService).Route
+    0.51MB  0.61% 58.45%     0.51MB  0.61%  github.com/google/gnostic-models/openapiv2.init
+    0.51MB  0.61% 59.07%     0.51MB  0.61%  k8s.io/utils/buffer.NewTypedRingGrowing[go.shape.interface {}] (inline)
+    0.51MB  0.61% 59.68%     0.51MB  0.61%  reflect.addReflectOff
+    0.51MB  0.61% 60.29%     0.51MB  0.61%  k8s.io/apiserver/pkg/endpoints/discovery/aggregated.(*resourceDiscoveryManager).calculateAPIGroupsLocked
+    0.50MB   0.6% 60.89%     0.50MB   0.6%  bufio.NewWriterSize (inline)
+    0.50MB   0.6% 61.49%     0.50MB   0.6%  k8s.io/api/rbac/v1.(*ClusterRole).Unmarshal
