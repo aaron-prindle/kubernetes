@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"unique"
 
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -298,7 +299,7 @@ func (f *FieldsV1) UnmarshalJSON(b []byte) error {
 		return errors.New("metav1.FieldsV1: UnmarshalJSON on nil pointer")
 	}
 	if !bytes.Equal(b, []byte("null")) {
-		f.Raw = string(b)
+		f.Raw = unique.Make(string(b)).Value()
 	}
 	return nil
 }
@@ -327,7 +328,7 @@ func (f *FieldsV1) UnmarshalCBOR(b []byte) error {
 		return errors.New("metav1.FieldsV1: UnmarshalCBOR on nil pointer")
 	}
 	if !bytes.Equal(b, cborNull) {
-		f.Raw = string(b)
+		f.Raw = unique.Make(string(b)).Value()
 	}
 	return nil
 }
