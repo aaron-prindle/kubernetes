@@ -443,7 +443,7 @@ func TestMultipleSources(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		name := discoveryendpoint.Source(100 * i)
 		manager := defaultManager.WithSource(name)
-		apis := fuzzAPIGroups(1, 3, int64(15+i))
+		apis := fuzzAPIGroups(1, 3, int64(42+i))
 
 		// Give the groups deterministic names
 		for i := range apis.Items {
