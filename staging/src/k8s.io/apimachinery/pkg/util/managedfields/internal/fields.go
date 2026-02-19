@@ -17,7 +17,7 @@ limitations under the License.
 package internal
 
 import (
-	"bytes"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -36,12 +36,13 @@ var EmptyFields = func() metav1.FieldsV1 {
 
 // FieldsToSet creates a set paths from an input trie of fields
 func FieldsToSet(f metav1.FieldsV1) (s fieldpath.Set, err error) {
-	err = s.FromJSON(bytes.NewReader(f.Raw))
+	err = s.FromJSON(strings.NewReader(f.Raw))
 	return s, err
 }
 
 // SetToFields creates a trie of fields from an input set of paths
 func SetToFields(s fieldpath.Set) (f metav1.FieldsV1, err error) {
-	f.Raw, err = s.ToJSON()
+	b, err := s.ToJSON()
+	f.Raw=string(b)
 	return f, err
 }

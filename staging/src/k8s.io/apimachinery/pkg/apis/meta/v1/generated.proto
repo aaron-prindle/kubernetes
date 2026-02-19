@@ -372,7 +372,7 @@ message FieldSelectorRequirement {
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 message FieldsV1 {
   // Raw is the underlying serialization of this object.
-  optional bytes Raw = 1;
+  optional string Raw = 1;
 }
 
 // GetOptions is the standard query options to the standard REST get call.

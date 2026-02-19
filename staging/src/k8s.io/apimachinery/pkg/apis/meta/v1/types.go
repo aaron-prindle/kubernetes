@@ -1398,11 +1398,11 @@ const (
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
 	// Raw is the underlying serialization of this object.
-	Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
+	Raw string `json:"-" protobuf:"bytes,1,opt,name=Raw"`
 }
 
 func (f FieldsV1) String() string {
-	return string(f.Raw)
+	return f.Raw
 }
 
 // TODO: Table does not generate to protobuf because of the interface{} - fix protobuf
