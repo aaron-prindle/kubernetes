@@ -35,6 +35,7 @@
 - [#115699: KCM High Memory from Full Object Caching](https://github.com/kubernetes/kubernetes/issues/115699)
 - [#82292: Large CRDs Go Over Size Limits](https://github.com/kubernetes/kubernetes/issues/82292)
 - [#124680: Watch for CRs Costs 10-15x More Memory](https://github.com/kubernetes/kubernetes/issues/124680)
+- [#131175: No-op SSA updates resourceVersion/managedFields timestamps](https://github.com/kubernetes/kubernetes/issues/131175)
 
 ## GitHub PRs - Optimizations
 - [#91946: Strip managedFields from kubectl edit](https://github.com/kubernetes/kubernetes/pull/91946)
@@ -44,6 +45,8 @@
 - [#78742: GC/Quota Using Metadata Client](https://github.com/kubernetes/kubernetes/pull/78742)
 - [#115700: Metadata Informers for KCM](https://github.com/kubernetes/kubernetes/pull/115700)
 - [#84043: Don't Use CachingObject if Few Watchers](https://github.com/kubernetes/kubernetes/pull/84043)
+- [#131016: Fix managedFields trimming bug in scheduler](https://github.com/kubernetes/kubernetes/pull/131016)
+- [#136760: WIP get/list option to omit managed fields](https://github.com/kubernetes/kubernetes/pull/136760)
 
 ## Third-Party Research and Blog Posts
 - [kube.rs: Controller Optimization Guide](https://kube.rs/controllers/optimization/)

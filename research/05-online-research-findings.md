@@ -101,11 +101,8 @@
 ### Theme 1: managedFields is a known problem
 Multiple sources confirm that managedFields is a significant portion of object size and memory. The kube.rs project explicitly recommends stripping them for memory optimization.
 
-### Theme 2: No server-side solution exists
-While client-side solutions exist (strip before caching in informers), there is NO server-side mechanism to:
-- Strip managedFields from watch responses when clients don't need them
-- Compress managedFields in the watch cache
-- Lazy-load managedFields on demand
+### Theme 2: No merged general server-side solution (yet)
+While client-side solutions exist (strip before caching in informers), there is not yet a broadly merged, GA server-side mechanism that solves managedFields overhead end-to-end for GET/LIST/WATCH and cache internals.
 
 ### Theme 3: The problem scales with cluster size
 Every additional object adds managedFields overhead. At scale (5,000+ nodes):
@@ -120,10 +117,10 @@ Every additional object adds managedFields overhead. At scale (5,000+ nodes):
 - CapManagers (max 10): Helps limit growth but doesn't reduce per-entry size
 
 ### Theme 5: There's a clear need for new solutions
-No KEP or proposal currently addresses:
+There is active discussion and implementation work, but no single merged architecture change that fully addresses:
 - Removing managedFields from the watch cache
-- Compressing FieldsV1 data in storage
-- Server-side filtering of managedFields for watch events
+- Compressing FieldsV1 data in cache/storage paths
+- Broad server-side filtering for managedFields across read APIs
 - Lazy loading of managedFields from etcd when needed
 
 ### 10. KEP-555: Server-Side Apply (Primary KEP)
@@ -181,13 +178,43 @@ Detailed explanation of controller-runtime `TransformStripManagedFields` for cac
 
 GA in v1.23. Added `omitManagedFields` to audit policies. Motivation: "ManagedFields of an object in the audit entries are not very useful and it consumes storage space pretty quickly especially in a big cluster under load."
 
+### 19. Open PR #136760: get/list option to omit managedFields
+**URL**: https://github.com/kubernetes/kubernetes/pull/136760
+
+Open work-in-progress proposal for an API option to omit managed fields in read paths. This is a significant upstream signal that server-side omission is now being actively explored.
+
+### 20. Issue #131175: no-op SSA metadata churn
+**URL**: https://github.com/kubernetes/kubernetes/issues/131175
+
+Open issue suggesting that no-op SSA can still update `resourceVersion` and managedFields timestamps. This matters because metadata churn can create avoidable watch/cache pressure.
+
+### 21. PR #131016: scheduler managedFields trim fix
+**URL**: https://github.com/kubernetes/kubernetes/pull/131016
+
+In-tree evidence that managedFields trimming in memory-sensitive consumers is practical and useful.
+
+## Current Upstream Status (as of 2026-02-13)
+
+1. There are merged targeted mitigations:
+- `kubectl` output stripping (`#96878`)
+- audit omission policy (`#94986`)
+- component-level trimming patterns (e.g., scheduler path + fix in `#131016`)
+
+2. There is active but unmerged server-side read-path work:
+- open PR `#136760` (omit managedFields in get/list)
+
+3. There is no merged, universal, low-risk server-side fix that simultaneously:
+- minimizes managedFields memory in apiserver cache internals,
+- preserves SSA ownership/conflict semantics,
+- and provides broad client compatibility by default.
+
 ## Absent Research
 
-The following items were searched for but **no proposals or solutions were found**:
+The following items were searched for and no clearly merged upstream end-state was found:
 1. KEP for stripping managedFields from watch cache
 2. KEP for compressing managedFields in apiserver cache
 3. KEP for server-side managedFields filtering on watch/list
 4. Any proposal for lazy-loading managedFields from etcd
 5. Any proposal for deduplicating common FieldsV1 patterns
 
-**This confirms that the managedFields memory problem is a known and well-documented pain point without proposed server-side solutions.**
+This confirms the managedFields memory problem is known and documented, with partial mitigations and active exploration, but without a merged comprehensive server-side solution today.
