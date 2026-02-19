@@ -18,6 +18,7 @@ package cbor
 
 import (
 	"fmt"
+	"unique"
 	"reflect"
 	"sync"
 
@@ -59,7 +60,7 @@ var rawTypeTranscodeFuncs = map[reflect.Type]func(reflect.Value) error{
 		if err != nil {
 			return fmt.Errorf("failed to transcode FieldsV1 to JSON: %w", err)
 		}
-		fields.Raw = string(j)
+		fields.Raw = unique.Make(string(j)).Value()
 		return nil
 	},
 }

@@ -17,9 +17,9 @@ limitations under the License.
 package internal_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -129,7 +129,7 @@ func TestCapUpdateManagers(t *testing.T) {
 		if err != nil {
 			panic(fmt.Sprintf("error building ManagedFieldsEntry for test: %v", err))
 		}
-		return &metav1.FieldsV1{Raw: b}
+		return &metav1.FieldsV1{Raw: string(b)}
 	}
 
 	entry := func(name string, version string, order int, fields *metav1.FieldsV1) metav1.ManagedFieldsEntry {
@@ -272,7 +272,7 @@ func expectManagesField(t *testing.T, f managedfieldstest.TestFieldManager, m st
 	for _, e := range f.ManagedFields() {
 		if e.Manager == m {
 			var s fieldpath.Set
-			err := s.FromJSON(bytes.NewReader(e.FieldsV1.Raw))
+			err := s.FromJSON(strings.NewReader(e.FieldsV1.Raw))
 			if err != nil {
 				t.Fatalf("error parsing managedFields for %v: %v: %#v", m, err, f.ManagedFields())
 			}

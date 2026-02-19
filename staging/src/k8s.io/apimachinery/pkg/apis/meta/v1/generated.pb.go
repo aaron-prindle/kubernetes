@@ -21,6 +21,7 @@ package v1
 
 import (
 	fmt "fmt"
+	"unique"
 
 	io "io"
 	"sort"
@@ -5369,7 +5370,7 @@ func (m *FieldsV1) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Raw = string(dAtA[iNdEx:postIndex])
+			m.Raw = unique.Make(string(dAtA[iNdEx:postIndex])).Value()
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
