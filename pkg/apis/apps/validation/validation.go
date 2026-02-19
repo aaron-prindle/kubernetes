@@ -610,12 +610,12 @@ func ValidateDeploymentStrategy(strategy *apps.DeploymentStrategy, fldPath *fiel
 	switch strategy.Type {
 	case apps.RecreateDeploymentStrategyType:
 		if strategy.RollingUpdate != nil {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("rollingUpdate"), "may not be specified when strategy `type` is '"+string(apps.RecreateDeploymentStrategyType+"'")))
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("rollingUpdate"), "may not be specified when strategy `type` is '"+string(apps.RecreateDeploymentStrategyType+"'")).MarkCoveredByDeclarative())
 		}
 	case apps.RollingUpdateDeploymentStrategyType:
 		// This should never happen since it's set and checked in defaults.go
 		if strategy.RollingUpdate == nil {
-			allErrs = append(allErrs, field.Required(fldPath.Child("rollingUpdate"), "this should be defaulted and never be nil"))
+			allErrs = append(allErrs, field.Required(fldPath.Child("rollingUpdate"), "this should be defaulted and never be nil").MarkCoveredByDeclarative())
 		} else {
 			allErrs = append(allErrs, ValidateRollingUpdateDeployment(strategy.RollingUpdate, fldPath.Child("rollingUpdate"))...)
 		}
