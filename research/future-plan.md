@@ -2,7 +2,11 @@
 
 ## Problem Statement
 
-The Kubernetes API server's memory usage scales poorly with the number of resources, primarily due to `managedFields` metadata introduced by Server Side Apply (SSA). At scale (5,000+ nodes, 100,000+ objects), managedFields can consume **1-3+ GB of apiserver memory** - representing 20-40% of total memory usage. This memory is almost entirely wasted because <5% of API clients ever use managedFields data.
+The Kubernetes API server's memory usage can scale poorly with the number of resources, and `managedFields` metadata introduced by Server Side Apply (SSA) is a significant contributor in many environments. At scale, managedFields overhead can reach hundreds of MB to multiple GB depending on object mix, manager churn, and watch/list behavior.
+
+Confidence statement:
+- High confidence: managedFields contributes materially to memory and payload overhead.
+- Medium confidence: exact contribution percentage is cluster-dependent and must be measured.
 
 ## Root Cause
 
@@ -11,11 +15,34 @@ Every Kubernetes object carries `managedFields` in its `ObjectMeta`:
 - `FieldsV1` is a JSON-encoded tree of all field paths the manager owns
 - A typical object has 3-11 entries, each 500 bytes to 20+ KB
 - The watch cache stores the FULL object (including managedFields) in memory
-- No compression, lazy-loading, or filtering exists
+- No merged comprehensive mechanism currently covers all cache + serving paths end-to-end
+
+## Upstream Context (as of 2026-02-13)
+
+- Targeted mitigations are already merged in parts of ecosystem/tooling (for example audit omission and component-level trimming).
+- Active upstream exploration exists for read-path omission (open PR `#136760`, get/list option to omit managed fields).
+- No merged universal solution yet removes managedFields cost from all hot paths while preserving default compatibility.
 
 ## Proposed Fix: Multi-Phase Approach
 
-### Phase 1: FieldsV1 Compression in Watch Cache (3-4 weeks)
+### Phase 1: Read-Path Omission and Churn Reduction (3-5 weeks)
+
+**Goal**: Reduce unnecessary managedFields exposure and avoid avoidable metadata churn before deep cache architecture changes.
+
+**Approach**:
+1. Prioritize read-path omission capability for clients that do not need managedFields (align with active upstream direction).
+2. Investigate and reduce no-op metadata churn (timestamps/resourceVersion updates on no-op apply paths).
+3. Keep behavior opt-in/backward-compatible for clients relying on managedFields.
+
+**Expected Impact**:
+- Immediate reduction in response payload and downstream informer memory where adopted.
+- Lower watch/cache churn from avoidable metadata-only updates.
+
+**Risks**: Low-Medium - requires API and client compatibility review.
+
+---
+
+### Phase 2: FieldsV1 Compression in Watch Cache (3-4 weeks)
 
 **Goal**: Reduce the memory footprint of FieldsV1 data by 60-80% through in-memory compression.
 
@@ -82,7 +109,7 @@ func compressManagedFields(mf []metav1.ManagedFieldsEntry) []compressedManagedFi
 
 ---
 
-### Phase 2: Server-Side ManagedFields Exclusion (4-6 weeks)
+### Phase 3: Server-Side ManagedFields Exclusion (4-6 weeks)
 
 **Goal**: Allow API clients to exclude managedFields from responses, saving both cache serialization memory and wire bandwidth.
 
@@ -144,7 +171,7 @@ func (o *cachingObject) CacheEncode(id runtime.Identifier, encode func(runtime.O
 
 ---
 
-### Phase 3: Watch Cache ManagedFields Separation (6-8 weeks)
+### Phase 4: Watch Cache ManagedFields Separation (6-8 weeks)
 
 **Goal**: Remove managedFields from the main watch cache objects entirely. Store them in a separate, lightweight sidecar structure.
 
@@ -226,7 +253,7 @@ func (w *watchCache) processEvent(event watch.Event) {
 ```
 
 **Expected Impact**:
-- 20-40% reduction in total apiserver memory
+- potentially large reduction in total apiserver memory (cluster-dependent; validate via profiling gates)
 - ManagedFields stored compressed in sidecar (~20% of original size)
 - Watch events sent without managedFields by default (massive bandwidth savings)
 - Apply operations still work (reconstruct from sidecar)
@@ -235,7 +262,7 @@ func (w *watchCache) processEvent(event watch.Event) {
 
 ---
 
-### Phase 4: Binary FieldsV1 Encoding (4-6 weeks, can parallel Phase 3)
+### Phase 5: Binary FieldsV1 Encoding (4-6 weeks, can parallel Phase 4)
 
 **Goal**: Replace the verbose JSON encoding of FieldsV1 with a compact binary format.
 
@@ -269,7 +296,7 @@ FieldsV2 Binary Format:
 
 ---
 
-### Phase 5: FieldsV1 Deduplication Pool (2-3 weeks, can parallel Phase 4)
+### Phase 6: FieldsV1 Deduplication Pool (2-3 weeks, can parallel Phase 5)
 
 **Goal**: Deduplicate identical FieldsV1 data across objects.
 
@@ -288,14 +315,13 @@ FieldsV2 Binary Format:
 ## Timeline
 
 ```
-Month 1-2:     Phase 1 (Compression) - Alpha
-Month 2-3:     Phase 2 (Server-side exclusion) - Alpha
-Month 3-5:     Phase 3 (Cache separation) - Alpha
-Month 4-6:     Phase 4 (Binary encoding) - Alpha
-Month 5-6:     Phase 5 (Deduplication) - Alpha
-Month 6-8:     Phase 1-2 Beta, Phase 3 Alpha testing
-Month 8-10:    Phase 1-2 GA, Phase 3 Beta
-Month 10-12:   Phase 3 GA, Phase 4-5 Beta
+Month 1-2:     Phase 1 (read-path omission + churn reduction) - Alpha
+Month 2-3:     Phase 2 (compression) - Alpha
+Month 3-5:     Phase 3 (server-side exclusion) - Alpha
+Month 4-6:     Phase 4 (cache separation prototype) - Alpha
+Month 5-7:     Phase 5 (binary encoding) - Alpha
+Month 6-8:     Phase 6 (deduplication) - Alpha
+Month 8-12:    promote proven phases based on metrics and compatibility gates
 ```
 
 ## Success Metrics
@@ -306,6 +332,20 @@ Month 10-12:   Phase 3 GA, Phase 4-5 Beta
 | managedFields memory | ~2 GB | ~600 MB | ~200 MB | <300 MB |
 | Watch event size (avg) | 5 KB | 5 KB | 3 KB | <3 KB |
 | Apply latency (p99) | 50ms | 52ms | 55ms | <60ms |
+
+## Evidence Gates Before Broad Rollout
+
+1. Memory evidence:
+- Heap/RSS reductions demonstrated in at least two workload shapes (low-churn and high-churn).
+
+2. Correctness evidence:
+- No regressions in SSA ownership/conflict semantics across integration tests.
+
+3. Compatibility evidence:
+- No breakage for clients that depend on managedFields visibility.
+
+4. Performance evidence:
+- CPU and tail latency impacts remain within agreed SLO budgets.
 
 ## KEP Requirements
 

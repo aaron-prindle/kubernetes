@@ -4,7 +4,12 @@ This directory contains a comprehensive investigation of Server-Side Apply (SSA)
 
 ## Key Finding
 
-**managedFields metadata can represent up to 60% of total object size** (per KEP-555), and profiling data from GitHub Issue #102259 shows `ObjectMetaFieldsSet` consuming **up to 59.72% of apiserver memory** (27.27 GB out of 45.65 GB) during scalability testing. This is memory that provides zero value to >95% of API clients.
+`managedFields` is a high-confidence contributor to memory and payload overhead in large clusters. Public evidence and local repro both show it can be a substantial fraction of object/caching cost, though exact percentages are workload-dependent.
+
+As of 2026-02-13:
+- targeted mitigations are merged in specific surfaces (for example audit omission, client/component trimming),
+- active upstream work exists on read-path omission (`#136760`),
+- no merged comprehensive end-to-end server-side solution exists yet.
 
 ## Artifact Index
 
@@ -66,11 +71,12 @@ This directory contains a comprehensive investigation of Server-Side Apply (SSA)
 
 | Priority | Solution | Expected Savings | Complexity |
 |----------|----------|-----------------|------------|
-| 1 | Compress FieldsV1.Raw in watch cache | 10-25% memory | Low |
-| 2 | Server-side managedFields exclusion parameter | 15-30% bandwidth | Medium |
-| 3 | Strip managedFields from watch cache entirely | 20-40% memory | High |
-| 4 | Binary FieldsV1 encoding (FieldsV2) | 10-20% storage | Medium |
-| 5 | FieldsV1 deduplication pool | 5-15% memory | Medium |
-| 6 | Lazy-load managedFields from etcd | 20-35% memory | Very High |
+| 1 | Server-side managedFields exclusion parameter | scenario-dependent | Medium |
+| 2 | Reduce no-op metadata churn | scenario-dependent | Medium |
+| 3 | Compress FieldsV1.Raw in watch cache | scenario-dependent | Medium |
+| 4 | Strip managedFields from watch cache entirely (prototype) | potentially high | High |
+| 5 | Binary FieldsV1 encoding (FieldsV2) | scenario-dependent | High |
+| 6 | FieldsV1 deduplication pool | scenario-dependent | High |
+| 7 | Lazy-load managedFields from etcd | scenario-dependent | Very High |
 
 ## Total Artifacts: 28 files across 6 directories (~3,300 lines of research)

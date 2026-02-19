@@ -2,7 +2,11 @@
 
 ## Executive Summary
 
-Server Side Apply's `managedFields` metadata is the primary contributor to excessive apiserver memory usage at scale. For typical workloads, managedFields constitutes **30-50% of the metadata** and **10-40% of total object size**. When multiplied across tens of thousands of objects in the watch cache, this adds **hundreds of megabytes to gigabytes** of memory that provides zero value to the vast majority of API clients.
+Server Side Apply's `managedFields` metadata is a significant contributor to apiserver memory usage in many high-cardinality workloads. In local reproduction and public reports, managedFields frequently appears as a large fraction of object metadata and can become a material fraction of total object size. At scale, this can add hundreds of megabytes to multiple gigabytes across cache and fanout paths.
+
+Important caveat:
+- Exact percentages are workload-dependent.
+- managedFields is often one of the top contributors, but not always the sole dominant one.
 
 ## The Core Problem
 
@@ -32,7 +36,7 @@ Where:
 | ReplicaSets | 30,000 | 4 KB | 120 MB |
 | **Total** | **265,000** | | **~1.68 GB** |
 
-**This is just the managedFields data.** With the 2-4x cache multiplier (store + event buffer + serialization), the actual memory consumed by managedFields can reach **3-7 GB**.
+This is an estimate for managedFields bytes before runtime effects (GC behavior, object sharing/copying patterns, watch topology, and feature-gated cache behavior) are fully accounted for.
 
 ## Bottleneck Analysis
 
@@ -156,9 +160,11 @@ Analysis of typical Kubernetes watchers:
 | Custom controllers (informers) | Rarely |
 | kubectl get/watch | No (hidden by default) |
 
-**Estimate: <5% of watch traffic needs managedFields.**
+Estimate:
+- Many common watchers do not consume managedFields directly.
+- The exact ratio should be measured per environment rather than assumed globally.
 
-Yet 100% of watch events include them, and 100% of cached objects store them.
+In default behavior today, watch/list responses and cached objects generally include managedFields unless a component/client explicitly trims or omits it.
 
 ### Memory vs. Information Value
 
@@ -184,8 +190,20 @@ Yet 100% of watch events include them, and 100% of cached objects store them.
 
 ### The Asymmetry
 - **Write path**: managedFields are essential (conflict detection, field ownership)
-- **Read path**: managedFields are almost never needed
-- **Storage**: managedFields are present in 100% of reads even though <5% need them
+- **Read path**: many consumers do not require managedFields
+- **Serving path**: managedFields is frequently present even for consumers that do not use it
+
+## Do Not Conflate These Three Buckets
+
+1. apiserver heap/RSS:
+- In-memory object and cache retention in apiserver process.
+
+2. controller/informer memory:
+- Separate process memory that can be reduced with client-side transforms (for example `TransformStripManagedFields`).
+
+3. wire-size and serialization cost:
+- Response payload and CPU/alloc overhead for encoding/decoding.
+- Wire compression helps this bucket but does not directly remove apiserver in-memory object cost.
 
 ## Comparison with Other Metadata Overhead
 
@@ -201,6 +219,9 @@ Yet 100% of watch events include them, and 100% of cached objects store them.
 
 ## Conclusion
 
-The apiserver memory bottleneck from SSA/managedFields is a **structural problem**: every object carries ownership metadata that scales with object complexity and manager count, yet this metadata is needed by only a tiny fraction of API consumers. The lack of any compression, lazy-loading, or selective serving mechanism means the full cost is paid by every cached object regardless of whether any client will use the data.
+The apiserver memory pressure from SSA/managedFields is a structural scaling concern: ownership metadata grows with object complexity and manager activity, and this overhead can be multiplied by cache and fanout behavior.
 
-**Estimated potential memory savings from addressing managedFields: 20-40% of total apiserver memory.**
+Updated conclusion:
+- managedFields is a high-confidence contributor to memory growth.
+- expected gains from targeted mitigations should be treated as scenario-dependent until validated with cluster-specific profiling.
+- a practical working range for planning remains significant (often double-digit percentages), but should be presented as measured outcomes, not universal constants.

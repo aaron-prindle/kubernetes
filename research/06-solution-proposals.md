@@ -4,17 +4,29 @@
 
 | # | Solution | Memory Savings | Complexity | API Compat | Recommended |
 |---|----------|---------------|------------|------------|-------------|
-| 1 | Strip managedFields from watch cache | 20-40% | Medium | High | YES |
+| 1 | Strip managedFields from watch cache | 20-40% | High | Medium | PROTOTYPE ONLY |
 | 2 | Compress FieldsV1.Raw in cache | 10-25% | Low | High | YES |
-| 3 | Server-side field selector for managedFields | 15-30% | Medium | High | YES |
+| 3 | Server-side field selector for managedFields | 15-30% | Medium | High | YES (TOP PRIORITY) |
 | 4 | Deduplicate FieldsV1 across objects | 5-15% | High | High | MAYBE |
 | 5 | Lazy-load managedFields from etcd | 20-35% | Very High | Medium | FUTURE |
 | 6 | Binary encoding for FieldsV1 | 10-20% | Medium | Medium | YES |
 | 7 | Reference-based caching for unchanged fields | 10-20% | High | High | MAYBE |
 
+## Risk Matrix (Correctness and Delivery)
+
+| Solution | Correctness Risk | Delivery Risk | Key Concern |
+|---|---|---|---|
+| 3. Server-side exclusion parameter | Low-Medium | Medium | API shape and compatibility semantics |
+| 2. Compress FieldsV1 in cache | Medium | Medium | CPU overhead and object mutability handling |
+| 1. Strip from watch cache | High | High | Reconstruction correctness for apply/conflict paths |
+| 4. Dedup fields across objects | Medium | High | Interning lifecycle and GC safety |
+| 5. Lazy-load from etcd | High | Very High | Latency and consistency complexity |
+| 6. Binary encoding | Medium | High | Migration/compatibility path |
+| 7. Reference-based caching | Medium | High | Version/reference correctness |
+
 ---
 
-## Solution 1: Strip ManagedFields from Watch Cache (HIGHEST IMPACT)
+## Solution 1: Strip ManagedFields from Watch Cache (HIGH IMPACT, HIGH RISK)
 
 ### Concept
 Store objects in the watch cache WITHOUT managedFields. When a client actually needs managedFields (rare), reconstruct them from etcd or a separate lightweight store.
@@ -419,30 +431,35 @@ When an object is updated and managedFields haven't changed (common for status u
 ## Recommended Implementation Order
 
 ### Phase 1 (Quick Wins)
-1. **Solution 2**: Compress FieldsV1.Raw in cache
-   - Low complexity, no API changes, 10-25% savings
-   - Can be feature-gated for safe rollout
-
-2. **Solution 3**: Server-side managedFields exclusion parameter
+1. **Solution 3**: Server-side managedFields exclusion parameter
    - API addition but backward compatible
-   - Benefits both memory and bandwidth
+   - Aligns with active upstream direction for read-path omission
+   - Benefits both memory and bandwidth in practical deployments
+
+2. **Reduce no-op metadata churn** (adjacent work item)
+   - Avoid unnecessary managedFields timestamp/resourceVersion changes
+   - Reduces watch/cache churn even when business state is unchanged
+   - See issue #131175 for motivation
+
+3. **Solution 2**: Compress FieldsV1.Raw in cache
+   - Potentially useful, but requires real benchmark evidence before prioritizing above read-path omission
 
 ### Phase 2 (Medium-Term)
-3. **Solution 1**: Strip managedFields from watch cache
-   - Highest impact (20-40% savings)
+4. **Solution 1**: Strip managedFields from watch cache
+   - Potentially highest impact
    - Requires careful design for reconstruction path
-   - Combined with Solution 3 for full optimization
+   - Keep as explicit prototype until correctness risks are retired
 
 ### Phase 3 (Long-Term)
-4. **Solution 6**: Binary encoding for FieldsV1
+5. **Solution 6**: Binary encoding for FieldsV1
    - Requires FieldsV2 type and migration path
    - Permanent 40-60% reduction in FieldsV1 size
 
-5. **Solution 4**: FieldsV1 deduplication
+6. **Solution 4**: FieldsV1 deduplication
    - High impact for homogeneous workloads
    - Complements other solutions
 
 ### Phase 4 (Future)
-6. **Solution 5**: Lazy-load from etcd
+7. **Solution 5**: Lazy-load from etcd
    - Maximum savings but highest complexity
    - May be unnecessary if other solutions are effective
