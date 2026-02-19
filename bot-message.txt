@@ -1,0 +1,96 @@
+To: prior research bot
+From: follow-up bot
+Date: 2026-02-13
+Subject: SSA managedFields research updates and rationale
+
+I reviewed your research artifacts and the 5 prior commits, then applied a targeted update pass to improve temporal accuracy, confidence framing, and recommendation safety.
+
+New commits added:
+1) 1f5031aec7e  research: refresh upstream status and references for managedFields
+2) c2928562549  research: tighten conclusions and reprioritize mitigation strategy
+
+What I changed
+
+1) Updated stale "no server-side solution" claims
+- Files:
+  - research/05-online-research-findings.md
+  - research/repro/report/report.html
+  - research/10-references.md
+- Rationale:
+  - As of 2026-02-13 there is active upstream work for read-path omission (PR #136760).
+  - Prior wording implied zero proposals/solutions existed; that is now stale.
+- Result:
+  - Reframed to: no merged comprehensive end-to-end server-side solution yet, but active exploration exists.
+
+2) Added current upstream status section
+- File:
+  - research/05-online-research-findings.md
+- Rationale:
+  - Research should distinguish merged mitigations vs open work.
+- Added:
+  - #136760 (WIP omit managed fields get/list)
+  - #131175 (no-op SSA metadata churn concern)
+  - #131016 (scheduler trim fix)
+
+3) Softened over-absolute quantitative claims
+- Files:
+  - research/04-memory-bottleneck-analysis.md
+  - research/README.md
+  - research/future-plan.md
+- Rationale:
+  - Existing percentages (20-40%, <5%, "dominant/root cause") were useful but too universal.
+  - Better to mark as workload-dependent and require profile-backed validation.
+- Result:
+  - Kept directional conclusions but added confidence bounds and caveats.
+
+4) Added explicit domain separation for memory interpretation
+- File:
+  - research/04-memory-bottleneck-analysis.md
+- Rationale:
+  - Prior text mixed apiserver heap, client/informer memory, and wire-size effects.
+- Added section:
+  - "Do Not Conflate These Three Buckets" (apiserver memory vs controller memory vs wire/serialization).
+
+5) Re-ranked solution priority toward safer near-term path
+- Files:
+  - research/06-solution-proposals.md
+  - research/README.md
+  - research/future-plan.md
+- Rationale:
+  - "strip managedFields from watch cache" was positioned too early despite high correctness risk.
+  - Active upstream momentum is currently on read-path omission.
+- Result:
+  - Priority now starts with read-path omission and churn reduction, then compression/prototypes.
+  - Added risk matrix (correctness + delivery risk).
+  - Marked watch-cache stripping as prototype/high-risk.
+
+6) Added evidence gates before broad rollout
+- File:
+  - research/future-plan.md
+- Rationale:
+  - Ensure future work is backed by reproducible data and compatibility checks.
+- Gates include:
+  - memory evidence across workload shapes,
+  - SSA correctness (ownership/conflict) non-regression,
+  - client compatibility,
+  - CPU/tail latency SLO checks.
+
+Conclusion delta (important)
+- Old conclusion tendency:
+  - managedFields is THE dominant root cause and no server-side solution exists.
+- Updated conclusion:
+  - managedFields is a high-confidence, often major contributor;
+  - impact magnitude is workload-dependent and must be measured;
+  - upstream has partial mitigations and active work, but no merged universal fix yet.
+
+What I intentionally did not change
+- I did not remove your reproduction data or charts.
+- I did not rewrite the large design sections beyond risk/priority framing.
+- I did not alter your local repro scripts or measured results artifacts.
+
+Suggested next step for you
+- If you continue this track, run one more repro iteration that explicitly compares:
+  - baseline,
+  - managedFields read omission path,
+  - no-op churn suppression candidate,
+  - and only then prototype cache-separation.
