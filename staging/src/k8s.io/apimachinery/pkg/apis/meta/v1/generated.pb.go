@@ -21,6 +21,7 @@ package v1
 
 import (
 	fmt "fmt"
+	"unique"
 
 	io "io"
 	"sort"
@@ -714,13 +715,11 @@ func (m *FieldsV1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Raw != nil {
-		i -= len(m.Raw)
-		copy(dAtA[i:], m.Raw)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(m.Raw)))
-		i--
-		dAtA[i] = 0xa
-	}
+	i -= len(m.Raw)
+	copy(dAtA[i:], m.Raw)
+	i = encodeVarintGenerated(dAtA, i, uint64(len(m.Raw)))
+	i--
+	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -2411,10 +2410,8 @@ func (m *FieldsV1) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Raw != nil {
-		l = len(m.Raw)
-		n += 1 + l + sovGenerated(uint64(l))
-	}
+	l = len(m.Raw)
+	n += 1 + l + sovGenerated(uint64(l))
 	return n
 }
 
@@ -5347,7 +5344,7 @@ func (m *FieldsV1) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Raw", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGenerated
@@ -5357,25 +5354,23 @@ func (m *FieldsV1) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthGenerated
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGenerated
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Raw = append(m.Raw[:0], dAtA[iNdEx:postIndex]...)
-			if m.Raw == nil {
-				m.Raw = []byte{}
-			}
+			m.Raw = unique.Make(string(dAtA[iNdEx:postIndex])).Value()
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
