@@ -30,7 +30,7 @@ import (
 func TestFieldsRoundTrip(t *testing.T) {
 	tests := []metav1.FieldsV1{
 		{
-			Raw: []byte(`{"f:metadata":{".":{},"f:name":{}}}`),
+			Raw: (`{"f:metadata":{".":{},"f:name":{}}}`),
 		},
 		EmptyFields,
 	}
@@ -58,7 +58,7 @@ func TestFieldsToSetError(t *testing.T) {
 	}{
 		{
 			fields: metav1.FieldsV1{
-				Raw: []byte(`{"k:{invalid json}":{"f:name":{},".":{}}}`),
+				Raw: (`{"k:{invalid json}":{"f:name":{},".":{}}}`),
 			},
 			errString: "ReadObjectCB",
 		},

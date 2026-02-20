@@ -23,9 +23,10 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"sigs.k8s.io/randfill"
+
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/randfill"
 )
 
 func TestLabelSelectorAsSelector(t *testing.T) {
@@ -263,38 +264,38 @@ func TestFieldsV1MarshalJSON(t *testing.T) {
 			Want:     []byte(`null`),
 		},
 		{
-			Name:     "empty invalid json is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte{}},
-			Want:     []byte{},
+			Name:     "empty json returns null",
+			FieldsV1: FieldsV1{Raw: string([]byte{})},
+			Want:     []byte(`null`),
 		},
 		{
 			Name:     "cbor null is transcoded to json null",
-			FieldsV1: FieldsV1{Raw: []byte{0xf6}}, // null
+			FieldsV1: FieldsV1{Raw: string([]byte{0xf6})}, // null
 			Want:     []byte(`null`),
 		},
 		{
 			Name:     "valid non-map cbor and valid non-object json is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte{0x30}},
+			FieldsV1: FieldsV1{Raw: string([]byte{0x30})},
 			Want:     []byte{0x30}, // Valid CBOR encoding of -17 and JSON encoding of 0!
 		},
 		{
 			Name:     "self-described cbor map is transcoded to json map",
-			FieldsV1: FieldsV1{Raw: []byte{0xd9, 0xd9, 0xf7, 0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'}}, // 55799({"foo":"bar"})
+			FieldsV1: FieldsV1{Raw: string([]byte{0xd9, 0xd9, 0xf7, 0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'})}, // 55799({"foo":"bar"})
 			Want:     []byte(`{"foo":"bar"}`),
 		},
 		{
 			Name:     "json object is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte(" \t\r\n{\"foo\":\"bar\"}")},
+			FieldsV1: FieldsV1{Raw: " \t\r\n{\"foo\":\"bar\"}"},
 			Want:     []byte(" \t\r\n{\"foo\":\"bar\"}"),
 		},
 		{
 			Name:     "invalid json is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte(`{{`)},
+			FieldsV1: FieldsV1{Raw: `{{`},
 			Want:     []byte(`{{`),
 		},
 		{
 			Name:     "invalid cbor fails to transcode to json",
-			FieldsV1: FieldsV1{Raw: []byte{0xa1}},
+			FieldsV1: FieldsV1{Raw: string([]byte{0xa1})},
 			Error:    "metav1.FieldsV1 cbor invalid: unexpected EOF",
 		},
 	} {
@@ -330,38 +331,38 @@ func TestFieldsV1MarshalCBOR(t *testing.T) {
 			Want:     []byte{0xf6}, // null
 		},
 		{
-			Name:     "empty invalid cbor is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte{}},
-			Want:     []byte{},
+			Name:     "empty cbor returns null",
+			FieldsV1: FieldsV1{Raw: string([]byte{})},
+			Want:     []byte{0xf6}, // null
 		},
 		{
 			Name:     "json null is transcoded to cbor null",
-			FieldsV1: FieldsV1{Raw: []byte(`null`)},
+			FieldsV1: FieldsV1{Raw: `null`},
 			Want:     []byte{0xf6}, // null
 		},
 		{
 			Name:     "valid non-map cbor and valid non-object json is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte{0x30}},
+			FieldsV1: FieldsV1{Raw: string([]byte{0x30})},
 			Want:     []byte{0x30}, // Valid CBOR encoding of -17 and JSON encoding of 0!
 		},
 		{
 			Name:     "json object is transcoded to cbor map",
-			FieldsV1: FieldsV1{Raw: []byte(" \t\r\n{\"foo\":\"bar\"}")},
+			FieldsV1: FieldsV1{Raw: " \t\r\n{\"foo\":\"bar\"}"},
 			Want:     []byte{0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'},
 		},
 		{
 			Name:     "self-described cbor map is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte{0xd9, 0xd9, 0xf7, 0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'}}, // 55799({"foo":"bar"})
-			Want:     []byte{0xd9, 0xd9, 0xf7, 0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'},                // 55799({"foo":"bar"})
+			FieldsV1: FieldsV1{Raw: string([]byte{0xd9, 0xd9, 0xf7, 0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'})}, // 55799({"foo":"bar"})
+			Want:     []byte{0xd9, 0xd9, 0xf7, 0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'},                        // 55799({"foo":"bar"})
 		},
 		{
 			Name:     "invalid json fails to transcode to cbor",
-			FieldsV1: FieldsV1{Raw: []byte(`{{`)},
+			FieldsV1: FieldsV1{Raw: `{{`},
 			Error:    "metav1.FieldsV1 json invalid: invalid character '{' looking for beginning of object key string",
 		},
 		{
 			Name:     "invalid cbor is returned as-is",
-			FieldsV1: FieldsV1{Raw: []byte{0xa1}},
+			FieldsV1: FieldsV1{Raw: string([]byte{0xa1})},
 			Want:     []byte{0xa1},
 		},
 	} {
@@ -401,20 +402,20 @@ func TestFieldsV1UnmarshalJSON(t *testing.T) {
 		{
 			Name: "json null does not modify receiver", // conventional for json.Unmarshaler
 			JSON: []byte(`null`),
-			Into: &FieldsV1{Raw: []byte(`unmodified`)},
-			Want: &FieldsV1{Raw: []byte(`unmodified`)},
+			Into: &FieldsV1{Raw: `unmodified`},
+			Want: &FieldsV1{Raw: `unmodified`},
 		},
 		{
 			Name: "valid input is copied verbatim",
 			JSON: []byte("{\"foo\":\"bar\"} \t\r\n"),
 			Into: &FieldsV1{},
-			Want: &FieldsV1{Raw: []byte("{\"foo\":\"bar\"} \t\r\n")},
+			Want: &FieldsV1{Raw: "{\"foo\":\"bar\"} \t\r\n"},
 		},
 		{
 			Name: "invalid input is copied verbatim",
 			JSON: []byte("{{"),
 			Into: &FieldsV1{},
-			Want: &FieldsV1{Raw: []byte("{{")},
+			Want: &FieldsV1{Raw: "{{"},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -455,20 +456,20 @@ func TestFieldsV1UnmarshalCBOR(t *testing.T) {
 		{
 			Name: "cbor null does not modify receiver",
 			CBOR: []byte{0xf6},
-			Into: &FieldsV1{Raw: []byte(`unmodified`)},
-			Want: &FieldsV1{Raw: []byte(`unmodified`)},
+			Into: &FieldsV1{Raw: `unmodified`},
+			Want: &FieldsV1{Raw: `unmodified`},
 		},
 		{
 			Name: "valid input is copied verbatim",
 			CBOR: []byte{0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'},
 			Into: &FieldsV1{},
-			Want: &FieldsV1{Raw: []byte{0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'}},
+			Want: &FieldsV1{Raw: string([]byte{0xa1, 0x43, 'f', 'o', 'o', 0x43, 'b', 'a', 'r'})},
 		},
 		{
 			Name: "invalid input is copied verbatim",
 			CBOR: []byte{0xff}, // UnmarshalCBOR should never be called with malformed input, testing anyway.
 			Into: &FieldsV1{},
-			Want: &FieldsV1{Raw: []byte{0xff}},
+			Want: &FieldsV1{Raw: string([]byte{0xff})},
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {

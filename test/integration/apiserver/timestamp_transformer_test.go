@@ -93,7 +93,7 @@ func doBench(b *testing.B, useUnstructured bool, shortCircuit bool) {
 			Time:       &now,
 			FieldsType: "FieldsV1",
 			FieldsV1: &metav1.FieldsV1{
-				Raw: []byte(`{"f:metadata":{"f:labels":{"f:sidecar_version":{}}},"f:spec":{"f:template":{"f:spec":{"f:containers":{"k:{\"name\":\"sidecar\"}":{".":{},"f:image":{},"f:name":{}}}}}}}`),
+				Raw: (`{"f:metadata":{"f:labels":{"f:sidecar_version":{}}},"f:spec":{"f:template":{"f:spec":{"f:containers":{"k:{\"name\":\"sidecar\"}":{".":{},"f:image":{},"f:name":{}}}}}}}`),
 			},
 		}
 

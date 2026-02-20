@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"unique"
 
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
@@ -279,17 +280,17 @@ func ResetObjectMetaForStatus(meta, existingMeta Object) {
 // MarshalJSON may get called on pointers or values, so implement MarshalJSON on value.
 // http://stackoverflow.com/questions/21390979/custom-marshaljson-never-gets-called-in-go
 func (f FieldsV1) MarshalJSON() ([]byte, error) {
-	if f.Raw == nil {
+	if len(f.Raw) == 0 {
 		return []byte("null"), nil
 	}
 	if f.getContentType() == fieldsV1InvalidOrValidCBORObject {
 		var u map[string]interface{}
-		if err := cbor.Unmarshal(f.Raw, &u); err != nil {
+		if err := cbor.Unmarshal([]byte(f.Raw), &u); err != nil {
 			return nil, fmt.Errorf("metav1.FieldsV1 cbor invalid: %w", err)
 		}
 		return utiljson.Marshal(u)
 	}
-	return f.Raw, nil
+	return []byte(f.Raw), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler
@@ -298,7 +299,7 @@ func (f *FieldsV1) UnmarshalJSON(b []byte) error {
 		return errors.New("metav1.FieldsV1: UnmarshalJSON on nil pointer")
 	}
 	if !bytes.Equal(b, []byte("null")) {
-		f.Raw = append(f.Raw[0:0], b...)
+		f.Raw = unique.Make(string(b)).Value()
 	}
 	return nil
 }
@@ -307,17 +308,17 @@ var _ json.Marshaler = FieldsV1{}
 var _ json.Unmarshaler = &FieldsV1{}
 
 func (f FieldsV1) MarshalCBOR() ([]byte, error) {
-	if f.Raw == nil {
+	if len(f.Raw) == 0 {
 		return cbor.Marshal(nil)
 	}
 	if f.getContentType() == fieldsV1InvalidOrValidJSONObject {
 		var u map[string]interface{}
-		if err := utiljson.Unmarshal(f.Raw, &u); err != nil {
+		if err := utiljson.Unmarshal([]byte(f.Raw), &u); err != nil {
 			return nil, fmt.Errorf("metav1.FieldsV1 json invalid: %w", err)
 		}
 		return cbor.Marshal(u)
 	}
-	return f.Raw, nil
+	return []byte(f.Raw), nil
 }
 
 var cborNull = []byte{0xf6}
@@ -327,7 +328,7 @@ func (f *FieldsV1) UnmarshalCBOR(b []byte) error {
 		return errors.New("metav1.FieldsV1: UnmarshalCBOR on nil pointer")
 	}
 	if !bytes.Equal(b, cborNull) {
-		f.Raw = append(f.Raw[0:0], b...)
+		f.Raw = unique.Make(string(b)).Value()
 	}
 	return nil
 }
