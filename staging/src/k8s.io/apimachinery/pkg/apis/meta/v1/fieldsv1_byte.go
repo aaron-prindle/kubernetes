@@ -1,3 +1,5 @@
+/*
+Copyright The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +18,7 @@ package v1
 
 import (
 	"bytes"
-	"io"
+	io "io"
 )
 
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
@@ -33,12 +35,15 @@ import (
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
 	// Raw is the underlying serialization of this object.
-	// Deprecated: Direct access to this field is deprecated. Use GetRaw, SetRaw, GetRawReader, NewFieldsV1 instead.
 	Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
 }
 
 func (f FieldsV1) String() string {
 	return string(f.Raw)
+}
+
+func (f FieldsV1) Equal(f2 FieldsV1) bool {
+	return bytes.Equal(f.Raw, f2.Raw)
 }
 
 type FieldsV1Reader interface {
