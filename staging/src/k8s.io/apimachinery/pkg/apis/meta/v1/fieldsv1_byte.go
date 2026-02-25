@@ -44,6 +44,10 @@ func (f FieldsV1) String() string {
 	return string(f.Raw)
 }
 
+func (f FieldsV1) Equal(f2 FieldsV1) bool {
+	return bytes.Equal(f.Raw, f2.Raw)
+}
+
 type FieldsV1Reader interface {
 	io.Reader
 	Size() int64
