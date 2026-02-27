@@ -132,7 +132,7 @@ func (m *FieldsV1) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SetRaw(string(dAtA[iNdEx:postIndex]))
+			m.SetRawBytes(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

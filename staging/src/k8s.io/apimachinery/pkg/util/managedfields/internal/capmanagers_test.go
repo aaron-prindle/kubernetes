@@ -17,9 +17,9 @@ limitations under the License.
 package internal_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -273,7 +273,7 @@ func expectManagesField(t *testing.T, f managedfieldstest.TestFieldManager, m st
 	for _, e := range f.ManagedFields() {
 		if e.Manager == m {
 			var s fieldpath.Set
-			err := s.FromJSON(strings.NewReader(e.FieldsV1.GetRaw()))
+			err := s.FromJSON(bytes.NewReader(e.FieldsV1.GetRawBytes()))
 			if err != nil {
 				t.Fatalf("error parsing managedFields for %v: %v: %#v", m, err, f.ManagedFields())
 			}

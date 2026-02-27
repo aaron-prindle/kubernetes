@@ -41,7 +41,7 @@ func TestAdmission(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	validFieldsV1.SetRaw(string(raw))
+	validFieldsV1.SetRawString(raw)
 	validManagedFieldsEntry := metav1.ManagedFieldsEntry{
 		APIVersion: "v1",
 		Operation:  metav1.ManagedFieldsOperationApply,

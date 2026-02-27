@@ -279,7 +279,7 @@ func ResetObjectMetaForStatus(meta, existingMeta Object) {
 // MarshalJSON may get called on pointers or values, so implement MarshalJSON on value.
 // http://stackoverflow.com/questions/21390979/custom-marshaljson-never-gets-called-in-go
 func (f FieldsV1) MarshalJSON() ([]byte, error) {
-	raw := f.GetRaw()
+	raw := f.GetRawBytes()
 	if len(raw) == 0 {
 		return []byte("null"), nil
 	}
@@ -299,7 +299,7 @@ func (f *FieldsV1) UnmarshalJSON(b []byte) error {
 		return errors.New("metav1.FieldsV1: UnmarshalJSON on nil pointer")
 	}
 	if !bytes.Equal(b, []byte("null")) {
-		f.SetRaw(string(b))
+		f.SetRawBytes(b)
 	}
 	return nil
 }
@@ -308,7 +308,7 @@ var _ json.Marshaler = FieldsV1{}
 var _ json.Unmarshaler = &FieldsV1{}
 
 func (f FieldsV1) MarshalCBOR() ([]byte, error) {
-	raw := f.GetRaw()
+	raw := f.GetRawBytes()
 	if len(raw) == 0 {
 		return cbor.Marshal(nil)
 	}
@@ -329,7 +329,7 @@ func (f *FieldsV1) UnmarshalCBOR(b []byte) error {
 		return errors.New("metav1.FieldsV1: UnmarshalCBOR on nil pointer")
 	}
 	if !bytes.Equal(b, cborNull) {
-		f.SetRaw(string(b))
+		f.SetRawBytes(b)
 	}
 	return nil
 }
@@ -364,7 +364,7 @@ const (
 // or, if a tag-enclosed map, an initial byte with major type "tag" (0xf6, 0xa0...0xbf, or
 // 0xc6...0xdb). The two sets of valid initial bytes don't intersect.
 func (f FieldsV1) getContentType() int {
-	raw := f.GetRaw()
+	raw := f.GetRawBytes()
 	if len(raw) > 0 {
 		p := raw[0]
 		switch p {

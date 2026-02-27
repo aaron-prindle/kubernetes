@@ -55,15 +55,44 @@ type FieldsV1Reader interface {
 }
 
 func (f *FieldsV1) GetRawReader() FieldsV1Reader {
+	if f == nil || len(f.Raw) == 0 {
+		return bytes.NewReader(nil)
+	}
 	return bytes.NewReader(f.Raw)
 }
 
-func (f *FieldsV1) GetRaw() string {
+// GetRawBytes returns the raw bytes.
+// During the transition to an internally string-backed representation,
+// this method returns the bytes directly or converts them if needed, without allocation when possible.
+func (f *FieldsV1) GetRawBytes() []byte {
+	if f == nil {
+		return nil
+	}
+	return f.Raw
+}
+
+// GetRawString returns the raw data as a string.
+// During the transition to an internally string-backed representation,
+// this method returns the string directly or converts the bytes to a string.
+func (f *FieldsV1) GetRawString() string {
+	if f == nil {
+		return ""
+	}
 	return string(f.Raw)
 }
 
-func (f *FieldsV1) SetRaw(raw string) {
-	f.Raw = []byte(raw)
+// SetRawBytes sets the raw bytes.
+func (f *FieldsV1) SetRawBytes(b []byte) {
+	if f != nil {
+		f.Raw = b
+	}
+}
+
+// SetRawString sets the raw data from a string.
+func (f *FieldsV1) SetRawString(s string) {
+	if f != nil {
+		f.Raw = []byte(s)
+	}
 }
 
 func (in *FieldsV1) DeepCopyInto(out *FieldsV1) {

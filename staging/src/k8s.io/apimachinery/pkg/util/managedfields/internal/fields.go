@@ -41,6 +41,6 @@ func FieldsToSet(f metav1.FieldsV1) (s fieldpath.Set, err error) {
 // SetToFields creates a trie of fields from an input set of paths
 func SetToFields(s fieldpath.Set) (f metav1.FieldsV1, err error) {
 	raw, err := s.ToJSON()
-	f.SetRaw(string(raw))
+	f.SetRawBytes(raw)
 	return f, err
 }

@@ -3320,7 +3320,7 @@ func TestRenamingAppliedFieldManagers(t *testing.T) {
 		t.Fatalf("Expected object to have 1 managed fields entry, got: %d", len(managedFields))
 	}
 	entry := managedFields[0]
-	if entry.Manager != "multi_manager" || entry.Operation != "Apply" || entry.FieldsV1.GetRaw() != `{"f:metadata":{"f:labels":{"f:b":{}}}}` {
+	if entry.Manager != "multi_manager" || entry.Operation != "Apply" || entry.FieldsV1.GetRawString() != `{"f:metadata":{"f:labels":{"f:b":{}}}}` {
 		t.Fatalf(`Unexpected entry, got: %v`, entry)
 	}
 }
@@ -3420,7 +3420,7 @@ func TestRenamingUpdatedFieldManagers(t *testing.T) {
 		t.Fatalf("Expected object to have 2 managed fields entries, got: %d", len(managedFields))
 	}
 	entry := managedFields[1]
-	if entry.Manager != "multi_manager" || entry.Operation != "Update" || entry.FieldsV1.GetRaw() != `{"f:metadata":{"f:labels":{"f:b":{}}}}` {
+	if entry.Manager != "multi_manager" || entry.Operation != "Update" || entry.FieldsV1.GetRawString() != `{"f:metadata":{"f:labels":{"f:b":{}}}}` {
 		t.Fatalf(`Unexpected entry, got: %v`, entry)
 	}
 }
@@ -3531,7 +3531,7 @@ func TestDroppingSubresourceField(t *testing.T) {
 		t.Fatalf("Expected object to have 2 managed fields entries, got: %d", len(managedFields))
 	}
 	entry := managedFields[1]
-	if entry.Manager != "label_manager" || entry.Operation != "Apply" || entry.FieldsV1.GetRaw() != `{"f:metadata":{"f:labels":{"f:b":{}}}}` {
+	if entry.Manager != "label_manager" || entry.Operation != "Apply" || entry.FieldsV1.GetRawString() != `{"f:metadata":{"f:labels":{"f:b":{}}}}` {
 		t.Fatalf(`Unexpected entry, got: %v`, entry)
 	}
 }
@@ -3643,7 +3643,7 @@ func TestDroppingSubresourceFromSpecField(t *testing.T) {
 		t.Fatalf("Expected object to have 2 managed fields entries, got: %d", len(managedFields))
 	}
 	entry := managedFields[1]
-	if entry.Manager != "manager" || entry.Operation != "Update" || entry.FieldsV1.GetRaw() != `{"f:status":{"f:phase":{}}}` {
+	if entry.Manager != "manager" || entry.Operation != "Update" || entry.FieldsV1.GetRawString() != `{"f:status":{"f:phase":{}}}` {
 		t.Fatalf(`Unexpected entry, got: %v`, entry)
 	}
 }
@@ -3724,7 +3724,7 @@ func TestSubresourceField(t *testing.T) {
 	if managedFields[1].Manager != "manager" ||
 		managedFields[1].Operation != "Update" ||
 		managedFields[1].Subresource != "scale" ||
-		managedFields[1].FieldsV1.GetRaw() != `{"f:spec":{"f:replicas":{}}}` {
+		managedFields[1].FieldsV1.GetRawString() != `{"f:spec":{"f:replicas":{}}}` {
 		t.Fatalf(`Unexpected entry, got: %v`, managedFields[1])
 	}
 }

@@ -330,6 +330,6 @@ func decodeManagedFieldsEntrySet(f metav1.ManagedFieldsEntry) (s fieldpath.Set, 
 // SetToFields creates a trie of fields from an input set of paths
 func encodeManagedFieldsEntrySet(f *metav1.ManagedFieldsEntry, s fieldpath.Set) (err error) {
 	raw, err := s.ToJSON()
-	f.FieldsV1.SetRaw(string(raw))
+	f.FieldsV1.SetRawBytes(raw)
 	return err
 }
