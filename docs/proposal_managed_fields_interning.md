@@ -74,6 +74,7 @@ We captured the live heap profiles from the API Server's `/debug/pprof/heap` end
 | **experimental** (`stringhandle`) | ~1.37 GB | 27.52 MB | `O(1)` |
 
 ![Memory Reduction Plot](./memory_reduction_plot.png)
+![Memory Scaling Plot](./memory_scaling_plot.png)
 
 With string interning enabled, `FieldsV1` allocations were reduced by ~80% down to 27.52 MB (representing only the mandatory baseline allocations for the struct pointers themselves).
 
