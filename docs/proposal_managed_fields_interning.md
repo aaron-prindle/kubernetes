@@ -167,7 +167,19 @@ Even when explicitly forcing parallel deserialization of novel strings via SSA, 
 
 While `unique.Make()` does take a lock for novel strings, the critical section executes in 1-5 nanoseconds. Before a concurrent request can reach the deserialization layer, it must traverse TLS, Authentication, RBAC, and JSON parsing. These millisecond-scale network and security layers act as a natural rate-limiter, staggering the arrival of individual goroutines at the deserialization boundary. With the benchmark tests as they were setup up it was not possible to deliver parallel requests fast enough over an HTTP boundary to overwhelm the lock-free spin-phase of Go's mutex.
 
-**Addressing the Protobuf Decode Concern:** During SIG discussions, a specific hypothetical was raised regarding Protobuf deserialization: *"What if 10 things are decoding in parallel, making 100s of unique.Make calls each inside a massive Protobuf message?"* We authored a dedicated microbenchmark (`bench_contention_protobuf_test.go`) exactly mirroring these parameters (10 parallel goroutines each executing 500 contiguous `unique.Make` calls). When the fields represented duplicated data, the array completed in just **~2,053 nanoseconds** (4ns per string). Even when we injected 500 novel, random strings into all 10 parallel decoders simultaneously to force maximum contention, the operation still completed in **<1 millisecond** (~900 microseconds).
+#### 3.3.2.1 Protobuf Decode Contention
+**Objective:** Address the specific SIG concern regarding Protobuf deserialization contention (e.g., 10 parallel decoders making 100s of `unique.Make` calls each inside a large Protobuf message).
+
+**Script:** [`bench_contention_protobuf_test.go`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/force/bench_contention_protobuf_test.go)
+
+**Steps:**
+*   Author a dedicated Go microbenchmark exactly mirroring the hypothetical parameters.
+*   Simulate 10 parallel goroutines each executing 500 contiguous `unique.Make` calls.
+*   Run the benchmark with duplicated strings to test the caching fast-path.
+*   Run the benchmark by injecting 500 novel, random strings into all 10 parallel decoders simultaneously to force maximum lock contention.
+
+**Data Collection:**
+We captured the total completion time for the parallel execution via standard `testing.B` benchmark results. When the fields represented duplicated data, the array completed in just **~2,053 nanoseconds** (4ns per string). Even when forcing maximum contention with novel strings, the operation still completed in **<1 millisecond** (~900 microseconds).
 
 ## 4. Rollout Strategy
 Transitioning a core API metadata field requires managing the blast radius for OSS and client-go developers. We propose a multi-release transition plan:
