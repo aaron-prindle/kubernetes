@@ -7,11 +7,11 @@ import (
 	"unique"
 )
 
-// BenchmarkJordanProtobufDecodes simulates Jordan's specific concern:
+// BenchmarkProtobufDecodes simulates a specific decoding concern:
 // 10 concurrent requests, each decoding a massive Protobuf message containing
 // 100s of FieldsV1 objects, resulting in 100s of unique.Make() calls per request
 // in parallel.
-func BenchmarkJordanProtobufDecodes(b *testing.B) {
+func BenchmarkProtobufDecodes(b *testing.B) {
 	// Simulate 100s of unique.Make() calls per decode operation
 	numFieldsPerRequest := 500 
 	
@@ -38,9 +38,9 @@ func BenchmarkJordanProtobufDecodes(b *testing.B) {
 	})
 }
 
-// BenchmarkJordanProtobufDecodesNovel tests the same scenario, but assumes every single
+// BenchmarkProtobufDecodesNovel tests the same scenario, but assumes every single
 // one of the 100s of fields is a completely unique string, forcing the slow-path lock every time.
-func BenchmarkJordanProtobufDecodesNovel(b *testing.B) {
+func BenchmarkProtobufDecodesNovel(b *testing.B) {
 	numFieldsPerRequest := 500 
 
 	b.SetParallelism(10)

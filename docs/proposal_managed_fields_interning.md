@@ -60,27 +60,35 @@ We ran the exact same 50,000 Pod `Kwok` simulation against a `kind` node compile
 With string interning enabled, `FieldsV1` allocations plummeted by ~80% down to just **27.52 MB** (representing only the mandatory baseline allocations for the struct pointers themselves). 
 
 ### 3.3 Parallel Contention Safety
-**Objective:** Address the concern that the standard library `unique` package relies on internal maps and locks. We must empirically prove that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations.
+**Objective:** Address the concern that the standard library `unique` package relies on internal maps and locks. We must empirically prove that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations. We authored two distinct contention benchmarks against the tuned cluster to test both the read and write paths independently.
 
-**Methodology:**
-We authored two distinct contention benchmarks against the tuned cluster:
-1.  **Read-Path Benchmark (Massive LISTs):** Seeds the API Server with 10,000 duplicated Kwok Pods, then bombards the API Server with 50 highly concurrent `LIST` clients to test serialization overhead.
-2.  **Write/Decode-Path Benchmark (Parallel SSA):** Floods the API Server with 50 concurrent Server-Side Apply (SSA) `PATCH` requests using randomly generated, entirely novel strings. This directly targets the deserialization boundary, forcing the API server to heavily decode `managedFields` and repeatedly hit the `unique.Make()` locking path.
+#### 3.3.1 Read-Path Isolation (Massive LISTs)
+To test if serialization overhead from parallel reads causes contention, we designed the [`run-kind-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-contention-benchmark.sh) test. This script seeds the API Server with 10,000 duplicated Kwok Pods and bombards it with 50 highly concurrent `LIST` clients for 30 seconds.
 
 **Results:**
-The real-world profiles prove that `unique.Make` introduces absolutely zero contention regression under heavy parallel load. 
-
 | Metric (30s window) | `master` (Baseline `[]byte`) | `experimental` (`stringhandle`) |
 | :--- | :--- | :--- |
 | **Read-Path Total CPU Load** | ~1336.79s | ~678.41s |
-| **Write-Path Mutex Contention** | 0 significant delays | 0 significant delays |
 
 ![CPU Scaling Plot](./contention_scaling_plot.png)
+
+The CPU profiles revealed that `unique.Make` is not in the critical path for parallel `LIST` requests. Decoding (and thus interning) occurs only when objects are written to etcd or initially loaded into the `WatchCache`. By eliminating duplicate heap allocations, the experimental branch sliced total read-path CPU time in half (from ~1336s down to ~678s) by removing the need for background garbage collection (`mallocgc`) to thrash.
+
+#### 3.3.2 Write-Path Safety (Architectural Rate Limiting)
+To directly target the deserialization boundary and test lock contention, we designed the [`run-kind-write-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-write-contention-benchmark.sh) test. This script floods the API Server with 50 concurrent Server-Side Apply (SSA) `PATCH` requests using randomly generated, entirely novel strings. This forces the API server to heavily decode `managedFields` and repeatedly hit the `unique.Make()` locking path.
+
+**Results:**
+| Metric (30s window) | `master` (Baseline `[]byte`) | `experimental` (`stringhandle`) |
+| :--- | :--- | :--- |
+| **Write-Path Mutex Contention** | 0 significant delays | 0 significant delays |
+
 ![Mutex Contention Plot](./mutex_contention_plot.png)
 
-*   **Read-Path Isolation & CPU Relief:** The CPU profiles revealed that `unique.Make` is not in the critical path for parallel `LIST` requests. Decoding (and thus interning) occurs only when objects are written to etcd or initially loaded into the `WatchCache`. By eliminating duplicate heap allocations, the experimental branch sliced total read-path CPU time in half (from ~1336s down to ~678s) by removing the need for background garbage collection (`mallocgc`) to thrash.
-*   **Write-Path Safety (Architectural Rate Limiting):** Even when explicitly forcing parallel deserialization of novel strings via SSA, the `-mutexprofile` returned completely empty on the live cluster. While `unique.Make()` does take a lock for novel strings, the critical section executes in 1-5 nanoseconds. Before a concurrent request can reach this deep deserialization layer, it must traverse TLS, Authentication, RBAC, and JSON parsing. These millisecond-scale network and security layers act as a natural rate-limiter. It is physically impossible to deliver parallel requests fast enough over an HTTP boundary to overwhelm the lock-free spin-phase of Go's mutex, ensuring the interning lock remains entirely frictionless.
-    *   *Addressing the Protobuf Decode Concern:* During SIG discussions, a specific worst-case scenario was raised: *"What if 10 things are decoding in parallel, making 100s of unique.Make calls each inside a massive Protobuf message?"* We authored a dedicated microbenchmark exactly mirroring these parameters (10 parallel goroutines each executing 500 contiguous `unique.Make` calls). When the fields represented duplicated data, the array completed in just **~2,053 nanoseconds** (4ns per string). Even when we maliciously injected 500 entirely novel, random strings into all 10 parallel decoders simultaneously to force maximum contention, the operation still completed in **<1 millisecond** (~900 microseconds).
+Even when explicitly forcing parallel deserialization of novel strings via SSA, the `-mutexprofile` returned completely empty on the live cluster. 
+
+While `unique.Make()` does take a lock for novel strings, the critical section executes in 1-5 nanoseconds. Before a concurrent request can reach this deep deserialization layer, it must traverse TLS, Authentication, RBAC, and JSON parsing. These millisecond-scale network and security layers act as a natural rate-limiter. It is physically impossible to deliver parallel requests fast enough over an HTTP boundary to overwhelm the lock-free spin-phase of Go's mutex, ensuring the interning lock remains entirely frictionless.
+
+*   **Addressing the Protobuf Decode Concern:** During SIG discussions, a specific hypothetical was raised regarding Protobuf deserialization: *"What if 10 things are decoding in parallel, making 100s of unique.Make calls each inside a massive Protobuf message?"* We authored a dedicated microbenchmark ([`bench_contention_protobuf_test.go`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/force/bench_contention_protobuf_test.go)) exactly mirroring these parameters (10 parallel goroutines each executing 500 contiguous `unique.Make` calls). When the fields represented duplicated data, the array completed in just **~2,053 nanoseconds** (4ns per string). Even when we maliciously injected 500 entirely novel, random strings into all 10 parallel decoders simultaneously to force maximum contention, the operation still completed in **<1 millisecond** (~900 microseconds).
 
 ## 4. Rollout Strategy
 Transitioning a core API metadata field requires managing the blast radius for OSS and client-go developers. We propose a multi-release transition plan:
