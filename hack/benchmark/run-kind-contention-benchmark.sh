@@ -8,14 +8,7 @@ set -euo pipefail
 CLUSTER_NAME="contention-bench-cluster"
 IMAGE_NAME="contention-bench-node:latest"
 REPLICAS=${1:-10000}
-if [ "$REPLICAS" -gt 40000 ]; then
-  DEFAULT_CONCURRENCY=5
-elif [ "$REPLICAS" -gt 15000 ]; then
-  DEFAULT_CONCURRENCY=20
-else
-  DEFAULT_CONCURRENCY=50
-fi
-CONCURRENCY=${2:-$DEFAULT_CONCURRENCY}
+CONCURRENCY=${2:-50}
 
 # Create output directories
 PROFILES_DIR="$(pwd)/hack/benchmark/profiles"
