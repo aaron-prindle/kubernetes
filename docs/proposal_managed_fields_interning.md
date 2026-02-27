@@ -50,6 +50,8 @@ At each scale milestone, we captured the live heap profile from the API Server's
 | **10,000** | ~41.5 MB |
 | **50,000** | ~134.6 MB |
 
+![Baseline Scaling Plot](./baseline_scaling_plot.png)
+
 The baseline memory usage scales with the number of replicas in this example (is the case for all objects as `managedFields` is across all k8s API objects). At scales of hundreds of thousands of identical objects across a massive cluster, `metav1.FieldsV1.Unmarshal` operations consume gigabytes of raw API server RAM just holding duplicate bytes.
 
 ### 3.2 Memory Footprint Reduction
