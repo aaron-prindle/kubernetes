@@ -31,9 +31,18 @@ When compiled with the `stringhandle` tag, the API server intercepts payloads du
 To build consensus and address concerns regarding `unique.Make` global lock contention, we designed rigorous, end-to-end live cluster benchmarks simulating extreme scaling conditions.
 
 ### 3.1 Proving the Bottleneck (Baseline Scaling)
+To prove that `managedFields` is a true scaling bottleneck for general Kubernetes users, we tested the standard `master` branch using `Kwok` to simulate the growth of duplicated workloads (e.g., a massive `DaemonSet`).
+
 **Script:** [`run-kind-baseline-scaling-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-baseline-scaling-benchmark.sh)
 
-To prove that `managedFields` is a true scaling bottleneck for general Kubernetes users, we tested the standard `master` branch using `Kwok` to simulate the growth of duplicated workloads (e.g., a massive `DaemonSet`). We captured the `inuse_space` metric from the API Server's `/debug/pprof/heap` endpoint at each scale milestone and isolated the allocations originating specifically from `k8s.io/apimachinery/pkg/apis/meta/v1.(*FieldsV1).Unmarshal`.
+**Steps:**
+*   Build a custom `kind` node image directly from the Kubernetes source tree (`master` branch).
+*   Provision a local cluster and install `Kwok` to simulate fake nodes.
+*   Deploy a `StatefulSet` and incrementally scale it to 1,000, 10,000, and 50,000 duplicated Pods.
+*   Pause at each milestone to allow the `WatchCache` to stabilize.
+
+**Data Collection:**
+At each scale milestone, we captured the live heap profile from the API Server's `/debug/pprof/heap` endpoint. We then isolated the `inuse_space` metric specifically tied to allocations originating from `k8s.io/apimachinery/pkg/apis/meta/v1.(*FieldsV1).Unmarshal`.
 
 | Number of Pods | Baseline Heap Allocation for `FieldsV1` |
 | :--- | :--- |
@@ -44,11 +53,18 @@ To prove that `managedFields` is a true scaling bottleneck for general Kubernete
 The baseline memory usage scales with the number of replicas in this example (is the case for all objects as `managedFields` is across all k8s API objects). At scales of hundreds of thousands of identical objects across a massive cluster, `metav1.FieldsV1.Unmarshal` operations consume gigabytes of raw API server RAM just holding duplicate bytes.
 
 ### 3.2 Memory Footprint Reduction
-**Script:** [`run-kind-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-benchmark.sh)
-
 **Objective:** Prove that string interning collapses this live API server memory footprint from O(N) to O(1).
 
-**Methodology:** We ran the exact same 50,000 Pod `Kwok` simulation against a `kind` node compiled from our experimental `unique.Handle` branch. We extracted the live `pprof` heap profiles from `/debug/pprof/heap` for both clusters. The "Total Apiserver Heap" metric represents the complete memory footprint of the `kube-apiserver` process, while the "FieldsV1 Allocation Profile" specifically isolates the `inuse_space` tracked to `metav1.FieldsV1.Unmarshal` operations.
+**Script:** [`run-kind-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-benchmark.sh)
+
+**Steps:**
+*   Build a custom `kind` node image using the experimental `unique.Handle` branch.
+*   Provision a local cluster and install `Kwok` to simulate fake nodes.
+*   Deploy a `StatefulSet` configured to create 50,000 duplicated Pods to recreate massive `managedFields` duplication.
+*   Wait for the `WatchCache` to completely stabilize with the 50,000 pods.
+
+**Data Collection:**
+We captured the live heap profiles from the API Server's `/debug/pprof/heap` endpoint for both the baseline and experimental clusters. The "Total Apiserver Heap" metric represents the complete memory footprint of the `kube-apiserver` process, while the "FieldsV1 Allocation Profile" specifically isolates the `inuse_space` tracked to `metav1.FieldsV1.Unmarshal` operations.
 
 | Branch | Total Apiserver Heap | `FieldsV1` Allocation Profile (`inuse_space`) | WatchCache Footprint Scaling |
 | :--- | :--- | :--- | :--- |
@@ -66,11 +82,17 @@ It is important to note that our baseline `Kwok` simulation used a minimal `paus
 **Objective:** Address concern that the standard lib `unique` package relies on internal maps and locks. We must prove that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations. We authored two distinct contention benchmarks against the tuned cluster to test both the read and write paths independently.
 
 #### 3.3.1 Read-Path Isolation (Massive LISTs)
+To test if serialization overhead from parallel reads causes contention, we designed this benchmark test to bombard the API Server with massive read payloads.
+
 **Script:** [`run-kind-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-contention-benchmark.sh)
 
-To test if serialization overhead from parallel reads causes contention, we designed this benchmark test. This script seeds the API Server with 10,000 duplicated Kwok Pods and bombards it with 50 highly concurrent `LIST` clients for 30 seconds.
+**Steps:**
+*   Seed the API Server with 10,000 duplicated Kwok Pods.
+*   Wait for the `WatchCache` to stabilize.
+*   Spawn 50 highly concurrent clients executing continuous `LIST` requests against the Pods API for 30 seconds.
 
-During this 30-second sustained load window, we captured the active CPU profiles from the API Server's `/debug/pprof/profile?seconds=30` endpoint. The "Read-Path Total CPU Load" metric was calculated by extracting the cumulative CPU sample time reported by `go tool pprof` across all goroutines executing during the trace.
+**Data Collection:**
+During the 30-second sustained load window, we captured the active CPU profiles from the API Server's `/debug/pprof/profile?seconds=30` endpoint. The "Read-Path Total CPU Load" metric was calculated by extracting the cumulative CPU sample time reported by `go tool pprof` across all goroutines executing during the trace.
 
 | Metric (30s window) | `master` (Baseline `[]byte`) | `experimental` (`stringhandle`) |
 | :--- | :--- | :--- |
@@ -81,11 +103,18 @@ During this 30-second sustained load window, we captured the active CPU profiles
 The CPU profiles revealed that `unique.Make` is not in the critical path for parallel `LIST` requests. Decoding (and thus interning) occurs only when objects are written to etcd or initially loaded into the `WatchCache`. By eliminating duplicate heap allocations, the experimental branch sliced total read-path CPU time in half (from ~1336s down to ~678s) by removing the need for background garbage collection (`mallocgc`) to thrash.
 
 #### 3.3.2 Write-Path Safety (Architectural Rate Limiting)
+To directly target the deserialization boundary and test lock contention, we designed this benchmark to force the API Server to process purely novel strings in parallel.
+
 **Script:** [`run-kind-write-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-write-contention-benchmark.sh)
 
-To directly target the deserialization boundary and test lock contention, we designed this benchmark test. This script floods the API Server with 50 concurrent Server-Side Apply (SSA) `PATCH` requests using randomly generated, entirely novel strings. This forces the API server to heavily decode `managedFields` and repeatedly hit the `unique.Make()` locking path.
+**Steps:**
+*   Instrument the API Server source code with `runtime.SetMutexProfileFraction(1)` to enable high-resolution contention profiling.
+*   Provision the custom cluster.
+*   Flood the API Server with 50 concurrent Server-Side Apply (SSA) `PATCH` requests.
+*   Ensure each request injects a completely random, novel string to aggressively trigger the `unique.Make()` locking path.
 
-To capture block and mutex delays, we instrumented the API server with `runtime.SetMutexProfileFraction(1)` and exposed the `/debug/pprof/mutex?seconds=30` endpoint. We measured contention by tracking the sum of wait times (delays) reported across all mutex events during the sustained 30-second concurrent write window.
+**Data Collection:**
+We captured the block and mutex delays from the `/debug/pprof/mutex?seconds=30` endpoint during the sustained 30-second concurrent write window. We measured contention by tracking the sum of wait times (delays) reported across all mutex events.
 
 | Metric (30s window) | `master` (Baseline `[]byte`) | `experimental` (`stringhandle`) |
 | :--- | :--- | :--- |
