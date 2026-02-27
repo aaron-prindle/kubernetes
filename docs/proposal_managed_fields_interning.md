@@ -41,8 +41,6 @@ To prove that `managedFields` is a true scaling bottleneck for general Kubernete
 | **10,000** | ~41.5 MB |
 | **50,000** | ~134.6 MB |
 
-![Baseline Scaling Plot](./baseline_scaling_plot.png)
-
 The baseline memory usage scales with the number of replicas in this example (is the case for all objects as `managedFields` is across all k8s API objects). At scales of hundreds of thousands of identical objects across a massive cluster, `metav1.FieldsV1.Unmarshal` operations consume gigabytes of raw API server RAM just holding duplicate bytes.
 
 ### 3.2 Memory Footprint Reduction
@@ -57,9 +55,12 @@ The baseline memory usage scales with the number of replicas in this example (is
 | **master** (Baseline `[]byte`) | ~1.45 GB | 130.59 MB | `O(N)` |
 | **experimental** (`stringhandle`) | ~1.37 GB | 27.52 MB | `O(1)` |
 
-![Memory Scaling Plot](./memory_scaling_plot.png)
+![Memory Reduction Plot](./memory_reduction_plot.png)
 
 With string interning enabled, `FieldsV1` allocations were reduced by ~80% down to 27.52 MB (representing only the mandatory baseline allocations for the struct pointers themselves).
+
+**Context on Absolute Savings vs. Pod Complexity:**
+It is important to note that our baseline `Kwok` simulation used a minimal `pause` container, which yields a relatively small `managedFields` payload (~134 MB for 50k pods). In contrast, analysis of real-world "megaclusters" (e.g., environments running 50,000+ complex networking DaemonSet pods with extensive configuration, volumes, and mounts) reveals a much more severe impact. Production cluster profiles show that `managedFields` is responsible for over **50% of the serialized pod size** in these scenarios. In such real-world environments with highly complex pods, total API server memory can easily exceed 10 GB just handling the duplicated state, and interning `managedFields` has been proven to yield a **15% to 25% reduction in total API server memory usage** (saving over 1.5 GB of RAM in a single cluster).
 
 ### 3.3 Parallel Contention Safety
 **Objective:** Address concern that the standard lib `unique` package relies on internal maps and locks. We must prove that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations. We authored two distinct contention benchmarks against the tuned cluster to test both the read and write paths independently.
@@ -96,7 +97,7 @@ Even when explicitly forcing parallel deserialization of novel strings via SSA, 
 
 While `unique.Make()` does take a lock for novel strings, the critical section executes in 1-5 nanoseconds. Before a concurrent request can reach the deserialization layer, it must traverse TLS, Authentication, RBAC, and JSON parsing. These millisecond-scale network and security layers act as a natural rate-limiter. With the benchmark tests as they were setup up it was not possible to deliver parallel requests fast enough over an HTTP boundary to overwhelm the lock-free spin-phase of Go's mutex.
 
-*   **Addressing the Protobuf Decode Concern:** During SIG discussions, a specific hypothetical was raised regarding Protobuf deserialization: *"What if 10 things are decoding in parallel, making 100s of unique.Make calls each inside a massive Protobuf message?"* We authored a dedicated microbenchmark ([`bench_contention_protobuf_test.go`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/force/bench_contention_protobuf_test.go)) exactly mirroring these parameters (10 parallel goroutines each executing 500 contiguous `unique.Make` calls). When the fields represented duplicated data, the array completed in just **~2,053 nanoseconds** (4ns per string). Even when we maliciously injected 500 entirely novel, random strings into all 10 parallel decoders simultaneously to force maximum contention, the operation still completed in **<1 millisecond** (~900 microseconds).
+**Addressing the Protobuf Decode Concern:** During SIG discussions, a specific hypothetical was raised regarding Protobuf deserialization: *"What if 10 things are decoding in parallel, making 100s of unique.Make calls each inside a massive Protobuf message?"* We authored a dedicated microbenchmark (`bench_contention_protobuf_test.go`) exactly mirroring these parameters (10 parallel goroutines each executing 500 contiguous `unique.Make` calls). When the fields represented duplicated data, the array completed in just **~2,053 nanoseconds** (4ns per string). Even when we maliciously injected 500 entirely novel, random strings into all 10 parallel decoders simultaneously to force maximum contention, the operation still completed in **<1 millisecond** (~900 microseconds).
 
 ## 4. Rollout Strategy
 Transitioning a core API metadata field requires managing the blast radius for OSS and client-go developers. We propose a multi-release transition plan:
