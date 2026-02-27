@@ -16,16 +16,47 @@ This ensures that duplicate `managedFields` data across thousands of pods resolv
 
 Based on the architectural proof-of-concept by [@liggitt (fieldsv1-string)](https://github.com/liggitt/kubernetes/commits/fieldsv1-string/), the solution relies on two key mechanisms:
 
-### Accessor Encapsulation
-To safely orchestrate this transition without breaking downstream `client-go` consumers, we must abstract how the codebase interacts with `FieldsV1`. We will introduce standard accessor methods (`GetRaw()`, `SetRaw()`) and eliminate all direct, in-tree use of the `.Raw` field.
+### 2.1 Accessor Encapsulation
+To safely orchestrate this transition without immediately breaking downstream `client-go` consumers, we must abstract how the codebase interacts with `FieldsV1`. We will introduce standard accessor methods and eliminate all direct, in-tree use of the `.Raw` field.
 
-### Build-Tagged Implementations
-Because `FieldsV1` relies heavily on auto-generated Protobuf and DeepCopy code, changing its underlying type dynamically breaks the code generators. The solution extracts the `FieldsV1` declaration and its unmarshal/deepcopy methods into isolated, manually maintained files governed by `//go:build` tags:
+```go
+// staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/types.go
+// Before:
+type FieldsV1 struct {
+    Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
+}
 
-*   [`fieldsv1_byte.go`](https://github.com/liggitt/kubernetes/blob/fieldsv1-string/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/fieldsv1_byte.go): The legacy `[]byte` implementation, remaining the default for standard OSS builds.
-*   [`fieldsv1_stringhandle.go`](https://github.com/liggitt/kubernetes/blob/fieldsv1-string/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/fieldsv1_stringhandle.go): The optimized implementation utilizing `unique.Make()`.
+// After: Direct access is deprecated.
+func (f *FieldsV1) GetRaw() []byte { ... }
+func (f *FieldsV1) SetRaw(b []byte) { ... }
+```
+*(See Jordan's initial accessors commit: [Add GetRaw/SetRaw methods to FieldsV1](https://github.com/liggitt/kubernetes/commit/5a1b32d20b6016e7f8e874cc6d628d009b0b467e))*
 
-When compiled with the `stringhandle` tag, the API server intercepts payloads during JSON, CBOR, or Protobuf deserialization. The first payload allocates the string, while subsequent identical payloads hit the `unique.Make` fast-path, pointing their handle directly at the original string in memory. Furthermore, because the target implementation is an immutable string, expensive defensive deep copies currently required by the `WatchCache` can be bypassed entirely.
+### 2.2 Build-Tagged Implementations
+Because `FieldsV1` relies heavily on auto-generated Protobuf and DeepCopy code, changing its underlying type dynamically breaks the code generators. The solution extracts the `FieldsV1` declaration and its unmarshal/deepcopy methods into isolated, manually maintained files governed by `//go:build` tags.
+
+This approach provides a safe swap mechanism at compile-time:
+*   [`fieldsv1_byte.go`](https://github.com/liggitt/kubernetes/blob/fieldsv1-string/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/fieldsv1_byte.go): The legacy `[]byte` implementation. This remains the default for standard OSS builds to prevent immediate downstream breakages.
+*   [`fieldsv1_stringhandle.go`](https://github.com/liggitt/kubernetes/blob/fieldsv1-string/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/fieldsv1_stringhandle.go): The optimized implementation utilizing Go 1.23's `unique.Handle[string]`.
+
+### 2.3 Native Interning at the Decoding Boundary
+When compiled with the `stringhandle` tag, the API server intercepts payloads during JSON, CBOR, or Protobuf deserialization and passes them directly through the standard library interning pool.
+
+```go
+// Inside fieldsv1_stringhandle.go Unmarshal logic
+func (m *FieldsV1) Unmarshal(dAtA []byte) error {
+    // ... protobuf boundary interception ...
+    m.handle = unique.Make(string(dAtA[iNdEx:postIndex]))
+    return nil
+}
+```
+
+If a `DaemonSet` spawns 50,000 pods with identical `managedFields`, the first payload allocates the string. The subsequent 49,999 identical payloads hit the `unique.Make` fast-path, discarding the incoming bytes and pointing their `FieldsV1.handle` directly at the original string in memory.
+
+### 2.4 Safe Caching via Immutability
+Currently, the API server must perform expensive deep copies of `[]byte` slices when reading from the `WatchCache` to prevent downstream informers from accidentally mutating the shared cache data. 
+
+Because the target implementation shifts to an inherently immutable `string` (or `unique.Handle`), these defensive deep copies can be bypassed entirely. The cache is natively protected by the Go compiler.
 
 ## 3. Performance Validation
 To build consensus and address concerns regarding `unique.Make` global lock contention, we designed rigorous, end-to-end live cluster benchmarks simulating extreme scaling conditions.
