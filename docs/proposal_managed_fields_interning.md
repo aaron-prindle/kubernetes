@@ -31,7 +31,7 @@ When compiled with the `stringhandle` tag, the API server intercepts payloads du
 To build consensus and address concerns regarding `unique.Make` global lock contention, we designed rigorous, end-to-end live cluster benchmarks simulating extreme scaling conditions.
 
 ### 3.1 Proving the Bottleneck (Baseline Scaling)
-To prove that `managedFields` is a true scaling bottleneck for general Kubernetes users, we tested the standard `master` branch using `Kwok` to simulate the growth of duplicated workloads (e.g., a massive `DaemonSet`).
+**Objective:** Prove that `managedFields` is a true scaling bottleneck for general Kubernetes users by empirically mapping its memory footprint scaling against replicated workloads on the standard `master` branch.
 
 **Script:** [`run-kind-baseline-scaling-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-baseline-scaling-benchmark.sh)
 
@@ -82,7 +82,7 @@ It is important to note that our baseline `Kwok` simulation used a minimal `paus
 **Objective:** Address concern that the standard lib `unique` package relies on internal maps and locks. We must prove that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations. We authored two distinct contention benchmarks against the tuned cluster to test both the read and write paths independently.
 
 #### 3.3.1 Read-Path Isolation (Massive LISTs)
-To test if serialization overhead from parallel reads causes contention, we designed this benchmark test to bombard the API Server with massive read payloads.
+**Objective:** Test if serialization overhead from parallel reads causes contention by bombarding the API Server with massive read payloads.
 
 **Script:** [`run-kind-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-contention-benchmark.sh)
 
@@ -103,7 +103,7 @@ During the 30-second sustained load window, we captured the active CPU profiles 
 The CPU profiles revealed that `unique.Make` is not in the critical path for parallel `LIST` requests. Decoding (and thus interning) occurs only when objects are written to etcd or initially loaded into the `WatchCache`. By eliminating duplicate heap allocations, the experimental branch sliced total read-path CPU time in half (from ~1336s down to ~678s) by removing the need for background garbage collection (`mallocgc`) to thrash.
 
 #### 3.3.2 Write-Path Safety (Architectural Rate Limiting)
-To directly target the deserialization boundary and test lock contention, we designed this benchmark to force the API Server to process purely novel strings in parallel.
+**Objective:** Directly target the deserialization boundary and test for `unique.Make` global lock contention by forcing the API Server to process purely novel strings in parallel.
 
 **Script:** [`run-kind-write-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-write-contention-benchmark.sh)
 
