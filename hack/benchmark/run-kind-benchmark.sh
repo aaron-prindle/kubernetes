@@ -32,7 +32,7 @@ kind build node-image --image "$IMAGE_NAME"
 
 echo "=> 2. Creating Kind Cluster..."
 kind delete cluster --name "$CLUSTER_NAME" 2>/dev/null || true
-kind create cluster --name "$CLUSTER_NAME" --image "$IMAGE_NAME"
+kind create cluster --name "$CLUSTER_NAME" --image "$IMAGE_NAME" --config "$(pwd)/hack/benchmark/kind.yaml"
 
 echo "=> 3. Setting up proxy to API Server..."
 kubectl proxy --port=8001 &
@@ -44,17 +44,24 @@ echo "=> 4. Installing Kwok Controller..."
 kubectl apply -f https://github.com/kubernetes-sigs/kwok/releases/download/v0.6.0/kwok.yaml
 kubectl apply -f https://github.com/kubernetes-sigs/kwok/releases/download/v0.6.0/stage-fast.yaml
 echo "   Waiting for Kwok Controller to be ready..."
-sleep 5
-kubectl -n kube-system wait --for=condition=Ready pods -l app=kwok-controller --timeout=120s
+sleep 30
+kubectl -n kube-system wait --for=condition=Ready pods -l app=kwok-controller --timeout=300s
 
-echo "=> 5. Creating Fake Node..."
-cat <<EOF | kubectl apply -f -
+echo "=> 6. Creating 100 Fake Nodes..."
+cat << 'EOF' > /tmp/addnodes.sh
+#!/bin/bash
+PARALLEL_JOBS=100
+NODE_COUNT=$1
+
+apply_node() {
+  local i=$1
+  kubectl apply -f - <<YAML
 apiVersion: v1
 kind: Node
 metadata:
   annotations:
-    node.alpha.kubernetes.io/ttl: "0"
-    kwok.x-k8s.io/node: "fake"
+    node.alpha.kubernetes.io/ttl: "5m"
+    kwok.x-k8s.io/node: fake
   labels:
     beta.kubernetes.io/arch: amd64
     beta.kubernetes.io/os: linux
@@ -64,9 +71,12 @@ metadata:
     kubernetes.io/role: agent
     node-role.kubernetes.io/agent: ""
     type: kwok
-  name: kwok-node-0
+  name: kwok-node-$i
 spec:
-  taints: # We want pods to schedule here normally
+  taints: # Avoid scheduling actual running pods to fake Node
+  - effect: NoSchedule
+    key: kwok.x-k8s.io/node
+    value: fake
 status:
   allocatable:
     cpu: 3200
@@ -81,22 +91,30 @@ status:
     bootID: ""
     containerRuntimeVersion: ""
     kernelVersion: ""
-    kubeProxyVersion: ""
+    kubeProxyVersion: fake
     kubeletVersion: fake
     machineID: ""
     operatingSystem: linux
     osImage: ""
     systemUUID: ""
   phase: Running
-EOF
+YAML
+}
 
-echo "=> 6. Deploying load generator (Deployment with $REPLICAS Pods)..."
+export -f apply_node
+seq 1 $NODE_COUNT | xargs -I {} -P $PARALLEL_JOBS bash -c 'apply_node "$@"' _ {}
+EOF
+chmod +x /tmp/addnodes.sh
+/tmp/addnodes.sh 100
+
+echo "=> 7. Deploying load generator (StatefulSet with $REPLICAS Pods)..."
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: memory-load-gen
 spec:
+  podManagementPolicy: "Parallel"
   replicas: $REPLICAS
   selector:
     matchLabels:
@@ -124,7 +142,7 @@ spec:
         image: registry.k8s.io/pause:3.9
 EOF
 
-echo "=> 7. Waiting for ReplicaSet to create $REPLICAS pods..."
+echo "=> 8. Waiting for StatefulSet to create $REPLICAS pods..."
 while true; do
   CREATED=$(kubectl get pods -l app=memory-load-gen --no-headers 2>/dev/null | wc -l || echo 0)
   RUNNING=$(kubectl get pods -l app=memory-load-gen --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l || echo 0)

@@ -1,0 +1,40 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    etcd:
+      local:
+        extraArgs:
+          quota-backend-bytes: "8589934592"
+    apiServer:
+      extraArgs:
+        max-requests-inflight: "640"
+        max-mutating-requests-inflight: "0"
+        v: "4"
+    controllerManager:
+      extraArgs:
+        bind-address: "0.0.0.0"
+        authorization-always-allow-paths: "/healthz,/readyz,/livez,/metrics,/debug/pprof/profile,/debug/pprof/block,/debug/pprof/mutex"
+        kube-api-qps: "500"
+        kube-api-burst: "500"
+        profiling: "true"
+        allocate-node-cidrs: "true"
+        v: "2"
+        concurrent-deployment-syncs: "50"
+        concurrent-daemonset-syncs: "50"
+        concurrent-job-syncs: "50"
+        concurrent-replicaset-syncs: "50"
+        concurrent-statefulset-syncs: "50"
+        concurrent-gc-syncs: "100"
+        contention-profiling: "true"
+    scheduler:
+      extraArgs:
+        bind-address: "0.0.0.0"
+        authorization-always-allow-paths: "/healthz,/readyz,/livez,/metrics"
+        kube-api-qps: "500"
+        kube-api-burst: "500"
+        profiling: "true"
+        v: "3"

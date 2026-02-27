@@ -7,8 +7,15 @@ set -euo pipefail
 
 CLUSTER_NAME="contention-bench-cluster"
 IMAGE_NAME="contention-bench-node:latest"
-REPLICAS=${1:-1000}
-CONCURRENCY=${2:-50}
+REPLICAS=${1:-10000}
+if [ "$REPLICAS" -gt 40000 ]; then
+  DEFAULT_CONCURRENCY=5
+elif [ "$REPLICAS" -gt 15000 ]; then
+  DEFAULT_CONCURRENCY=20
+else
+  DEFAULT_CONCURRENCY=50
+fi
+CONCURRENCY=${2:-$DEFAULT_CONCURRENCY}
 
 # Create output directories
 PROFILES_DIR="$(pwd)/hack/benchmark/profiles"
@@ -30,9 +37,9 @@ echo "=========================================================="
 echo "=> 1. Building Kubernetes Node Image from current tree..."
 kind build node-image --image "$IMAGE_NAME"
 
-echo "=> 2. Creating Kind Cluster..."
+echo "=> 2. Creating Kind Cluster with tuned API Server config..."
 kind delete cluster --name "$CLUSTER_NAME" 2>/dev/null || true
-kind create cluster --name "$CLUSTER_NAME" --image "$IMAGE_NAME"
+kind create cluster --name "$CLUSTER_NAME" --image "$IMAGE_NAME" --config "$(pwd)/hack/benchmark/kind.yaml"
 
 echo "=> 3. Setting up proxy to API Server..."
 kubectl proxy --port=8001 &
@@ -40,13 +47,24 @@ PROXY_PID=$!
 trap "kill $PROXY_PID 2>/dev/null || true; kind delete cluster --name $CLUSTER_NAME 2>/dev/null || true" EXIT
 sleep 2
 
-echo "=> 4. Deploying load generator (Deployment with $REPLICAS Pending Pods)..."
+echo "=> 4. Installing Kwok Controller..."
+kubectl apply -f https://github.com/kubernetes-sigs/kwok/releases/download/v0.6.0/kwok.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/kwok/releases/download/v0.6.0/stage-fast.yaml
+echo "   Waiting for Kwok Controller to be ready..."
+sleep 15
+kubectl -n kube-system wait --for=condition=Ready pods -l app=kwok-controller --timeout=300s
+
+echo "=> 5. Creating 100 Fake Nodes using addnodes.sh..."
+"$(pwd)/hack/benchmark/addnodes.sh" 100
+
+echo "=> 6. Deploying load generator (StatefulSet with $REPLICAS Pods)..."
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: contention-load-gen
 spec:
+  podManagementPolicy: "Parallel"
   replicas: $REPLICAS
   selector:
     matchLabels:
@@ -56,38 +74,50 @@ spec:
       labels:
         app: contention-load-gen
     spec:
-      nodeSelector:
-        non-existent-node: "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: type
+                operator: In
+                values:
+                - kwok
+      tolerations:
+      - key: "kwok.x-k8s.io/node"
+        operator: "Exists"
+        effect: "NoSchedule"
       containers:
       - name: pause
         image: registry.k8s.io/pause:3.9
 EOF
 
-echo "=> 5. Waiting for ReplicaSet to create $REPLICAS pods..."
+echo "=> 7. Waiting for StatefulSet to create $REPLICAS pods..."
 while true; do
   CREATED=$(kubectl get pods -l app=contention-load-gen --no-headers 2>/dev/null | wc -l || echo 0)
-  if [ "$CREATED" -ge "$REPLICAS" ]; then
+  RUNNING=$(kubectl get pods -l app=contention-load-gen --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l || echo 0)
+  if [ "$RUNNING" -ge "$REPLICAS" ]; then
     break
   fi
-  echo "   Created $CREATED / $REPLICAS pods..."
+  echo "   Created $CREATED / $REPLICAS pods ($RUNNING Running)..."
   sleep 5
 done
 
-echo "=> 6. All pods created. Waiting 5 seconds for stabilization..."
-sleep 5
+echo "=> 8. All pods Running. Waiting 10 seconds for stabilization..."
+sleep 10
 
-echo "=> 7. Initiating $CONCURRENCY parallel LIST requests and capturing profiles..."
+echo "=> 9. Initiating $CONCURRENCY parallel LIST requests and capturing profiles..."
 
-# We will capture CPU and Mutex profiles for 10 seconds.
-curl -s "http://localhost:8001/debug/pprof/profile?seconds=10" > "$CPU_PROFILE" &
-curl -s "http://localhost:8001/debug/pprof/mutex?seconds=10" > "$MUTEX_PROFILE" &
+# We will capture CPU and Mutex profiles for 30 seconds.
+curl -s "http://localhost:8001/debug/pprof/profile?seconds=30" > "$CPU_PROFILE" &
+curl -s "http://localhost:8001/debug/pprof/mutex?seconds=30" > "$MUTEX_PROFILE" &
 
-# Run highly parallel LIST requests for 10 seconds
+# Run highly parallel LIST requests for 30 seconds
 # Using timeout so curl processes don't block indefinitely
-timeout 12s bash -c "
+timeout 32s bash -c "
   for i in \$(seq 1 $CONCURRENCY); do
     while true; do
-      curl -m 5 -s http://localhost:8001/api/v1/pods > /dev/null || true
+      curl -m 30 -s http://localhost:8001/api/v1/pods > /dev/null || true
     done &
   done
   wait
