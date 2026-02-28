@@ -14,6 +14,11 @@ limitations under the License.
 
 package v1
 
+import (
+	"bytes"
+	"io"
+)
+
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
 //
 // Each key is either a '.' representing the field itself, and will always map to an empty set,
@@ -28,9 +33,56 @@ package v1
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
 	// Raw is the underlying serialization of this object.
+	// Deprecated: Direct access to this field is deprecated. Use GetRaw, SetRaw, GetRawReader, NewFieldsV1 instead.
 	Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
 }
 
 func (f FieldsV1) String() string {
 	return string(f.Raw)
+}
+
+type FieldsV1Reader interface {
+	io.Reader
+	Size() int64
+}
+
+func (f *FieldsV1) GetRawReader() FieldsV1Reader {
+	if f == nil || len(f.Raw) == 0 {
+		return bytes.NewReader(nil)
+	}
+	return bytes.NewReader(f.Raw)
+}
+
+// GetRawBytes returns the raw bytes.
+func (f *FieldsV1) GetRawBytes() []byte {
+	if f == nil {
+		return nil
+	}
+	return f.Raw
+}
+
+// GetRawString returns the raw data as a string.
+func (f *FieldsV1) GetRawString() string {
+	if f == nil {
+		return ""
+	}
+	return string(f.Raw)
+}
+
+// SetRawBytes sets the raw bytes.
+func (f *FieldsV1) SetRawBytes(b []byte) {
+	if f != nil {
+		f.Raw = b
+	}
+}
+
+// SetRawString sets the raw data from a string.
+func (f *FieldsV1) SetRawString(s string) {
+	if f != nil {
+		f.Raw = []byte(s)
+	}
+}
+
+func NewFieldsV1(raw string) *FieldsV1 {
+	return &FieldsV1{Raw: []byte(raw)}
 }
