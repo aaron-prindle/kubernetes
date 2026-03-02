@@ -9,7 +9,7 @@
 *   **The Problem:** `managedFields` string duplication causes O(N) memory bloat in the API server where N is number of k8s objects (notably Pods). In highly replicated workloads (DaemonSets, etc.), `managedFields` can account for ~50% of the serialized pod size. 
 *   **The Solution:** Transition `metav1.FieldsV1` from a `[]byte` to an immutable string and use Go 1.23 `unique.Handle[string]`. This brings footprint to O(1). 
 *   **Rollout Plan:** Encapsulate `FieldsV1` with accessors in v1.36 and use build tags to safely opt-in to `string` (not the default). Flip the default to the string implementation in v1.37, and remove the legacy `[]byte` implementation in v1.38 (v1.39+?).
-*   **Memory Savings:** In a 50k minimal pod test, `FieldsV1` allocations dropped by ~80% (130MB to 27MB), reducing the total kube-apiserver heap memory by ~5% (~1.45 GB down to ~1.37 GB). Based on internal analysis of production clusters with more-complex + higher-#-of pods, we estimate this optimization could yield a 10-25% reduction in total API Server memory usage for large clusters.
+*   **Memory Savings:** In a 100k minimal pod test, the total kube-apiserver heap memory dropped by ~167 MB (~1.78 GB down to ~1.61 GB). Based on internal analysis of production clusters with more-complex + higher-#-of pods, we estimate this optimization could yield a 10-25% reduction in total API Server memory usage for large clusters.
 *   **unique.Make Contention:** Profiling shows the standard library interning lock (`unique.Make`) causes 0 contention in the test usage. The read-path bypasses interning entirely (reducing CPU load by ~50%), and the write-path lock operates in the nanosecond range, which in testing is not the bottleneck behind the millisecond-scale latency of the API server's networking and security layers.
 
 ## 1. Problem Statement
@@ -108,13 +108,16 @@ The baseline memory usage scales with the number of replicas in this example (is
 
 | Branch | Total Apiserver Heap | `FieldsV1` Allocation Profile (`inuse_space`) | WatchCache Footprint Scaling |
 | :--- | :--- | :--- | :--- |
-| master (Baseline `[]byte`) | ~1.45 GB | 130.59 MB | O(N) |
-| experimental (`stringhandle`) | ~1.37 GB | 27.52 MB | O(1) |
+| master (Baseline `[]byte`) | ~1.78 GB (1780.52 MB) | 134.59 MB | O(N) |
+| experimental (`stringhandle`) | ~1.61 GB (1613.24 MB) | 46.03 MB | O(1) |
 
-![Memory Reduction Plot](./memory_reduction_plot.png)
-![Memory Scaling Plot](./memory_scaling_plot.png)
+![Memory Scaling Plot](./memory_scaling_plot.svg)
 
-With string interning enabled, `FieldsV1` allocations were reduced by ~80% down to 27.52 MB (representing only the mandatory baseline allocations for the struct pointers themselves).
+*Fig 1. Total `kube-apiserver` heap memory scaling across replicated workload sizes.*
+
+With string interning enabled on a 100,000 Pod cluster simulation, the **total `kube-apiserver` heap memory dropped by ~167 MB**. 
+
+Specifically tracing the source of the bloat, `FieldsV1` allocations plummeted from 134.59 MB down to just 46.03 MB (representing only the mandatory baseline allocations for the struct pointers themselves). The additional memory savings beyond the strict `FieldsV1` data is due to reduced garbage collection tracking overhead and the elimination of redundant deep-copies triggered by duplicate payloads.
 
 **Context on Absolute Savings vs. Pod Complexity:** Our baseline Kwok simulation used a minimal pause container, which has a relatively small `managedFields` payload (~134 MB for 50k pods). In contrast, analysis of real-world "megaclusters" (e.g., environments running 50,000+ complex networking DaemonSet pods with extensive configuration, volumes, and mounts) reveals a much more significant impact. Production cluster profiles show that `managedFields` is responsible for over 50% of the serialized pod size in these scenarios. In such real-world environments with highly complex pods (and more pods), total API server memory can be ~X - XX GB just handling the duplicated state, and interning `managedFields` would be expected to save ~15% - 25% reduction in total API server memory usage for such cases.
 

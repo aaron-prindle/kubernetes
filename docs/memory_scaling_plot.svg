@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" style="background-color: white; font-family: sans-serif;">
+    <!-- Title -->
+    <text x="400.0" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#333">Total API Server Heap Memory vs. Pod Scale</text>
+    
+    <!-- Y Axis Label -->
+    <text x="-250.0" y="30" transform="rotate(-90)" text-anchor="middle" font-size="16" fill="#666">Total API Server Heap (MB)</text>
+    
+    <!-- X Axis Label -->
+    <text x="400.0" y="480" text-anchor="middle" font-size="16" fill="#666">Number of Duplicated Pods (Running)</text>
+    
+    <!-- Legend -->
+    <line x1="260.0" y1="65" x2="290.0" y2="65" stroke="#E24A33" stroke-width="3"/>
+    <circle cx="275.0" cy="65" r="5" fill="#E24A33"/>
+    <text x="300.0" y="70" font-size="14" fill="#333">master ([]byte)</text>
+    
+    <line x1="430.0" y1="65" x2="460.0" y2="65" stroke="#348ABD" stroke-width="3"/>
+    <circle cx="445.0" cy="65" r="5" fill="#348ABD"/>
+    <text x="470.0" y="70" font-size="14" fill="#333">experimental (stringhandle)</text>
+    
+    <!-- Grid and Axes -->
+    <line x1="100" y1="420.0" x2="760" y2="420.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="425.0" text-anchor="end" font-size="12" fill="#666">0</text>
+<line x1="100" y1="352.0" x2="760" y2="352.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="357.0" text-anchor="end" font-size="12" fill="#666">391</text>
+<line x1="100" y1="284.0" x2="760" y2="284.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="289.0" text-anchor="end" font-size="12" fill="#666">783</text>
+<line x1="100" y1="216.0" x2="760" y2="216.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="221.0" text-anchor="end" font-size="12" fill="#666">1175</text>
+<line x1="100" y1="148.0" x2="760" y2="148.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="153.0" text-anchor="end" font-size="12" fill="#666">1566</text>
+<line x1="100" y1="80.0" x2="760" y2="80.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="85.0" text-anchor="end" font-size="12" fill="#666">1958</text>
+<line x1="100.0" y1="420" x2="100.0" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="100.0" y="440" text-anchor="middle" font-size="12" fill="#666">50</text>
+<line x1="429.83491745872936" y1="420" x2="429.83491745872936" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="429.83491745872936" y="440" text-anchor="middle" font-size="12" fill="#666">50,000</text>
+<line x1="760.0" y1="420" x2="760.0" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="760.0" y="440" text-anchor="middle" font-size="12" fill="#666">100,000</text>
+
+    <line x1="100" y1="420" x2="760" y2="420" stroke="#ccc" stroke-width="2"/>
+    <line x1="100" y1="80" x2="100" y2="420" stroke="#ccc" stroke-width="2"/>
+    <path d="M 100.0 211.6849623092743 L 429.83491745872936 168.2859961237065 L 760.0 110.90909090909093 L 760.0 139.9482071631781 L 429.83491745872936 182.1736653030882 L 100.0 211.6849623092743 Z" fill="#348ABD" opacity="0.15" />
+<path d="M 100.0 211.6849623092743 L 429.83491745872936 168.2859961237065 L 760.0 110.90909090909093 " fill="none" stroke="#E24A33" stroke-width="3" />
+<path d="M 100.0 211.6849623092743 L 429.83491745872936 182.1736653030882 L 760.0 139.9482071631781 " fill="none" stroke="#348ABD" stroke-width="3" />
+<circle cx="100.0" cy="211.6849623092743" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="100.0" y="199.6849623092743" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">1200.0 MB</text>
+<circle cx="429.83491745872936" cy="168.2859961237065" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="429.83491745872936" y="156.2859961237065" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">1450.0 MB</text>
+<circle cx="760.0" cy="110.90909090909093" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="760.0" y="98.90909090909093" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">1780.5 MB</text>
+<circle cx="100.0" cy="211.6849623092743" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="100.0" y="231.6849623092743" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">1200.0 MB</text>
+<circle cx="429.83491745872936" cy="182.1736653030882" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="429.83491745872936" y="202.1736653030882" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">1370.0 MB</text>
+<circle cx="760.0" cy="139.9482071631781" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="760.0" y="159.9482071631781" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">1613.2 MB</text>
+</svg>
