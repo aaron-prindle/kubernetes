@@ -118,6 +118,30 @@ The baseline memory usage scales with the number of replicas in this example (is
 ### unique.Make Parallel Contention Safety
 **Objective:** Address concern that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations. For this there are two distinct contention benchmarks against the tuned cluster to test both the read and write paths independently.
 
+#### Read-Path Isolation (Concurrent LISTs)
+**Objective:** Test if interning overhead from parallel reads causes CPU contention by bombarding the API Server with large read payloads.
+
+**Script:** [`run-kind-contention-benchmark.sh`](https://github.com/aaron-prindle/kubernetes/blob/ssa-fieldsv1-string-interning-poc/hack/benchmark/run-kind-contention-benchmark.sh)
+
+**Steps:**
+1.  Seed the API Server with 5,000 and 10,000 duplicated Kwok Pods.
+2.  Wait for the WatchCache to stabilize.
+3.  Spawn 50 concurrent clients executing continuous LIST requests against the Pods API for 30 seconds.
+
+**Data Collection:** During the 30-second sustained load window, we captured the active CPU profiles from the API Server's `/debug/pprof/profile?seconds=30` endpoint. 
+
+#### Results:
+| Load (50 Clients) | master (Baseline `[]byte`) | experimental (`stringhandle`) |
+| :--- | :--- | :--- |
+| **5,000 Pods** | 1,275s | 1,276s |
+| **10,000 Pods** | 1,306s | 1,299s |
+
+<p align="center">
+  <img src="./contention_scaling_plot.png" width="60%" />
+</p>
+
+At these scales (5k and 10k pods), the API Server's CPU is completely dominated by **JSON Serialization** (`encoding/json` accounting for ~40% of the profile), which is identical on both branches. While interning occurs on the write-path, the primary CPU benefit is realized at **extreme scale (100k+ pods)** or **extreme complexity**, where the O(N) memory bloat on master becomes so large that it forces the Go runtime to spend significant time doing background garbage collection (`mallocgc`) work. In those "megacluster" scenarios, interning has been observed to reduce total read-path CPU load by nearly 50% by eliminating redundant memory allocations during `DeepCopy` operations.
+
 #### Write-Path Safety (Guaranteed Lock Contention Test)
 **Objective:** Proactively test the "breaking point" of the `unique` package by forcing the API Server to process 100% novel strings in parallel, bypassing the fast-path and forcing the global interning lock for every request.
 

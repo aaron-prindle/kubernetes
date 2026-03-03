@@ -34,10 +34,11 @@ echo "=> 2. Creating Kind Cluster with tuned API Server config..."
 kind delete cluster --name "$CLUSTER_NAME" 2>/dev/null || true
 kind create cluster --name "$CLUSTER_NAME" --image "$IMAGE_NAME" --config "$(pwd)/hack/benchmark/kind.yaml"
 
-echo "=> 3. Setting up proxy to API Server..."
-kubectl proxy --port=8001 &
-PROXY_PID=$!
-trap "kill $PROXY_PID 2>/dev/null || true; kind delete cluster --name $CLUSTER_NAME 2>/dev/null || true" EXIT
+echo "=> 3. Extracting connection details..."
+API_SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --serviceaccount=default:default > /dev/null 2>&1 || true
+TOKEN=$(kubectl create token default --duration=1h)
+trap "kind delete cluster --name $CLUSTER_NAME 2>/dev/null || true" EXIT
 sleep 2
 
 echo "=> 4. Installing Kwok Controller..."
@@ -102,15 +103,15 @@ sleep 10
 echo "=> 9. Initiating $CONCURRENCY parallel LIST requests and capturing profiles..."
 
 # We will capture CPU and Mutex profiles for 30 seconds.
-curl -s "http://localhost:8001/debug/pprof/profile?seconds=30" > "$CPU_PROFILE" &
-curl -s "http://localhost:8001/debug/pprof/mutex?seconds=30" > "$MUTEX_PROFILE" &
+curl -k -s -H "Authorization: Bearer $TOKEN" "$API_SERVER/debug/pprof/profile?seconds=30" > "$CPU_PROFILE" &
+curl -k -s -H "Authorization: Bearer $TOKEN" "$API_SERVER/debug/pprof/mutex?seconds=30" > "$MUTEX_PROFILE" &
 
 # Run highly parallel LIST requests for 30 seconds
 # Using timeout so curl processes don't block indefinitely
 timeout 32s bash -c "
   for i in \$(seq 1 $CONCURRENCY); do
     while true; do
-      curl -m 30 -s http://localhost:8001/api/v1/pods > /dev/null || true
+      curl -k -H \"Authorization: Bearer $TOKEN\" -m 30 -s \"$API_SERVER/api/v1/pods\" > /dev/null || true
     done &
   done
   wait
