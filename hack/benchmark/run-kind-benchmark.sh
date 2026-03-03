@@ -34,10 +34,11 @@ echo "=> 2. Creating Kind Cluster..."
 kind delete cluster --name "$CLUSTER_NAME" 2>/dev/null || true
 kind create cluster --name "$CLUSTER_NAME" --image "$IMAGE_NAME" --config "$(pwd)/hack/benchmark/kind.yaml"
 
-echo "=> 3. Setting up proxy to API Server..."
-kubectl proxy --port=8001 &
-PROXY_PID=$!
-trap "kill $PROXY_PID 2>/dev/null || true; kind delete cluster --name $CLUSTER_NAME 2>/dev/null || true" EXIT
+echo "=> 3. Extracting API Server connection details..."
+API_SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --serviceaccount=default:default > /dev/null 2>&1 || true
+TOKEN=$(kubectl create token default)
+trap "kind delete cluster --name $CLUSTER_NAME 2>/dev/null || true" EXIT
 sleep 2
 
 echo "=> 4. Installing Kwok Controller..."
@@ -138,18 +139,54 @@ spec:
         operator: "Exists"
         effect: "NoSchedule"
       containers:
-      - name: pause
+      - name: pause-1
         image: registry.k8s.io/pause:3.9
+        env:
+        - name: TEST_ENV_1
+          value: "some_complex_value_string_1"
+        - name: TEST_ENV_2
+          value: "some_complex_value_string_2"
+        - name: TEST_ENV_3
+          value: "some_complex_value_string_3"
+        volumeMounts:
+        - name: data-vol-1
+          mountPath: /data1
+        - name: data-vol-2
+          mountPath: /data2
+      - name: pause-2
+        image: registry.k8s.io/pause:3.9
+        env:
+        - name: TEST_ENV_4
+          value: "some_complex_value_string_4"
+        - name: TEST_ENV_5
+          value: "some_complex_value_string_5"
+        volumeMounts:
+        - name: data-vol-3
+          mountPath: /data3
+      - name: pause-3
+        image: registry.k8s.io/pause:3.9
+        env:
+        - name: TEST_ENV_6
+          value: "some_complex_value_string_6"
+      volumes:
+      - name: data-vol-1
+        emptyDir: {}
+      - name: data-vol-2
+        emptyDir: {}
+      - name: data-vol-3
+        emptyDir: {}
 EOF
 
 echo "=> 8. Waiting for StatefulSet to create $REPLICAS pods..."
 while true; do
-  CREATED=$(kubectl get pods -l app=memory-load-gen --no-headers 2>/dev/null | wc -l || echo 0)
-  RUNNING=$(kubectl get pods -l app=memory-load-gen --field-selector=status.phase=Running --no-headers 2>/dev/null | wc -l || echo 0)
+  RUNNING=$(kubectl get statefulset memory-load-gen -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo 0)
+  if [ -z "$RUNNING" ]; then
+    RUNNING=0
+  fi
   if [ "$RUNNING" -ge "$REPLICAS" ]; then
     break
   fi
-  echo "   Created $CREATED / $REPLICAS pods ($RUNNING Running)..."
+  echo "   $RUNNING / $REPLICAS pods Running..."
   sleep 5
 done
 
@@ -157,7 +194,7 @@ echo "=> 8. All pods Running. Waiting 30 seconds for watch caches to stabilize..
 sleep 30
 
 echo "=> 9. Capturing API Server Heap Profile..."
-curl -s http://localhost:8001/debug/pprof/heap > "$PROFILE_FILE"
+curl -k -s -H "Authorization: Bearer $TOKEN" "$API_SERVER/debug/pprof/heap" > "$PROFILE_FILE"
 echo "   Saved heap profile to $PROFILE_FILE"
 
 echo "=========================================================="

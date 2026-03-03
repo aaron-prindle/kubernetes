@@ -106,18 +106,18 @@ The baseline memory usage scales with the number of replicas in this example (is
 
 **Data Collection:** We captured the live heap profiles from the API Server's `/debug/pprof/heap` endpoint for both the baseline and experimental clusters. The "Total Apiserver Heap" metric represents the complete memory footprint of the kube-apiserver process, while the "FieldsV1 Allocation Profile" specifically isolates the `inuse_space` tracked to `metav1.FieldsV1.Unmarshal` operations.
 
-| Branch | Total Apiserver Heap | `FieldsV1` Allocation Profile (`inuse_space`) | WatchCache Footprint Scaling |
-| :--- | :--- | :--- | :--- |
-| master (Baseline `[]byte`) | ~1.78 GB (1780.52 MB) | 134.59 MB | O(N) |
-| experimental (`stringhandle`) | ~1.61 GB (1613.24 MB) | 46.03 MB | O(1) |
+| Branch | Total Apiserver Heap (100k Pods) | Total Apiserver Heap (200k Pods) | `FieldsV1` Profile | WatchCache Footprint |
+| :--- | :--- | :--- | :--- | :--- |
+| master (Baseline `[]byte`) | ~1.78 GB (1780.52 MB) | ~3.05 GB (3052.52 MB) | O(N) | O(N) |
+| experimental (`stringhandle`) | ~1.61 GB (1613.24 MB) | ~2.91 GB (2908.03 MB) | O(1) | O(1) |
 
 ![Memory Scaling Plot](./memory_scaling_plot.svg)
 
-*Fig 1. Total `kube-apiserver` heap memory scaling across replicated workload sizes.*
+*Fig 1. Total `kube-apiserver` heap memory scaling across replicated workload sizes (up to 200,000 Pods).*
 
-With string interning enabled on a 100,000 Pod cluster simulation, the **total `kube-apiserver` heap memory dropped by ~167 MB**. 
+With string interning enabled on a 200,000 Pod cluster simulation, the **total `kube-apiserver` heap memory dropped by ~144 MB**. 
 
-Specifically tracing the source of the bloat, `FieldsV1` allocations plummeted from 134.59 MB down to just 46.03 MB (representing only the mandatory baseline allocations for the struct pointers themselves). The additional memory savings beyond the strict `FieldsV1` data is due to reduced garbage collection tracking overhead and the elimination of redundant deep-copies triggered by duplicate payloads.
+Specifically tracing the source of the bloat at 200k scale, `FieldsV1` allocations plummeted from **267.18 MB** down to just **82.54 MB** (representing only the mandatory baseline allocations for the struct pointers themselves). The additional memory savings beyond the strict `FieldsV1` data is due to reduced garbage collection tracking overhead and the elimination of redundant deep-copies triggered by duplicate payloads.
 
 **Context on Absolute Savings vs. Pod Complexity:** Our baseline Kwok simulation used a minimal pause container, which has a relatively small `managedFields` payload (~134 MB for 50k pods). In contrast, analysis of real-world "megaclusters" (e.g., environments running 50,000+ complex networking DaemonSet pods with extensive configuration, volumes, and mounts) reveals a much more significant impact. Production cluster profiles show that `managedFields` is responsible for over 50% of the serialized pod size in these scenarios. In such real-world environments with highly complex pods (and more pods), total API server memory can be ~X - XX GB just handling the duplicated state, and interning `managedFields` would be expected to save ~15% - 25% reduction in total API server memory usage for such cases.
 

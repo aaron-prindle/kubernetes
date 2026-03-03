@@ -11,15 +11,16 @@ nodes:
           quota-backend-bytes: "8589934592"
     apiServer:
       extraArgs:
-        max-requests-inflight: "640"
-        max-mutating-requests-inflight: "0"
+        max-requests-inflight: "5000"
+        max-mutating-requests-inflight: "2000"
+        watch-cache-sizes: "pods#1000000"
         v: "4"
     controllerManager:
       extraArgs:
         bind-address: "0.0.0.0"
         authorization-always-allow-paths: "/healthz,/readyz,/livez,/metrics,/debug/pprof/profile,/debug/pprof/block,/debug/pprof/mutex"
-        kube-api-qps: "500"
-        kube-api-burst: "500"
+        kube-api-qps: "10000"
+        kube-api-burst: "10000"
         profiling: "true"
         allocate-node-cidrs: "true"
         v: "2"
@@ -34,7 +35,7 @@ nodes:
       extraArgs:
         bind-address: "0.0.0.0"
         authorization-always-allow-paths: "/healthz,/readyz,/livez,/metrics"
-        kube-api-qps: "500"
-        kube-api-burst: "500"
+        kube-api-qps: "10000"
+        kube-api-burst: "10000"
         profiling: "true"
         v: "3"
