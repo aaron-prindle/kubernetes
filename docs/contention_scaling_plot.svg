@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" style="background-color: white; font-family: sans-serif;">
+    <text x="400.0" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">Read-Path CPU Load (50 parallel LISTs, 30s)</text>
+    <text x="-225.0" y="30" transform="rotate(-90)" text-anchor="middle" font-size="14" fill="#666">Total CPU Samples (Seconds)</text>
+    
+    <rect x="550" y="20" width="15" height="15" fill="#E24A33"/>
+    <text x="570" y="32" font-size="12" fill="#333">master ([]byte)</text>
+    <rect x="550" y="45" width="15" height="15" fill="#348ABD"/>
+    <text x="570" y="57" font-size="12" fill="#333">experimental (interned)</text>
+    <rect x="182.5" y="137.7986217457887" width="110.0" height="252.2013782542113" fill="#E24A33"/>
+<text x="237.5" y="132.7986217457887" text-anchor="middle" font-size="11" fill="#E24A33">1275</text>
+<rect x="297.5" y="137.60081674323635" width="110.0" height="252.39918325676365" fill="#348ABD"/>
+<text x="352.5" y="132.60081674323635" text-anchor="middle" font-size="11" fill="#348ABD">1276</text>
+<text x="295.0" y="410" text-anchor="middle" font-size="12" fill="#666">5k Pods</text>
+<rect x="512.5" y="131.66666666666669" width="110.0" height="258.3333333333333" fill="#E24A33"/>
+<text x="567.5" y="126.66666666666669" text-anchor="middle" font-size="11" fill="#E24A33">1306</text>
+<rect x="627.5" y="133.05130168453292" width="110.0" height="256.9486983154671" fill="#348ABD"/>
+<text x="682.5" y="128.05130168453292" text-anchor="middle" font-size="11" fill="#348ABD">1299</text>
+<text x="625.0" y="410" text-anchor="middle" font-size="12" fill="#666">10k Pods</text>
+<line x1="100" y1="390" x2="760" y2="390" stroke="#ccc" stroke-width="2"/>
+</svg>

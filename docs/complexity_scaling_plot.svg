@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" style="background-color: white; font-family: sans-serif;">
+    <!-- Title -->
+    <text x="400.0" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#333">Total Heap Scaling by Pod Complexity (20,000 Pods)</text>
+    
+    <!-- Y Axis Label -->
+    <text x="-250.0" y="30" transform="rotate(-90)" text-anchor="middle" font-size="16" fill="#666">Total API Server Heap (MB)</text>
+    
+    <!-- X Axis Label -->
+    <text x="400.0" y="480" text-anchor="middle" font-size="16" fill="#666">Additional Config Fields per Pod</text>
+    
+    <!-- Legend -->
+    <line x1="260.0" y1="65" x2="290.0" y2="65" stroke="#E24A33" stroke-width="3"/>
+    <circle cx="275.0" cy="65" r="5" fill="#E24A33"/>
+    <text x="300.0" y="70" font-size="14" fill="#333">master ([]byte)</text>
+    
+    <line x1="430.0" y1="65" x2="460.0" y2="65" stroke="#348ABD" stroke-width="3"/>
+    <circle cx="445.0" cy="65" r="5" fill="#348ABD"/>
+    <text x="470.0" y="70" font-size="14" fill="#333">experimental (stringhandle)</text>
+    
+    <!-- Grid and Axes -->
+    <line x1="100" y1="420.0" x2="760" y2="420.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="425.0" text-anchor="end" font-size="12" fill="#666">0</text>
+<line x1="100" y1="352.0" x2="760" y2="352.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="357.0" text-anchor="end" font-size="12" fill="#666">1583</text>
+<line x1="100" y1="284.0" x2="760" y2="284.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="289.0" text-anchor="end" font-size="12" fill="#666">3166</text>
+<line x1="100" y1="216.0" x2="760" y2="216.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="221.0" text-anchor="end" font-size="12" fill="#666">4749</text>
+<line x1="100" y1="148.0" x2="760" y2="148.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="153.0" text-anchor="end" font-size="12" fill="#666">6333</text>
+<line x1="100" y1="80.0" x2="760" y2="80.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="85.0" text-anchor="end" font-size="12" fill="#666">7916</text>
+<line x1="100.0" y1="420" x2="100.0" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="100.0" y="440" text-anchor="middle" font-size="12" fill="#666">+0</text>
+<line x1="141.25" y1="420" x2="141.25" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="141.25" y="440" text-anchor="middle" font-size="12" fill="#666">+75</text>
+<line x1="182.5" y1="420" x2="182.5" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="182.5" y="440" text-anchor="middle" font-size="12" fill="#666">+150</text>
+<line x1="265.0" y1="420" x2="265.0" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="265.0" y="440" text-anchor="middle" font-size="12" fill="#666">+300</text>
+<line x1="430.0" y1="420" x2="430.0" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="430.0" y="440" text-anchor="middle" font-size="12" fill="#666">+600</text>
+<line x1="760.0" y1="420" x2="760.0" y2="425" stroke="#ccc" stroke-width="2"/>
+<text x="760.0" y="440" text-anchor="middle" font-size="12" fill="#666">+1200</text>
+
+    <line x1="100" y1="420" x2="760" y2="420" stroke="#ccc" stroke-width="2"/>
+    <line x1="100" y1="80" x2="100" y2="420" stroke="#ccc" stroke-width="2"/>
+    <path d="M 100.0 388.5074431727388 L 141.25 349.71307988628547 L 182.5 317.92417305273983 L 265.0 289.5750737559079 L 430.0 212.36816624906916 L 760.0 110.90909090909093 L 760.0 169.8664214347206 L 430.0 250.44098169413422 L 265.0 313.67563064380334 L 182.5 332.28125712531653 L 141.25 357.52211729826314 L 100.0 389.0829634747986 Z" fill="#348ABD" opacity="0.15" />
+<path d="M 100.0 388.5074431727388 L 141.25 349.71307988628547 L 182.5 317.92417305273983 L 265.0 289.5750737559079 L 430.0 212.36816624906916 L 760.0 110.90909090909093 " fill="none" stroke="#E24A33" stroke-width="3" />
+<path d="M 100.0 389.0829634747986 L 141.25 357.52211729826314 L 182.5 332.28125712531653 L 265.0 313.67563064380334 L 430.0 250.44098169413422 L 760.0 169.8664214347206 " fill="none" stroke="#348ABD" stroke-width="3" />
+<circle cx="100.0" cy="388.5074431727388" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="100.0" y="376.5074431727388" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">733</text>
+<circle cx="141.25" cy="349.71307988628547" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="141.25" y="337.71307988628547" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">1637</text>
+<circle cx="182.5" cy="317.92417305273983" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="182.5" y="305.92417305273983" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">2377</text>
+<circle cx="265.0" cy="289.5750737559079" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="265.0" y="277.5750737559079" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">3037</text>
+<circle cx="430.0" cy="212.36816624906916" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="430.0" y="200.36816624906916" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">4834</text>
+<circle cx="760.0" cy="110.90909090909093" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>
+<text x="760.0" y="98.90909090909093" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">7197</text>
+<circle cx="100.0" cy="389.0829634747986" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="100.0" y="409.0829634747986" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">720</text>
+<circle cx="141.25" cy="357.52211729826314" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="141.25" y="377.52211729826314" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">1455</text>
+<circle cx="182.5" cy="332.28125712531653" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="182.5" y="352.28125712531653" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">2042</text>
+<circle cx="265.0" cy="313.67563064380334" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="265.0" y="333.67563064380334" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">2476</text>
+<circle cx="430.0" cy="250.44098169413422" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="430.0" y="270.4409816941342" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">3948</text>
+<circle cx="760.0" cy="169.8664214347206" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>
+<text x="760.0" y="194.8664214347206" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">5824</text>
+</svg>

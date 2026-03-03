@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" style="background-color: white; font-family: sans-serif;">
+    <!-- Title -->
+    <text x="300.0" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">Total Memory Reduction (20,000 Extreme Pods)</text>
+    
+    <!-- Y Axis Label -->
+    <text x="-225.0" y="30" transform="rotate(-90)" text-anchor="middle" font-size="16" fill="#666">Total API Server Heap (MB)</text>
+    
+    <!-- Axes -->
+    <line x1="100" y1="390" x2="560" y2="390" stroke="#ccc" stroke-width="2"/>
+    <line x1="100" y1="80" x2="100" y2="390" stroke="#ccc" stroke-width="2"/>
+    
+    <!-- Legend -->
+    <rect x="180.0" y="60" width="15" height="15" fill="#E24A33" rx="2" ry="2"/>
+    <text x="200.0" y="72" font-size="14" fill="#333">master ([]byte)</text>
+    <rect x="320.0" y="60" width="15" height="15" fill="#348ABD" rx="2" ry="2"/>
+    <text x="340.0" y="72" font-size="14" fill="#333">experimental (stringhandle)</text>
+    <line x1="100" y1="390.0" x2="560" y2="390.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="395.0" text-anchor="end" font-size="12" fill="#666">0</text>
+<line x1="100" y1="328.0" x2="560" y2="328.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="333.0" text-anchor="end" font-size="12" fill="#666">570</text>
+<line x1="100" y1="266.0" x2="560" y2="266.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="271.0" text-anchor="end" font-size="12" fill="#666">1140</text>
+<line x1="100" y1="204.0" x2="560" y2="204.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="209.0" text-anchor="end" font-size="12" fill="#666">1711</text>
+<line x1="100" y1="142.00000000000003" x2="560" y2="142.00000000000003" stroke="#eee" stroke-width="1"/>
+<text x="90" y="147.00000000000003" text-anchor="end" font-size="12" fill="#666">2281</text>
+<line x1="100" y1="80.0" x2="560" y2="80.0" stroke="#eee" stroke-width="1"/>
+<text x="90" y="85.0" text-anchor="end" font-size="12" fill="#666">2851</text>
+<rect x="205.0" y="131.66666666666663" width="100" height="258.33333333333337" fill="#E24A33" rx="4" ry="4"/>
+<text x="255.0" y="121.66666666666663" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">2376.66 MB</text>
+<rect x="355.0" y="168.00155119649702" width="100" height="221.99844880350298" fill="#348ABD" rx="4" ry="4"/>
+<text x="405.0" y="158.00155119649702" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">2042.38 MB</text>
+<text x="255.0" y="415" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Baseline</text>
+<text x="405.0" y="415" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Optimized</text>
+</svg>

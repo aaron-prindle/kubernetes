@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" style="background-color: white; font-family: sans-serif;">
+    <text x="400.0" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">API Server Mutex Contention (30s Window)</text>
+    <text x="-225.0" y="30" transform="rotate(-90)" text-anchor="middle" font-size="14" fill="#666">Significant Mutex Delays (Count)</text>
+    
+    <rect x="550" y="20" width="15" height="15" fill="#E24A33"/>
+    <text x="570" y="32" font-size="12" fill="#333">master ([]byte)</text>
+    <rect x="550" y="45" width="15" height="15" fill="#348ABD"/>
+    <text x="570" y="57" font-size="12" fill="#333">experimental (interned)</text>
+    <rect x="155.0" y="131.66666666666663" width="73.33333333333333" height="258.33333333333337" fill="#E24A33"/>
+<text x="191.66666666666666" y="126.66666666666663" text-anchor="middle" font-size="11" fill="#E24A33">0</text>
+<rect x="233.33333333333331" y="131.66666666666663" width="73.33333333333333" height="258.33333333333337" fill="#348ABD"/>
+<text x="270.0" y="126.66666666666663" text-anchor="middle" font-size="11" fill="#348ABD">0</text>
+<text x="230.83333333333331" y="410" text-anchor="middle" font-size="12" fill="#666">5k LIST</text>
+<rect x="375.0" y="131.66666666666663" width="73.33333333333333" height="258.33333333333337" fill="#E24A33"/>
+<text x="411.6666666666667" y="126.66666666666663" text-anchor="middle" font-size="11" fill="#E24A33">0</text>
+<rect x="453.3333333333333" y="131.66666666666663" width="73.33333333333333" height="258.33333333333337" fill="#348ABD"/>
+<text x="490.0" y="126.66666666666663" text-anchor="middle" font-size="11" fill="#348ABD">0</text>
+<text x="450.8333333333333" y="410" text-anchor="middle" font-size="12" fill="#666">10k LIST</text>
+<rect x="595.0" y="131.66666666666663" width="73.33333333333333" height="258.33333333333337" fill="#E24A33"/>
+<text x="631.6666666666666" y="126.66666666666663" text-anchor="middle" font-size="11" fill="#E24A33">0</text>
+<rect x="673.3333333333334" y="131.66666666666663" width="73.33333333333333" height="258.33333333333337" fill="#348ABD"/>
+<text x="710.0" y="126.66666666666663" text-anchor="middle" font-size="11" fill="#348ABD">0</text>
+<text x="670.8333333333334" y="410" text-anchor="middle" font-size="12" fill="#666">Brutal WRITE</text>
+<line x1="100" y1="390" x2="760" y2="390" stroke="#ccc" stroke-width="2"/>
+</svg>
