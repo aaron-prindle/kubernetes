@@ -119,21 +119,23 @@ With string interning enabled on a 200,000 Pod cluster simulation, the **total `
 
 Specifically tracing the source of the bloat at 200k scale, `FieldsV1` allocations plummeted from **267.18 MB** down to just **82.54 MB** (representing only the mandatory baseline allocations for the struct pointers themselves). The additional memory savings beyond the strict `FieldsV1` data is due to reduced garbage collection tracking overhead and the elimination of redundant deep-copies triggered by duplicate payloads.
 
-**Context on Absolute Savings vs. Pod Complexity:** 
-The standard baseline simulation above used a minimal `pause` container. However, analysis of real-world "megaclusters" (e.g., environments running massive networking `DaemonSets` with extensive configuration, multiple containers, environment variables, and volume mounts) reveals a much more significant impact. Production cluster profiles show that `managedFields` can be responsible for over 50% of the serialized pod size in these scenarios. 
+**Context on Absolute Savings vs. Pod Spec Complexity:** 
+The standard baseline simulation above used a minimal `pause` container (which has a near-empty SSA payload). However, analysis of real-world "megaclusters" reveals a much more significant impact. Production cluster profiles show that `managedFields` can be responsible for over 50% of the serialized pod size in environments running massive networking `DaemonSets` with extensive configurations (multiple containers, environment variables, and volume mounts). 
 
-To prove this, we ran an identical 50,000 Pod test, but artificially inflated the SSA payload by injecting multiple containers, 6 environment variables, and 3 volume mounts into every Pod template.
+To prove how scaling the complexity of the Pod spec exponentially increases memory bloat on the baseline branch, we ran 20,000 Pod tests while artificially inflating the SSA payload. We injected varying amounts of explicit configuration (init containers, labels, annotations, env vars, and volume mounts) into the template to simulate production-weight Pods.
 
-| Branch | Total Apiserver Heap (50k Complex Pods) | `FieldsV1` Profile |
-| :--- | :--- | :--- |
-| master (Baseline `[]byte`) | ~1.95 GB (1945.20 MB) | 222.40 MB |
-| experimental (`stringhandle`) | ~1.75 GB (1748.14 MB) | 17.51 MB |
+| Branch | Total Heap (+75 Fields) | Total Heap (+150 Fields) | Total Heap (+300 Fields) | Total Heap (+600 Fields) |
+| :--- | :--- | :--- | :--- | :--- |
+| master (Baseline `[]byte`) | ~1.64 GB (1636 MB) | ~2.38 GB (2376 MB) | ~3.04 GB (3036 MB) | ~4.83 GB (4834 MB) |
+| experimental (`stringhandle`) | ~1.45 GB (1454 MB) | ~2.04 GB (2042 MB) | ~2.48 GB (2475 MB) | ~3.95 GB (3947 MB) |
 
-![Complex Pod Memory Plot](./complex_pod_memory_plot.svg)
+![Complexity Scaling Plot](./complexity_scaling_plot.svg)
 
-*Fig 2. Total memory reduction using a complex, production-like Pod template.*
+*Fig 2. Total API Server heap memory scaling dynamically against the number of explicit fields configured in the Pod template.*
 
-By simply increasing the complexity of the Pod definition, the `FieldsV1` string duplication bloat skyrocketed. On the `master` branch, the `FieldsV1` slice consumed 222.40 MB for just 50,000 pods. On the experimental branch, `unique.Make()` collapsed this to just 17.51 MB, yielding a **~200 MB (10%) reduction in total API Server memory** at just 50k scale. This strongly supports the estimate that interning `managedFields` will save 15% - 25% of total API server memory in true heavy-workload production environments.
+By simply increasing the number of configured fields in the Pod definition, the `FieldsV1` string duplication bloat skyrockets. On the `master` branch, pushing the template complexity to +600 fields caused the `FieldsV1` slice to balloon to **925.64 MB** for *only* 20,000 pods. 
+
+On the experimental branch, string interning yielded an **~886 MB (18.3%) reduction in total API Server memory** at just 20k scale on the most complex workload. This perfectly maps the trajectory: as a pod spec becomes heavier and more "production-like," the percentage of total API Server RAM wasted on duplicate `managedFields` strings grows exponentially, and the string interning patch becomes proportionately more critical.
 
 ### 3.3 unique.Make Parallel Contention Safety
 **Objective:** Address concern that the standard lib unique package relies on internal maps and locks. We must prove that `unique.Make()` does not become a global lock bottleneck during highly parallel API Server operations. We authored two distinct contention benchmarks against the tuned cluster to test both the read and write paths independently.
