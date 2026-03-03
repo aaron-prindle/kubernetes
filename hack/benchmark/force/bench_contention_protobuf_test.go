@@ -57,3 +57,23 @@ func BenchmarkProtobufDecodesNovel(b *testing.B) {
 		}
 	})
 }
+
+// BenchmarkProtobufDecodesNovel1000 simulates a realistic "high-end production" limit.
+// We use a parallelism multiplier that results in ~1000 goroutines on most machines.
+func BenchmarkProtobufDecodesNovel1000(b *testing.B) {
+	numFieldsPerRequest := 500 
+
+	// On a 64-core machine, a multiplier of 16 yields 1024 goroutines.
+	b.SetParallelism(16) 
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			for i := 0; i < numFieldsPerRequest; i++ {
+				novelString := fmt.Sprintf(`{"f:metadata":{"f:labels":{"f:rand%d-%d":{}}}}`, rand.Int(), rand.Int())
+				m := struct{ Raw string }{}
+				m.Raw = unique.Make(novelString).Value()
+				_ = m
+			}
+		}
+	})
+}
