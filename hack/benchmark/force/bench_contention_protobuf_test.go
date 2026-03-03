@@ -22,7 +22,7 @@ func BenchmarkProtobufDecodes(b *testing.B) {
 		duplicatePayloads[i] = fmt.Sprintf(`{"f:metadata":{"f:labels":{"f:app":{},"f:tier":{}}},"f:spec":{"f:replicas":{}}}`)
 	}
 
-	b.SetParallelism(10) // Specifically target the "10 things decoding in parallel"
+	b.SetParallelism(100) // Maximize parallel workers fighting for the global lock
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
@@ -43,7 +43,7 @@ func BenchmarkProtobufDecodes(b *testing.B) {
 func BenchmarkProtobufDecodesNovel(b *testing.B) {
 	numFieldsPerRequest := 500 
 
-	b.SetParallelism(10)
+	b.SetParallelism(100)
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {

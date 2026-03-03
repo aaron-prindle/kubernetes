@@ -14,7 +14,7 @@ def create_line_chart(filename, title, pods_data, baseline_vals, optimized_vals,
     max_pods = max(pods_data)
     min_pods = min(pods_data)
     max_val = max(max(baseline_vals), max(optimized_vals)) * 1.1
-    min_val = 1000 # Set a lower bound for better visualization
+    min_val = 1000 # Focusing on the 1GB+ range for clarity
     
     def get_x(pods):
         return margin_left + ((pods - min_pods) / (max_pods - min_pods)) * chart_width
@@ -56,8 +56,7 @@ def create_line_chart(filename, title, pods_data, baseline_vals, optimized_vals,
     for pods in pods_data:
         x = get_x(pods)
         svg += f'<line x1="{x}" y1="{svg_height - margin_bottom}" x2="{x}" y2="{svg_height - margin_bottom + 5}" stroke="#ccc" stroke-width="2"/>\n'
-        # Format X labels (e.g., 50k, 100k, 200k)
-        label_text = f"{pods // 1000}k" if pods >= 1000 else str(pods)
+        label_text = f"{pods // 1000}k"
         svg += f'<text x="{x}" y="{svg_height - margin_bottom + 20}" text-anchor="middle" font-size="12" fill="#666">{label_text}</text>\n'
 
     svg += f'''
@@ -91,29 +90,25 @@ def create_line_chart(filename, title, pods_data, baseline_vals, optimized_vals,
     for i, (pods, val) in enumerate(zip(pods_data, baseline_vals)):
         x, y = get_x(pods), get_y(val)
         svg += f'<circle cx="{x}" cy="{y}" r="6" fill="#E24A33" stroke="white" stroke-width="2"/>\n'
-        if val > 0:
-            svg += f'<text x="{x}" y="{y - 12}" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">{val:.1f} MB</text>\n'
+        svg += f'<text x="{x}" y="{y - 12}" text-anchor="middle" font-size="12" font-weight="bold" fill="#E24A33">{int(val)} MB</text>\n'
 
     for i, (pods, val) in enumerate(zip(pods_data, optimized_vals)):
         x, y = get_x(pods), get_y(val)
         svg += f'<circle cx="{x}" cy="{y}" r="6" fill="#348ABD" stroke="white" stroke-width="2"/>\n'
-        if val > 0:
-            y_offset = 20 if pods < max_pods else 25 # Ensure labels don't overlap baseline
-            if i > 0 and (baseline_vals[i] - val) < 200: # If lines are close, push optimized label down
-                y_offset = 20
-            svg += f'<text x="{x}" y="{y + y_offset}" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">{val:.1f} MB</text>\n'
+        # Position labels so they don't overlap
+        y_offset = 25
+        if i == 0: y_offset = 20
+        svg += f'<text x="{x}" y="{y + y_offset}" text-anchor="middle" font-size="12" font-weight="bold" fill="#348ABD">{int(val)} MB</text>\n'
 
     svg += '</svg>'
     
     with open(filename, 'w') as f:
         f.write(svg)
 
-# Data points
-pods = [50, 50000, 100000, 200000]
-# Master Total Heap
-baseline = [1450, 1550, 1780.52, 3052.52]  
-# Optimized Total Heap
-optimized = [1450, 1470, 1613.24, 2908.03] 
+# Data points starting at 50k
+pods = [50000, 100000, 200000]
+baseline = [1550.0, 1780.52, 3052.52]
+optimized = [1470.0, 1613.24, 2908.03]
 
 create_line_chart(
     'docs/memory_scaling_plot.svg',
@@ -124,4 +119,4 @@ create_line_chart(
     'Total API Server Heap (MB)'
 )
 
-print("Line chart SVG generated successfully.")
+print("Line chart SVG regenerated starting at 50k.")
