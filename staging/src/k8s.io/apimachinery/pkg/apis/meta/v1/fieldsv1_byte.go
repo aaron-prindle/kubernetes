@@ -37,18 +37,18 @@ import (
 // +protobuf.options.marshal=false
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
-	// Raw is the underlying serialization of this object.
+	// raw is the underlying serialization of this object.
 	//
 	// Deprecated: Direct access to this field is deprecated. Use GetRawBytes, GetRawString, SetRawBytes, SetRawString, GetRawReader, NewFieldsV1 instead.
-	Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
+	raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
 }
 
 func (f FieldsV1) String() string {
-	return string(f.Raw)
+	return string(f.raw)
 }
 
 func (f FieldsV1) Equal(f2 FieldsV1) bool {
-	return bytes.Equal(f.Raw, f2.Raw)
+	return bytes.Equal(f.raw, f2.raw)
 }
 
 var map_FieldsV1 = map[string]string{
@@ -67,10 +67,10 @@ type FieldsV1Reader interface {
 }
 
 func (f *FieldsV1) GetRawReader() FieldsV1Reader {
-	if f == nil || len(f.Raw) == 0 {
+	if f == nil || len(f.raw) == 0 {
 		return bytes.NewReader(nil)
 	}
-	return bytes.NewReader(f.Raw)
+	return bytes.NewReader(f.raw)
 }
 
 // GetRawBytes returns the raw bytes.
@@ -81,7 +81,7 @@ func (f *FieldsV1) GetRawBytes() []byte {
 	if f == nil {
 		return nil
 	}
-	return f.Raw
+	return f.raw
 }
 
 // GetRawString returns the raw data as a string.
@@ -89,31 +89,31 @@ func (f *FieldsV1) GetRawString() string {
 	if f == nil {
 		return ""
 	}
-	return string(f.Raw)
+	return string(f.raw)
 }
 
 // SetRawBytes sets the raw bytes. It does not retain the passed-in byte slice.
 func (f *FieldsV1) SetRawBytes(b []byte) {
 	if f != nil {
-		f.Raw = bytes.Clone(b)
+		f.raw = bytes.Clone(b)
 	}
 }
 
 // SetRawString sets the raw data from a string.
 func (f *FieldsV1) SetRawString(s string) {
 	if f != nil {
-		f.Raw = []byte(s)
+		f.raw = []byte(s)
 	}
 }
 
 func NewFieldsV1(raw string) *FieldsV1 {
-	return &FieldsV1{Raw: []byte(raw)}
+	return &FieldsV1{raw: []byte(raw)}
 }
 
 func (f *FieldsV1) DeepCopyInto(out *FieldsV1) {
 	*out = *f
-	if f.Raw != nil {
-		in, out := &f.Raw, &out.Raw
+	if f.raw != nil {
+		in, out := &f.raw, &out.raw
 		*out = make([]byte, len(*in))
 		copy(*out, *in)
 	}
@@ -148,10 +148,10 @@ func (f *FieldsV1) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if f.Raw != nil {
-		i -= len(f.Raw)
-		copy(dAtA[i:], f.Raw)
-		i = encodeVarintGenerated(dAtA, i, uint64(len(f.Raw)))
+	if f.raw != nil {
+		i -= len(f.raw)
+		copy(dAtA[i:], f.raw)
+		i = encodeVarintGenerated(dAtA, i, uint64(len(f.raw)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -164,8 +164,8 @@ func (f *FieldsV1) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if f.Raw != nil {
-		l = len(f.Raw)
+	if f.raw != nil {
+		l = len(f.raw)
 		n += 1 + l + sovGenerated(uint64(l))
 	}
 	return n
@@ -229,9 +229,9 @@ func (f *FieldsV1) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			f.Raw = append(f.Raw[:0], dAtA[iNdEx:postIndex]...)
-			if f.Raw == nil {
-				f.Raw = []byte{}
+			f.raw = append(f.raw[:0], dAtA[iNdEx:postIndex]...)
+			if f.raw == nil {
+				f.raw = []byte{}
 			}
 			iNdEx = postIndex
 		default:
