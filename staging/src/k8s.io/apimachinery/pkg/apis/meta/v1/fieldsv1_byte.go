@@ -95,7 +95,7 @@ func (f *FieldsV1) GetRawString() string {
 // SetRawBytes sets the raw bytes. It does not retain the passed-in byte slice.
 func (f *FieldsV1) SetRawBytes(b []byte) {
 	if f != nil {
-		f.Raw = append(f.Raw[0:0], b...)
+		f.Raw = bytes.Clone(b)
 	}
 }
 
