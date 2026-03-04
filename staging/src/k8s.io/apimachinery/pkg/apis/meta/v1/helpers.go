@@ -285,12 +285,12 @@ func (f FieldsV1) MarshalJSON() ([]byte, error) {
 	}
 	if f.getContentType() == fieldsV1InvalidOrValidCBORObject {
 		var u map[string]interface{}
-		if err := cbor.Unmarshal([]byte(raw), &u); err != nil {
+		if err := cbor.Unmarshal(raw, &u); err != nil {
 			return nil, fmt.Errorf("metav1.FieldsV1 cbor invalid: %w", err)
 		}
 		return utiljson.Marshal(u)
 	}
-	return []byte(raw), nil
+	return raw, nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler
@@ -314,12 +314,12 @@ func (f FieldsV1) MarshalCBOR() ([]byte, error) {
 	}
 	if f.getContentType() == fieldsV1InvalidOrValidJSONObject {
 		var u map[string]interface{}
-		if err := utiljson.Unmarshal([]byte(raw), &u); err != nil {
+		if err := utiljson.Unmarshal(raw, &u); err != nil {
 			return nil, fmt.Errorf("metav1.FieldsV1 json invalid: %w", err)
 		}
 		return cbor.Marshal(u)
 	}
-	return []byte(raw), nil
+	return raw, nil
 }
 
 var cborNull = []byte{0xf6}
@@ -364,17 +364,20 @@ const (
 // or, if a tag-enclosed map, an initial byte with major type "tag" (0xf6, 0xa0...0xbf, or
 // 0xc6...0xdb). The two sets of valid initial bytes don't intersect.
 func (f FieldsV1) getContentType() int {
-	raw := f.GetRawBytes()
-	if len(raw) > 0 {
-		p := raw[0]
-		switch p {
-		case 'n', '{', '\t', '\r', '\n', ' ':
-			return fieldsV1InvalidOrValidJSONObject
-		case 0xf6: // null
-			return fieldsV1InvalidOrValidCBORObject
-		default:
-			if p >= 0xa0 && p <= 0xbf /* map */ || p >= 0xc6 && p <= 0xdb /* tag */ {
+	reader := f.GetRawReader()
+	if reader.Size() > 0 {
+		var buf [1]byte
+		if _, err := reader.Read(buf[:]); err == nil {
+			p := buf[0]
+			switch p {
+			case 'n', '{', '\t', '\r', '\n', ' ':
+				return fieldsV1InvalidOrValidJSONObject
+			case 0xf6: // null
 				return fieldsV1InvalidOrValidCBORObject
+			default:
+				if p >= 0xa0 && p <= 0xbf /* map */ || p >= 0xc6 && p <= 0xdb /* tag */ {
+					return fieldsV1InvalidOrValidCBORObject
+				}
 			}
 		}
 	}

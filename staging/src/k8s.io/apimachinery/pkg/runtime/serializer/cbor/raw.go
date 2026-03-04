@@ -50,7 +50,7 @@ var rawTypeTranscodeFuncs = map[reflect.Type]func(reflect.Value) error{
 			return nil
 		}
 		fields := rv.Addr().Interface().(*metav1.FieldsV1)
-		if len(fields.GetRawBytes()) == 0 {
+		if fields.GetRawReader().Size() == 0 {
 			// When Raw is nil it encodes to null. Don't change nil Raw values during
 			// transcoding, they would have unmarshalled from JSON as nil too.
 			return nil
