@@ -20,6 +20,7 @@ package v1
 
 import (
 	"strings"
+	"unique"
 )
 
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
@@ -37,22 +38,25 @@ import (
 // +protobuf.options.marshal=false
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
-	raw string
+	handle unique.Handle[string]
 }
 
 func (f FieldsV1) String() string {
-	return f.raw
+	if f.handle == (unique.Handle[string]{}) {
+		return ""
+	}
+	return f.handle.Value()
 }
 
 func (f FieldsV1) Equal(f2 FieldsV1) bool {
-	return f.raw == f2.raw
+	return f.handle == f2.handle
 }
 
 func (f *FieldsV1) GetRawReader() FieldsV1Reader {
-	if f == nil || len(f.raw) == 0 {
+	if f == nil || f.handle == (unique.Handle[string]{}) || len(f.handle.Value()) == 0 {
 		return strings.NewReader("")
 	}
-	return strings.NewReader(f.raw)
+	return strings.NewReader(f.handle.Value())
 }
 
 // GetRawBytes returns the raw bytes.
@@ -60,36 +64,36 @@ func (f *FieldsV1) GetRawReader() FieldsV1Reader {
 // If mutating the underlying bytes is desired, the returned bytes may be mutated and then passed to SetRawBytes().
 // If mutating the underlying bytes is not desired, make a copy of the returned bytes.
 func (f *FieldsV1) GetRawBytes() []byte {
-	if f == nil || len(f.raw) == 0 {
+	if f == nil || f.handle == (unique.Handle[string]{}) || len(f.handle.Value()) == 0 {
 		return nil
 	}
-	return []byte(f.raw)
+	return []byte(f.handle.Value())
 }
 
 // GetRawString returns the raw data as a string.
 func (f *FieldsV1) GetRawString() string {
-	if f == nil {
+	if f == nil || f.handle == (unique.Handle[string]{}) {
 		return ""
 	}
-	return f.raw
+	return f.handle.Value()
 }
 
 // SetRawBytes sets the raw bytes. It does not retain the passed-in byte slice.
 func (f *FieldsV1) SetRawBytes(b []byte) {
 	if f != nil {
-		f.raw = string(b)
+		f.handle = unique.Make(string(b))
 	}
 }
 
 // SetRawString sets the raw data from a string.
 func (f *FieldsV1) SetRawString(s string) {
 	if f != nil {
-		f.raw = s
+		f.handle = unique.Make(s)
 	}
 }
 
 func NewFieldsV1(raw string) *FieldsV1 {
-	return &FieldsV1{raw: raw}
+	return &FieldsV1{handle: unique.Make(raw)}
 }
 
 func (f *FieldsV1) DeepCopyInto(out *FieldsV1) {
