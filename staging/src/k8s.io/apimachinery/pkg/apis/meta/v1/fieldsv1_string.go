@@ -1,4 +1,4 @@
-//go:build !fieldsv1string
+//go:build fieldsv1string
 
 /*
 Copyright The Kubernetes Authors.
@@ -19,7 +19,7 @@ limitations under the License.
 package v1
 
 import (
-	"bytes"
+	"strings"
 )
 
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
@@ -37,25 +37,22 @@ import (
 // +protobuf.options.marshal=false
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
-	// Raw is the underlying serialization of this object.
-	//
-	// Deprecated: Direct access to this field is deprecated. Use GetRawBytes, GetRawString, SetRawBytes, SetRawString, GetRawReader, NewFieldsV1 instead.
-	Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
+	raw string
 }
 
 func (f FieldsV1) String() string {
-	return string(f.Raw)
+	return f.raw
 }
 
 func (f FieldsV1) Equal(f2 FieldsV1) bool {
-	return bytes.Equal(f.Raw, f2.Raw)
+	return f.raw == f2.raw
 }
 
 func (f *FieldsV1) GetRawReader() FieldsV1Reader {
-	if f == nil || len(f.Raw) == 0 {
-		return bytes.NewReader(nil)
+	if f == nil || len(f.raw) == 0 {
+		return strings.NewReader("")
 	}
-	return bytes.NewReader(f.Raw)
+	return strings.NewReader(f.raw)
 }
 
 // GetRawBytes returns the raw bytes.
@@ -63,10 +60,10 @@ func (f *FieldsV1) GetRawReader() FieldsV1Reader {
 // If mutating the underlying bytes is desired, the returned bytes may be mutated and then passed to SetRawBytes().
 // If mutating the underlying bytes is not desired, make a copy of the returned bytes.
 func (f *FieldsV1) GetRawBytes() []byte {
-	if f == nil {
+	if f == nil || len(f.raw) == 0 {
 		return nil
 	}
-	return f.Raw
+	return []byte(f.raw)
 }
 
 // GetRawString returns the raw data as a string.
@@ -74,32 +71,27 @@ func (f *FieldsV1) GetRawString() string {
 	if f == nil {
 		return ""
 	}
-	return string(f.Raw)
+	return f.raw
 }
 
 // SetRawBytes sets the raw bytes. It does not retain the passed-in byte slice.
 func (f *FieldsV1) SetRawBytes(b []byte) {
 	if f != nil {
-		f.Raw = bytes.Clone(b)
+		f.raw = string(b)
 	}
 }
 
 // SetRawString sets the raw data from a string.
 func (f *FieldsV1) SetRawString(s string) {
 	if f != nil {
-		f.Raw = []byte(s)
+		f.raw = s
 	}
 }
 
 func NewFieldsV1(raw string) *FieldsV1 {
-	return &FieldsV1{Raw: []byte(raw)}
+	return &FieldsV1{raw: raw}
 }
 
 func (f *FieldsV1) DeepCopyInto(out *FieldsV1) {
 	*out = *f
-	if f.Raw != nil {
-		in, out := &f.Raw, &out.Raw
-		*out = make([]byte, len(*in))
-		copy(*out, *in)
-	}
 }
