@@ -53,7 +53,7 @@ func (f FieldsV1) Equal(f2 FieldsV1) bool {
 }
 
 func (f *FieldsV1) GetRawReader() FieldsV1Reader {
-	if f == nil || f.handle == (unique.Handle[string]{}) || len(f.handle.Value()) == 0 {
+	if f == nil || f.handle == (unique.Handle[string]{}) {
 		return strings.NewReader("")
 	}
 	return strings.NewReader(f.handle.Value())
@@ -64,7 +64,7 @@ func (f *FieldsV1) GetRawReader() FieldsV1Reader {
 // If mutating the underlying bytes is desired, the returned bytes may be mutated and then passed to SetRawBytes().
 // If mutating the underlying bytes is not desired, make a copy of the returned bytes.
 func (f *FieldsV1) GetRawBytes() []byte {
-	if f == nil || f.handle == (unique.Handle[string]{}) || len(f.handle.Value()) == 0 {
+	if f == nil || f.handle == (unique.Handle[string]{}) {
 		return nil
 	}
 	return []byte(f.handle.Value())
