@@ -950,7 +950,7 @@ kube::golang::build_binaries() {
   fi
 
   # Extract tags if any specified in GOFLAGS
-  gotags="selinux,notest${grpcnotrace},$(echo "${GOFLAGS:-}" | sed -ne 's|.*-tags=\([^-]*\).*|\1|p')"
+  gotags="selinux,notest,fieldsv1string${grpcnotrace},$(echo "${GOFLAGS:-}" | sed -ne 's|.*-tags=\([^-]*\).*|\1|p')"
 
   local -a targets=()
   local arg
