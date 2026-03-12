@@ -625,12 +625,17 @@ type IngressClassParametersReference struct {
 	// scope represents if this refers to a cluster or namespace scoped resource.
 	// This may be set to "Cluster" (default) or "Namespace".
 	// +optional
+	// +k8s:alpha(since: "1.36")=+k8s:optional
+	// +k8s:alpha(since: "1.36")=+k8s:discriminator
 	Scope *string `json:"scope" protobuf:"bytes,4,opt,name=scope"`
 
 	// namespace is the namespace of the resource being referenced. This field is
 	// required when scope is set to "Namespace" and must be unset when scope is set to
 	// "Cluster".
 	// +optional
+	// +k8s:alpha(since: "1.36")=+k8s:optional
+	// +k8s:alpha(since: "1.36")=+k8s:member("Namespace")=+k8s:required
+	// +k8s:alpha(since: "1.36")=+k8s:member("Cluster")=+k8s:forbidden
 	Namespace *string `json:"namespace,omitempty" protobuf:"bytes,5,opt,name=namespace"`
 }
 

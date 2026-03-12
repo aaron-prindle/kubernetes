@@ -69,6 +69,27 @@ func TestDeclarativeValidateParameter(t *testing.T) {
 						field.Required(field.NewPath("spec", "parameters", "kind"), "").MarkAlpha(),
 					},
 				},
+				"missing parameter namespace for namespace scope": {
+					input: mkValidIngressClass(func(obj *networking.IngressClass) {
+						scope := networking.IngressClassParametersReferenceScopeNamespace
+						obj.Spec.Parameters.Scope = &scope
+						obj.Spec.Parameters.Namespace = nil
+					}),
+					expectedErrs: field.ErrorList{
+						field.Required(field.NewPath("spec", "parameters", "namespace"), "").MarkAlpha(),
+					},
+				},
+				"parameter namespace forbidden for cluster scope": {
+					input: mkValidIngressClass(func(obj *networking.IngressClass) {
+						namespace := "default"
+						scope := networking.IngressClassParametersReferenceScopeCluster
+						obj.Spec.Parameters.Scope = &scope
+						obj.Spec.Parameters.Namespace = &namespace
+					}),
+					expectedErrs: field.ErrorList{
+						field.Forbidden(field.NewPath("spec", "parameters", "namespace"), "").MarkAlpha(),
+					},
+				},
 			}
 			for name, tc := range testCases {
 				t.Run(name, func(t *testing.T) {
@@ -132,6 +153,35 @@ func TestDeclarativeValidateUpdateParameters(t *testing.T) {
 					}),
 					expectedErrs: field.ErrorList{
 						field.Required(field.NewPath("spec", "parameters", "kind"), "").MarkAlpha(),
+					},
+				},
+				"update fails when namespace scope is missing namespace": {
+					oldObj: mkValidIngressClass(func(obj *networking.IngressClass) {
+						obj.ResourceVersion = "1"
+					}),
+					updateObj: mkValidIngressClass(func(obj *networking.IngressClass) {
+						scope := networking.IngressClassParametersReferenceScopeNamespace
+						obj.ResourceVersion = "1"
+						obj.Spec.Parameters.Scope = &scope
+						obj.Spec.Parameters.Namespace = nil
+					}),
+					expectedErrs: field.ErrorList{
+						field.Required(field.NewPath("spec", "parameters", "namespace"), "").MarkAlpha(),
+					},
+				},
+				"update fails when cluster scope keeps namespace": {
+					oldObj: mkValidIngressClass(func(obj *networking.IngressClass) {
+						obj.ResourceVersion = "1"
+					}),
+					updateObj: mkValidIngressClass(func(obj *networking.IngressClass) {
+						namespace := "default"
+						scope := networking.IngressClassParametersReferenceScopeCluster
+						obj.ResourceVersion = "1"
+						obj.Spec.Parameters.Scope = &scope
+						obj.Spec.Parameters.Namespace = &namespace
+					}),
+					expectedErrs: field.ErrorList{
+						field.Forbidden(field.NewPath("spec", "parameters", "namespace"), "").MarkAlpha(),
 					},
 				},
 			}
