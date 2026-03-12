@@ -359,6 +359,8 @@ type StatefulSetList struct {
 // +k8s:prerelease-lifecycle-gen:introduced=1.9
 
 // Deployment enables declarative updates for Pods and ReplicaSets.
+// +k8s:supportsSubresource="/scale"
+// +k8s:supportsSubresource="/status"
 type Deployment struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object's metadata.

@@ -46,6 +46,10 @@ import (
 	printersinternal "k8s.io/kubernetes/pkg/printers/internalversion"
 	printerstorage "k8s.io/kubernetes/pkg/printers/storage"
 	"k8s.io/kubernetes/pkg/registry/apps/deployment"
+
+	"k8s.io/apimachinery/pkg/api/operation"
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
+
 	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 )
 
@@ -321,7 +325,7 @@ func (r *ScaleREST) Update(ctx context.Context, name string, objInfo rest.Update
 	obj, _, err := r.store.Update(
 		ctx,
 		name,
-		&scaleUpdatedObjectInfo{name, objInfo},
+		&scaleUpdatedObjectInfo{name, objInfo, r},
 		toScaleCreateValidation(createValidation),
 		toScaleUpdateValidation(updateValidation),
 		false,
@@ -394,8 +398,9 @@ func scaleFromDeployment(deployment *apps.Deployment) (*autoscaling.Scale, error
 
 // scaleUpdatedObjectInfo transforms existing deployment -> existing scale -> new scale -> new deployment
 type scaleUpdatedObjectInfo struct {
-	name       string
-	reqObjInfo rest.UpdatedObjectInfo
+	name           string
+	reqObjInfo     rest.UpdatedObjectInfo
+	scaleGVKMapper rest.GroupVersionKindProvider
 }
 
 func (i *scaleUpdatedObjectInfo) Preconditions() *metav1.Preconditions {
@@ -451,9 +456,11 @@ func (i *scaleUpdatedObjectInfo) UpdatedObject(ctx context.Context, oldObj runti
 	if !ok {
 		return nil, errors.NewBadRequest(fmt.Sprintf("expected input object type to be Scale, but %T", newScaleObj))
 	}
-
 	// validate
-	if errs := autoscalingvalidation.ValidateScale(scale); len(errs) > 0 {
+	errs := autoscalingvalidation.ValidateScale(scale)
+	errs = rest.ValidateDeclarativelyWithMigrationChecks(ctx, legacyscheme.Scheme, scale, oldScale, errs, operation.Update, rest.WithSubresourceMapper(i.scaleGVKMapper))
+
+	if len(errs) > 0 {
 		return nil, errors.NewInvalid(autoscaling.Kind("Scale"), deployment.Name, errs)
 	}
 
