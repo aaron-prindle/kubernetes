@@ -229,7 +229,7 @@ func ValidateRoleBindingSubject(subject rbac.Subject, isNamespaced bool, fldPath
 			}
 		}
 		if len(subject.APIGroup) > 0 {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("apiGroup"), subject.APIGroup, []string{""}))
+			allErrs = append(allErrs, field.NotSupported(fldPath.Child("apiGroup"), subject.APIGroup, []string{""}).MarkCoveredByDeclarative())
 		}
 		if !isNamespaced && len(subject.Namespace) == 0 {
 			allErrs = append(allErrs, field.Required(fldPath.Child("namespace"), ""))
@@ -238,17 +238,17 @@ func ValidateRoleBindingSubject(subject rbac.Subject, isNamespaced bool, fldPath
 	case rbac.UserKind:
 		// TODO(ericchiang): What other restrictions on user name are there?
 		if subject.APIGroup != rbac.GroupName {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("apiGroup"), subject.APIGroup, []string{rbac.GroupName}))
+			allErrs = append(allErrs, field.NotSupported(fldPath.Child("apiGroup"), subject.APIGroup, []string{rbac.GroupName}).MarkCoveredByDeclarative())
 		}
 
 	case rbac.GroupKind:
 		// TODO(ericchiang): What other restrictions on group name are there?
 		if subject.APIGroup != rbac.GroupName {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("apiGroup"), subject.APIGroup, []string{rbac.GroupName}))
+			allErrs = append(allErrs, field.NotSupported(fldPath.Child("apiGroup"), subject.APIGroup, []string{rbac.GroupName}).MarkCoveredByDeclarative())
 		}
 
 	default:
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("kind"), subject.Kind, []string{rbac.ServiceAccountKind, rbac.UserKind, rbac.GroupKind}))
+		allErrs = append(allErrs, field.NotSupported(fldPath.Child("kind"), subject.Kind, []string{rbac.ServiceAccountKind, rbac.UserKind, rbac.GroupKind}).MarkCoveredByDeclarative())
 	}
 
 	return allErrs

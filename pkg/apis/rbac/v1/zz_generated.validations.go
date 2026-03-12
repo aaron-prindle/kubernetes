@@ -275,8 +275,79 @@ func Validate_RoleRef(ctx context.Context, op operation.Operation, fldPath *fiel
 // Validate_Subject validates an instance of Subject according
 // to declarative validation rules in the API schema.
 func Validate_Subject(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *rbacv1.Subject) (errs field.ErrorList) {
-	// field rbacv1.Subject.Kind has no validation
-	// field rbacv1.Subject.APIGroup has no validation
+	errs = append(errs, validate.Discriminated(ctx, op, fldPath, obj, oldObj, "apiGroup", func(obj *rbacv1.Subject) *string { return &obj.APIGroup }, func(obj *rbacv1.Subject) string { return obj.Kind }, validate.DirectEqualPtr, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		errs := field.ErrorList{}
+		errs = append(errs, validate.ForbiddenValue(ctx, op, fldPath, obj, oldObj)...)
+		return errs
+	}, []validate.DiscriminatedRule[*string, string]{
+		{
+			Value: "Group", Validation: func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				errs := field.ErrorList{}
+				earlyReturn := false
+				if e := validate.OptionalValue(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+					earlyReturn = true
+				}
+				if earlyReturn {
+					return errs
+				}
+				return errs
+			}},
+		{
+			Value: "ServiceAccount", Validation: func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				errs := field.ErrorList{}
+				errs = append(errs, validate.MaxLength(ctx, op, fldPath, obj, oldObj, 0)...)
+				return errs
+			}},
+		{
+			Value: "User", Validation: func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				errs := field.ErrorList{}
+				earlyReturn := false
+				if e := validate.OptionalValue(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+					earlyReturn = true
+				}
+				if earlyReturn {
+					return errs
+				}
+				return errs
+			}},
+	})...)
+
+	// field rbacv1.Subject.Kind
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.RequiredValue(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("kind"), &obj.Kind, safe.Field(oldObj, func(oldObj *rbacv1.Subject) *string { return &oldObj.Kind }), oldObj != nil)...)
+
+	// field rbacv1.Subject.APIGroup
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalValue(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("apiGroup"), &obj.APIGroup, safe.Field(oldObj, func(oldObj *rbacv1.Subject) *string { return &oldObj.APIGroup }), oldObj != nil)...)
 
 	// field rbacv1.Subject.Name
 	errs = append(errs,

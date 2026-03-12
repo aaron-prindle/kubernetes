@@ -82,11 +82,17 @@ type Subject struct {
 	// Kind of object being referenced. Values defined by this API group are "User", "Group", and "ServiceAccount".
 	// If the Authorizer does not recognized the kind value, the Authorizer should report an error.
 	// +required
+	// +k8s:alpha(since: "1.36")=+k8s:required
+	// +k8s:alpha(since: "1.36")=+k8s:discriminator
 	Kind string `json:"kind" protobuf:"bytes,1,opt,name=kind"`
 	// APIGroup holds the API group of the referenced subject.
 	// Defaults to "" for ServiceAccount subjects.
 	// Defaults to "rbac.authorization.k8s.io" for User and Group subjects.
 	// +optional
+	// +k8s:alpha(since: "1.36")=+k8s:optional
+	// +k8s:alpha(since: "1.36")=+k8s:member("ServiceAccount")=+k8s:maxLength=0
+	// +k8s:alpha(since: "1.36")=+k8s:member("User")=+k8s:optional
+	// +k8s:alpha(since: "1.36")=+k8s:member("Group")=+k8s:optional
 	APIGroup string `json:"apiGroup,omitempty" protobuf:"bytes,2,opt,name=apiGroup"`
 	// Name of the object being referenced.
 	// +required
