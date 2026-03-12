@@ -168,6 +168,48 @@ func Validate_IngressClass(ctx context.Context, op operation.Operation, fldPath 
 // Validate_IngressClassParametersReference validates an instance of IngressClassParametersReference according
 // to declarative validation rules in the API schema.
 func Validate_IngressClassParametersReference(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *networkingv1.IngressClassParametersReference) (errs field.ErrorList) {
+	errs = append(errs, validate.Discriminated(ctx, op, fldPath, obj, oldObj, "namespace", func(obj *networkingv1.IngressClassParametersReference) *string { return obj.Namespace }, func(obj *networkingv1.IngressClassParametersReference) string {
+		if obj.Scope == nil {
+			var zero string
+			return zero
+		}
+		return *obj.Scope
+	}, validate.DirectEqualPtr, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		errs := field.ErrorList{}
+		errs = append(errs, validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj)...)
+		return errs
+	}, []validate.DiscriminatedRule[*string, string]{
+		{
+			Value: "Cluster", Validation: func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				errs := field.ErrorList{}
+				earlyReturn := false
+				if e := validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+					errs = append(errs, e...)
+					earlyReturn = true
+				}
+				if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+					earlyReturn = true
+				}
+				if earlyReturn {
+					return errs
+				}
+				return errs
+			}},
+		{
+			Value: "Namespace", Validation: func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				errs := field.ErrorList{}
+				earlyReturn := false
+				if e := validate.RequiredPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+					errs = append(errs, e...)
+					earlyReturn = true
+				}
+				if earlyReturn {
+					return errs
+				}
+				return errs
+			}},
+	}).MarkAlpha()...)
+
 	// field networkingv1.IngressClassParametersReference.APIGroup has no validation
 
 	// field networkingv1.IngressClassParametersReference.Kind
@@ -208,8 +250,42 @@ func Validate_IngressClassParametersReference(ctx context.Context, op operation.
 			return
 		}(fldPath.Child("name"), &obj.Name, safe.Field(oldObj, func(oldObj *networkingv1.IngressClassParametersReference) *string { return &oldObj.Name }), oldObj != nil)...)
 
-	// field networkingv1.IngressClassParametersReference.Scope has no validation
-	// field networkingv1.IngressClassParametersReference.Namespace has no validation
+	// field networkingv1.IngressClassParametersReference.Scope
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("scope"), obj.Scope, safe.Field(oldObj, func(oldObj *networkingv1.IngressClassParametersReference) *string { return oldObj.Scope }), oldObj != nil)...)
+
+	// field networkingv1.IngressClassParametersReference.Namespace
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("namespace"), obj.Namespace, safe.Field(oldObj, func(oldObj *networkingv1.IngressClassParametersReference) *string { return oldObj.Namespace }), oldObj != nil)...)
+
 	return errs
 }
 

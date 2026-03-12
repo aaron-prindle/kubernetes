@@ -67,6 +67,23 @@ type memberRule struct {
 	validations Validations
 }
 
+func minValidationStability(validations []Validations) ValidationStabilityLevel {
+	level := ValidationStabilityLevel("")
+	for _, validationSet := range validations {
+		for _, fn := range validationSet.Functions {
+			switch fn.StabilityLevel {
+			case ValidationStabilityLevelAlpha:
+				return ValidationStabilityLevelAlpha
+			case ValidationStabilityLevelBeta:
+				if level == "" {
+					level = ValidationStabilityLevelBeta
+				}
+			}
+		}
+	}
+	return level
+}
+
 func (mg discriminatorGroups) getOrCreate(name string) *discriminatorGroup {
 	if name == "" {
 		name = "default"
@@ -97,10 +114,6 @@ func (mtv *discriminatorTagValidator) ValidScopes() sets.Set[Scope] {
 }
 
 func (mtv *discriminatorTagValidator) GetValidations(context Context, tag codetags.Tag) (Validations, error) {
-	if util.NativeType(context.Type).Kind == types.Pointer {
-		return Validations{}, fmt.Errorf("can only be used on non-pointer types")
-	}
-
 	if t := util.NonPointer(util.NativeType(context.Type)); t.Kind != types.Builtin || (t.Name.Name != "string" && t.Name.Name != "bool" && !types.IsInteger(t)) {
 		return Validations{}, fmt.Errorf("can only be used on string, bool or integer types (%s)", rootTypeString(context.Type, t))
 	}
@@ -201,6 +214,11 @@ func (mtv *memberTagValidator) GetValidations(context Context, tag codetags.Tag)
 	payloadValidations, err := mtv.validator.ExtractTagValidations(context, *tag.ValueTag)
 	if err != nil {
 		return Validations{}, err
+	}
+	if context.StabilityLevel != "" {
+		for i := range payloadValidations.Functions {
+			payloadValidations.Functions[i] = payloadValidations.Functions[i].WithStabilityLevel(context.StabilityLevel)
+		}
 	}
 
 	group.members[fieldName].rules = append(group.members[fieldName].rules, memberRule{
@@ -326,6 +344,7 @@ func (mtfv *discriminatorFieldValidator) generateMemberFieldValidation(context C
 	// Aggregate rules by value
 	rulesByValue := make(map[string]Validations)
 	var values []string
+	allRuleValidations := make([]Validations, 0, len(rules.rules))
 	for _, rule := range rules.rules {
 		if _, ok := rulesByValue[rule.value]; !ok {
 			values = append(values, rule.value)
@@ -333,10 +352,11 @@ func (mtfv *discriminatorFieldValidator) generateMemberFieldValidation(context C
 		v := rulesByValue[rule.value]
 		v.Add(rule.validations)
 		rulesByValue[rule.value] = v
+		allRuleValidations = append(allRuleValidations, rule.validations)
 	}
 	slices.Sort(values)
 
-	discriminatorType := group.discriminatorMember.Type
+	discriminatorType := util.NonPointer(group.discriminatorMember.Type)
 
 	var discriminatedRules []any
 	for _, val := range values {
@@ -380,10 +400,14 @@ func (mtfv *discriminatorFieldValidator) generateMemberFieldValidation(context C
 	}
 
 	// getDiscriminator extractor
+	discriminatorBody := fmt.Sprintf("return obj.%s", group.discriminatorMember.Name)
+	if util.NativeType(group.discriminatorMember.Type).Kind == types.Pointer {
+		discriminatorBody = fmt.Sprintf("if obj.%[1]s == nil { var zero %[2]s; return zero }\nreturn *obj.%[1]s", group.discriminatorMember.Name, discriminatorType.Name.Name)
+	}
 	getDiscriminator := FunctionLiteral{
 		Parameters: []ParamResult{{Name: "obj", Type: types.PointerTo(context.Type)}},
 		Results:    []ParamResult{{Type: discriminatorType}},
-		Body:       fmt.Sprintf("return obj.%s", group.discriminatorMember.Name),
+		Body:       discriminatorBody,
 	}
 
 	// directComparable is used to determine whether we can use the direct
@@ -404,6 +428,9 @@ func (mtfv *discriminatorFieldValidator) generateMemberFieldValidation(context C
 		defaultForbidden,
 		rulesSlice,
 	)
+	if level := minValidationStability(allRuleValidations); level != "" {
+		fn = fn.WithStabilityLevel(level)
+	}
 
 	return Validations{Functions: []FunctionGen{fn}}, nil
 }

@@ -132,6 +132,31 @@ func TestMultipleDiscriminators(t *testing.T) {
 	})
 }
 
+func TestPointerDiscriminator(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
+
+	modeA := "A"
+	modeB := "B"
+
+	st.Value(&PointerDiscriminator{
+		D1:     ptr.To(modeA),
+		FieldA: ptr.To("val"),
+	}).ExpectValid()
+
+	st.Value(&PointerDiscriminator{
+		D1: ptr.To(modeA),
+	}).ExpectMatches(field.ErrorMatcher{}.ByType().ByField().ByValidationStabilityLevel(), field.ErrorList{
+		field.Required(field.NewPath("fieldA"), "").MarkAlpha(),
+	})
+
+	st.Value(&PointerDiscriminator{
+		D1:     ptr.To(modeB),
+		FieldA: ptr.To("val"),
+	}).ExpectMatches(field.ErrorMatcher{}.ByType().ByField().ByValidationStabilityLevel(), field.ErrorList{
+		field.Forbidden(field.NewPath("fieldA"), "").MarkAlpha(),
+	})
+}
+
 func TestCollections(t *testing.T) {
 	st := localSchemeBuilder.Test(t)
 

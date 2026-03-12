@@ -77,6 +77,14 @@ func RegisterValidations(scheme *testscheme.Scheme) error {
 		}
 		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
 	})
+	// type PointerDiscriminator
+	scheme.AddValidationFunc((*PointerDiscriminator)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+		switch op.Request.SubresourcePath() {
+		case "/":
+			return Validate_PointerDiscriminator(ctx, op, nil /* fldPath */, obj.(*PointerDiscriminator), safe.Cast[*PointerDiscriminator](oldObj))
+		}
+		return field.ErrorList{field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath()))}
+	})
 	// type SharedField
 	scheme.AddValidationFunc((*SharedField)(nil), func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
 		switch op.Request.SubresourcePath() {
@@ -298,6 +306,76 @@ func Validate_NonStringDiscriminator(ctx context.Context, op operation.Operation
 	// field NonStringDiscriminator.FieldA has no validation
 	// field NonStringDiscriminator.D2 has no validation
 	// field NonStringDiscriminator.FieldB has no validation
+	return errs
+}
+
+// Validate_PointerDiscriminator validates an instance of PointerDiscriminator according
+// to declarative validation rules in the API schema.
+func Validate_PointerDiscriminator(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *PointerDiscriminator) (errs field.ErrorList) {
+	errs = append(errs, validate.Discriminated(ctx, op, fldPath, obj, oldObj, "fieldA", func(obj *PointerDiscriminator) *string { return obj.FieldA }, func(obj *PointerDiscriminator) string {
+		if obj.D1 == nil {
+			var zero string
+			return zero
+		}
+		return *obj.D1
+	}, validate.DirectEqualPtr, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+		errs := field.ErrorList{}
+		errs = append(errs, validate.ForbiddenPointer(ctx, op, fldPath, obj, oldObj)...)
+		return errs
+	}, []validate.DiscriminatedRule[*string, string]{
+		{
+			Value: "A", Validation: func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				errs := field.ErrorList{}
+				earlyReturn := false
+				if e := validate.RequiredPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+					errs = append(errs, e...)
+					earlyReturn = true
+				}
+				if earlyReturn {
+					return errs
+				}
+				return errs
+			}},
+	}).MarkAlpha()...)
+
+	// field PointerDiscriminator.TypeMeta has no validation
+
+	// field PointerDiscriminator.D1
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("d1"), obj.D1, safe.Field(oldObj, func(oldObj *PointerDiscriminator) *string { return oldObj.D1 }), oldObj != nil)...)
+
+	// field PointerDiscriminator.FieldA
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			return
+		}(fldPath.Child("fieldA"), obj.FieldA, safe.Field(oldObj, func(oldObj *PointerDiscriminator) *string { return oldObj.FieldA }), oldObj != nil)...)
+
 	return errs
 }
 
