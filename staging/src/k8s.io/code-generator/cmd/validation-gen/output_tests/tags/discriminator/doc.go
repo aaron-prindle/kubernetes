@@ -105,6 +105,18 @@ type MultipleDiscriminators struct {
 	FieldB *string `json:"fieldB,omitempty"`
 }
 
+type PointerDiscriminator struct {
+	TypeMeta int
+
+	// +k8s:alpha(since:"1.36")=+k8s:optional
+	// +k8s:alpha(since:"1.36")=+k8s:discriminator
+	D1 *string `json:"d1,omitempty"`
+
+	// +k8s:alpha(since:"1.36")=+k8s:optional
+	// +k8s:alpha(since:"1.36")=+k8s:member("A")=+k8s:required
+	FieldA *string `json:"fieldA,omitempty"`
+}
+
 type Collections struct {
 	TypeMeta int
 
