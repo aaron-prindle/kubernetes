@@ -60,6 +60,8 @@ type discriminatorGroup struct {
 type fieldMemberRules struct {
 	member *types.Member
 	rules  []memberRule
+	// stabilityLevel denotes the stability level of this field's discriminated validation.
+	stabilityLevel ValidationStabilityLevel
 }
 
 type memberRule struct {
@@ -201,6 +203,10 @@ func (mtv *memberTagValidator) GetValidations(context Context, tag codetags.Tag)
 	payloadValidations, err := mtv.validator.ExtractTagValidations(context, *tag.ValueTag)
 	if err != nil {
 		return Validations{}, err
+	}
+
+	if context.StabilityLevel != "" {
+		group.members[fieldName].stabilityLevel = context.StabilityLevel
 	}
 
 	group.members[fieldName].rules = append(group.members[fieldName].rules, memberRule{
@@ -403,7 +409,7 @@ func (mtfv *discriminatorFieldValidator) generateMemberFieldValidation(context C
 		equivArg,
 		defaultForbidden,
 		rulesSlice,
-	)
+	).WithStabilityLevel(rules.stabilityLevel)
 
 	return Validations{Functions: []FunctionGen{fn}}, nil
 }
