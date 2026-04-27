@@ -197,6 +197,10 @@ func Validate_CounterSet(ctx context.Context, op operation.Operation, fldPath *f
 				errs = append(errs, e...)
 				earlyReturn = true
 			}
+			if e := validate.MaxProperties(ctx, op, fldPath, obj, oldObj, 32).MarkAlpha(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
 			if earlyReturn {
 				return // do not proceed
 			}
@@ -1037,6 +1041,10 @@ func Validate_DeviceCounterConsumption(ctx context.Context, op operation.Operati
 			// call field-attached validations
 			earlyReturn := false
 			if e := validate.RequiredMap(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				errs = append(errs, e...)
+				earlyReturn = true
+			}
+			if e := validate.MaxProperties(ctx, op, fldPath, obj, oldObj, 32).MarkAlpha(); len(e) != 0 {
 				errs = append(errs, e...)
 				earlyReturn = true
 			}

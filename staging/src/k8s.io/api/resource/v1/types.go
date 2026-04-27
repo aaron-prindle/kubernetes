@@ -237,6 +237,7 @@ type CounterSet struct {
 	// +required
 	// +k8s:alpha(since: "1.36")=+k8s:required
 	// +k8s:alpha(since: "1.36")=+k8s:eachKey=+k8s:format=k8s-short-name
+	// +k8s:alpha(since: "1.37")=+k8s:maxProperties=32
 	Counters map[string]Counter `json:"counters,omitempty" protobuf:"bytes,2,name=counters"`
 }
 
@@ -534,6 +535,7 @@ type DeviceCounterConsumption struct {
 	// +required
 	// +k8s:alpha(since: "1.36")=+k8s:required
 	// +k8s:alpha(since: "1.36")=+k8s:eachKey=+k8s:format=k8s-short-name
+	// +k8s:alpha(since: "1.37")=+k8s:maxProperties=32
 	Counters map[string]Counter `json:"counters,omitempty" protobuf:"bytes,2,opt,name=counters"`
 }
 

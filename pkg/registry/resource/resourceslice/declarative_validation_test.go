@@ -215,6 +215,15 @@ func TestDeclarativeValidate(t *testing.T) {
 					},
 				},
 				// spec.sharedCounters.counters
+				"valid: at limit shared counter map": {
+					input: mkResourceSliceWithSharedCounters(tweakSharedCounter(counterMap(resource.ResourceSliceMaxCountersPerCounterSet))),
+				},
+				"invalid: too many shared counter map entries": {
+					input: mkResourceSliceWithSharedCounters(tweakSharedCounter(counterMap(resource.ResourceSliceMaxCountersPerCounterSet + 1))),
+					expectedErrs: field.ErrorList{
+						field.TooMany(field.NewPath("spec", "sharedCounters").Index(0).Child("counters"), resource.ResourceSliceMaxCountersPerCounterSet+1, resource.ResourceSliceMaxCountersPerCounterSet).WithOrigin("maxProperties").MarkAlpha(),
+					},
+				},
 				"invalid: shared counter key with uppercase": {
 					input: mkResourceSliceWithSharedCounters(tweakSharedCounter(counters("InvalidKey"))),
 					expectedErrs: field.ErrorList{
@@ -225,6 +234,15 @@ func TestDeclarativeValidate(t *testing.T) {
 					input: mkResourceSliceWithSharedCounters(tweakSharedCounter(counters("valid-key"))),
 				},
 				// spec.devices.consumesCounters.counters
+				"valid: at limit device counter map": {
+					input: mkResourceSliceWithDevices(tweakDeviceCounter(counterMap(resource.ResourceSliceMaxCountersPerDeviceCounterConsumption))),
+				},
+				"invalid: too many device counter map entries": {
+					input: mkResourceSliceWithDevices(tweakDeviceCounter(counterMap(resource.ResourceSliceMaxCountersPerDeviceCounterConsumption + 1))),
+					expectedErrs: field.ErrorList{
+						field.TooMany(field.NewPath("spec", "devices").Index(0).Child("consumesCounters").Index(0).Child("counters"), resource.ResourceSliceMaxCountersPerDeviceCounterConsumption+1, resource.ResourceSliceMaxCountersPerDeviceCounterConsumption).WithOrigin("maxProperties").MarkAlpha(),
+					},
+				},
 				"invalid: device counter key with uppercase": {
 					input: mkResourceSliceWithDevices(tweakDeviceCounter(counters("InvalidKey"))),
 					expectedErrs: field.ErrorList{
@@ -422,6 +440,17 @@ func TestDeclarativeValidateUpdate(t *testing.T) {
 					},
 				},
 				// spec.sharedCounters.counters
+				"valid update: at limit shared counter map": {
+					old:    mkResourceSliceWithSharedCounters(),
+					update: mkResourceSliceWithSharedCounters(tweakSharedCounter(counterMap(resource.ResourceSliceMaxCountersPerCounterSet))),
+				},
+				"invalid update: too many shared counter map entries": {
+					old:    mkResourceSliceWithSharedCounters(),
+					update: mkResourceSliceWithSharedCounters(tweakSharedCounter(counterMap(resource.ResourceSliceMaxCountersPerCounterSet + 1))),
+					expectedErrs: field.ErrorList{
+						field.TooMany(field.NewPath("spec", "sharedCounters").Index(0).Child("counters"), resource.ResourceSliceMaxCountersPerCounterSet+1, resource.ResourceSliceMaxCountersPerCounterSet).WithOrigin("maxProperties").MarkAlpha(),
+					},
+				},
 				"invalid update: shared counter key with uppercase": {
 					old:    mkResourceSliceWithSharedCounters(),
 					update: mkResourceSliceWithSharedCounters(tweakSharedCounter(counters("InvalidKey"))),
@@ -438,6 +467,17 @@ func TestDeclarativeValidateUpdate(t *testing.T) {
 					},
 				},
 				// spec.devices.consumesCounters.counters
+				"valid update: at limit device counter map": {
+					old:    mkResourceSliceWithDevices(),
+					update: mkResourceSliceWithDevices(tweakDeviceCounter(counterMap(resource.ResourceSliceMaxCountersPerDeviceCounterConsumption))),
+				},
+				"invalid update: too many device counter map entries": {
+					old:    mkResourceSliceWithDevices(),
+					update: mkResourceSliceWithDevices(tweakDeviceCounter(counterMap(resource.ResourceSliceMaxCountersPerDeviceCounterConsumption + 1))),
+					expectedErrs: field.ErrorList{
+						field.TooMany(field.NewPath("spec", "devices").Index(0).Child("consumesCounters").Index(0).Child("counters"), resource.ResourceSliceMaxCountersPerDeviceCounterConsumption+1, resource.ResourceSliceMaxCountersPerDeviceCounterConsumption).WithOrigin("maxProperties").MarkAlpha(),
+					},
+				},
 				"invalid update: device counter key with uppercase": {
 					old:    mkResourceSliceWithDevices(),
 					update: mkResourceSliceWithDevices(tweakDeviceCounter(counters("InvalidKey"))),
@@ -651,4 +691,12 @@ func counters(key string) map[string]resource.Counter {
 	return map[string]resource.Counter{
 		key: {},
 	}
+}
+
+func counterMap(count int) map[string]resource.Counter {
+	counters := map[string]resource.Counter{}
+	for i := 0; i < count; i++ {
+		counters[fmt.Sprintf("valid-key-%d", i)] = resource.Counter{}
+	}
+	return counters
 }

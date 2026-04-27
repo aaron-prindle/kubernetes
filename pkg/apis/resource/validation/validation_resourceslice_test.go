@@ -1115,7 +1115,7 @@ func TestValidateResourceSlice(t *testing.T) {
 		},
 		"too-many-counters-in-counter-set": {
 			wantFailures: field.ErrorList{
-				field.TooMany(field.NewPath("spec", "sharedCounters").Index(0).Child("counters"), resourceapi.ResourceSliceMaxCountersPerCounterSet+1, resourceapi.ResourceSliceMaxCountersPerCounterSet),
+				field.TooMany(field.NewPath("spec", "sharedCounters").Index(0).Child("counters"), resourceapi.ResourceSliceMaxCountersPerCounterSet+1, resourceapi.ResourceSliceMaxCountersPerCounterSet).WithOrigin("maxProperties").MarkCoveredByDeclarative(),
 			},
 			slice: func() *resourceapi.ResourceSlice {
 				slice := testResourceSliceWithSharedCounters(goodName, goodName, driverName, 1)
@@ -1221,7 +1221,7 @@ func TestValidateResourceSlice(t *testing.T) {
 		},
 		"too-many-counters-in-device-counter-consumption": {
 			wantFailures: field.ErrorList{
-				field.TooMany(field.NewPath("spec", "devices").Index(0).Child("consumesCounters").Index(0).Child("counters"), resourceapi.ResourceSliceMaxCountersPerDeviceCounterConsumption+1, resourceapi.ResourceSliceMaxCountersPerDeviceCounterConsumption),
+				field.TooMany(field.NewPath("spec", "devices").Index(0).Child("consumesCounters").Index(0).Child("counters"), resourceapi.ResourceSliceMaxCountersPerDeviceCounterConsumption+1, resourceapi.ResourceSliceMaxCountersPerDeviceCounterConsumption).WithOrigin("maxProperties").MarkCoveredByDeclarative(),
 			},
 			slice: func() *resourceapi.ResourceSlice {
 				slice := testResourceSlice(goodName, goodName, driverName, 1)

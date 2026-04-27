@@ -801,7 +801,7 @@ func validateCounterSet(counterSet resource.CounterSet, fldPath *field.Path) fie
 	} else {
 		// The size limit is enforced for across all sets by the caller.
 		allErrs = append(allErrs, validateMap(counterSet.Counters, resource.ResourceSliceMaxCountersPerCounterSet, validation.DNS1123LabelMaxLength,
-			validateCounterName, validateDeviceCounter, fldPath.Child("counters"), keysCovered)...)
+			validateCounterName, validateDeviceCounter, fldPath.Child("counters"), keysCovered, sizeCovered)...)
 	}
 
 	return allErrs
@@ -957,7 +957,7 @@ func validateDeviceCounterConsumption(deviceCounterConsumption resource.DeviceCo
 		allErrs = append(allErrs, field.Required(fldPath.Child("counters"), ""))
 	} else {
 		allErrs = append(allErrs, validateMap(deviceCounterConsumption.Counters, resource.ResourceSliceMaxCountersPerDeviceCounterConsumption,
-			validation.DNS1123LabelMaxLength, validateCounterName, validateDeviceCounter, fldPath.Child("counters"), keysCovered)...)
+			validation.DNS1123LabelMaxLength, validateCounterName, validateDeviceCounter, fldPath.Child("counters"), keysCovered, sizeCovered)...)
 	}
 	return allErrs
 }
@@ -1352,7 +1352,11 @@ func quantityKey(item apiresource.Quantity) string {
 func validateMap[K ~string, T any](m map[K]T, maxSize, truncateKeyLen int, validateKey func(K, *field.Path) field.ErrorList, validateItem func(T, *field.Path) field.ErrorList, fldPath *field.Path, opts ...validationOption) field.ErrorList {
 	var allErrs field.ErrorList
 	if maxSize >= 0 && len(m) > maxSize {
-		allErrs = append(allErrs, field.TooMany(fldPath, len(m), maxSize))
+		err := field.TooMany(fldPath, len(m), maxSize).WithOrigin("maxProperties")
+		if slices.Contains(opts, sizeCovered) {
+			err = err.MarkCoveredByDeclarative()
+		}
+		allErrs = append(allErrs, err)
 		// maxSize check short-circuits for DOS protection
 		return allErrs
 	}
