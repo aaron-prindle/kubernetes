@@ -646,6 +646,9 @@ func Validate_DeviceAttribute(ctx context.Context, op operation.Operation, fldPa
 			if earlyReturn {
 				return // do not proceed
 			}
+			errs = append(errs, validate.EachSliceVal(ctx, op, fldPath, obj, oldObj, nil, nil, func(ctx context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj *string) field.ErrorList {
+				return validate.MaxBytes(ctx, op, fldPath, obj, oldObj, 64)
+			}).MarkAlpha()...)
 			return
 		}(fldPath.Child("strings"), obj.StringValues, safe.Field(oldObj, func(oldObj *resourcev1.DeviceAttribute) []string { return oldObj.StringValues }), oldObj != nil)...)
 

@@ -18,6 +18,7 @@ package resourceslice
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -118,6 +119,14 @@ func TestDeclarativeValidate(t *testing.T) {
 				},
 				"valid: device attribute list of strings": {
 					input: mkResourceSliceWithDevices(tweakDeviceAttribute("test.io/list_of_strings", resource.DeviceAttribute{StringValues: []string{"a", "b", "c"}})),
+				},
+				"invalid: device attribute list of strings with too-long item": {
+					input: mkResourceSliceWithDevices(tweakDeviceAttribute("test.io/list_of_strings", resource.DeviceAttribute{
+						StringValues: []string{strings.Repeat("\xc3\xa9", resource.DeviceAttributeMaxValueLength/2+1)},
+					})),
+					expectedErrs: field.ErrorList{
+						field.TooLong(field.NewPath("spec", "devices").Index(0).Child("attributes").Key("test.io/list_of_strings").Child("strings").Index(0), "", resource.DeviceAttributeMaxValueLength).WithOrigin("maxBytes").MarkAlpha(),
+					},
 				},
 				"valid: device attribute list of versions": {
 					input: mkResourceSliceWithDevices(tweakDeviceAttribute("test.io/list_of_versions", resource.DeviceAttribute{VersionValues: []string{"1.2.3", "2.3.4"}})),
@@ -333,6 +342,15 @@ func TestDeclarativeValidateUpdate(t *testing.T) {
 					update: mkResourceSliceWithDevices(tweakDeviceAttribute("test.io/empty", resource.DeviceAttribute{})),
 					expectedErrs: field.ErrorList{
 						field.Invalid(field.NewPath("spec", "devices").Index(0).Child("attributes").Key("test.io/empty"), "", "").WithOrigin("union").MarkAlpha(),
+					},
+				},
+				"invalid update: device attribute list of strings with too-long item": {
+					old: mkResourceSliceWithDevices(),
+					update: mkResourceSliceWithDevices(tweakDeviceAttribute("test.io/list_of_strings", resource.DeviceAttribute{
+						StringValues: []string{strings.Repeat("\xc3\xa9", resource.DeviceAttributeMaxValueLength/2+1)},
+					})),
+					expectedErrs: field.ErrorList{
+						field.TooLong(field.NewPath("spec", "devices").Index(0).Child("attributes").Key("test.io/list_of_strings").Child("strings").Index(0), "", resource.DeviceAttributeMaxValueLength).WithOrigin("maxBytes").MarkAlpha(),
 					},
 				},
 				// spec.sharedCounters
