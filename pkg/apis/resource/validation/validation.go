@@ -1352,7 +1352,11 @@ func quantityKey(item apiresource.Quantity) string {
 func validateMap[K ~string, T any](m map[K]T, maxSize, truncateKeyLen int, validateKey func(K, *field.Path) field.ErrorList, validateItem func(T, *field.Path) field.ErrorList, fldPath *field.Path, opts ...validationOption) field.ErrorList {
 	var allErrs field.ErrorList
 	if maxSize >= 0 && len(m) > maxSize {
-		allErrs = append(allErrs, field.TooMany(fldPath, len(m), maxSize))
+		err := field.TooMany(fldPath, len(m), maxSize).WithOrigin("maxProperties")
+		if slices.Contains(opts, sizeCovered) {
+			err = err.MarkCoveredByDeclarative()
+		}
+		allErrs = append(allErrs, err)
 		// maxSize check short-circuits for DOS protection
 		return allErrs
 	}
