@@ -493,7 +493,7 @@ func (minLengthTagValidator) GetValidations(context Context, tag codetags.Tag) (
 func (mltv minLengthTagValidator) Docs() TagDoc {
 	return TagDoc{
 		Tag:            mltv.TagName(),
-		StabilityLevel: TagStabilityLevelAlpha,
+		StabilityLevel: TagStabilityLevelBeta,
 		Scopes:         sets.List(mltv.ValidScopes()),
 		Description: `Indicates that a string field has a minimum length for its value in characters.
 		This means that the minimum size in bytes is a range from X to 4X if multi-byte characters are allowed.

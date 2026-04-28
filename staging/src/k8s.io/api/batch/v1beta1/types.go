@@ -98,6 +98,8 @@ type CronJobSpec struct {
 	// reason UnknownTimeZone.
 	// More information can be found in https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#time-zones
 	// +optional
+	// +k8s:optional
+	// +k8s:beta(since: "1.37")=+k8s:minLength=1
 	TimeZone *string `json:"timeZone,omitempty" protobuf:"bytes,8,opt,name=timeZone"`
 
 	// Optional deadline in seconds for starting the job if it misses scheduled
