@@ -2955,7 +2955,7 @@ func TestValidateCronJob(t *testing.T) {
 				},
 			},
 		},
-		"spec.timeZone: timeZone must be nil or non-empty string": {
+		"spec.timeZone: Too short": {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "mycronjob",
 				Namespace: metav1.NamespaceDefault,

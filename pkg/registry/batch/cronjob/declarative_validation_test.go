@@ -24,6 +24,7 @@ import (
 	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	apitesting "k8s.io/kubernetes/pkg/api/testing"
 	"k8s.io/kubernetes/pkg/apis/batch"
+	"k8s.io/utils/ptr"
 )
 
 var apiVersions = []string{"v1", "v1beta1"}
@@ -45,6 +46,18 @@ func testDeclarativeValidateForDeclarative(t *testing.T, apiVersion string) {
 	}{
 		"valid": {
 			input: mkCronJob(),
+		},
+		"timeZone: nil": {
+			input: mkCronJob(tweakTimeZone(nil)),
+		},
+		"timeZone: valid": {
+			input: mkCronJob(tweakTimeZone(ptr.To("UTC"))),
+		},
+		"timeZone: empty": {
+			input: mkCronJob(tweakTimeZone(ptr.To(""))),
+			expectedErrs: field.ErrorList{
+				field.TooShort(field.NewPath("spec", "timeZone"), "", 1).WithOrigin("minLength").MarkBeta(),
+			},
 		},
 		"schedule: empty": {
 			input: mkCronJob(tweakSchedule("")),
@@ -79,6 +92,17 @@ func testValidateUpdateForDeclarative(t *testing.T, apiVersion string) {
 		"valid (no changes)": {
 			old:    mkCronJob(),
 			update: mkCronJob(),
+		},
+		"timeZone: updated from nil to valid": {
+			old:    mkCronJob(tweakTimeZone(nil)),
+			update: mkCronJob(tweakTimeZone(ptr.To("UTC"))),
+		},
+		"timeZone: updated from nil to empty": {
+			old:    mkCronJob(tweakTimeZone(nil)),
+			update: mkCronJob(tweakTimeZone(ptr.To(""))),
+			expectedErrs: field.ErrorList{
+				field.TooShort(field.NewPath("spec", "timeZone"), "", 1).WithOrigin("minLength").MarkBeta(),
+			},
 		},
 
 		"schedule: updated to empty": {
@@ -117,5 +141,11 @@ func mkCronJob(mutators ...func(*batch.CronJob)) batch.CronJob {
 func tweakSchedule(schedule string) func(*batch.CronJob) {
 	return func(job *batch.CronJob) {
 		job.Spec.Schedule = schedule
+	}
+}
+
+func tweakTimeZone(timeZone *string) func(*batch.CronJob) {
+	return func(job *batch.CronJob) {
+		job.Spec.TimeZone = timeZone
 	}
 }

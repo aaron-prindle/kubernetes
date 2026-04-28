@@ -863,7 +863,7 @@ func validateTimeZone(timeZone *string, fldPath *field.Path) field.ErrorList {
 	}
 
 	if len(*timeZone) == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, timeZone, "timeZone must be nil or non-empty string"))
+		allErrs = append(allErrs, field.TooShort(fldPath, *timeZone, 1).WithOrigin("minLength").MarkCoveredByDeclarative())
 		return allErrs
 	}
 

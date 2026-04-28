@@ -94,7 +94,25 @@ func Validate_CronJobSpec(ctx context.Context, op operation.Operation, fldPath *
 			return
 		}(fldPath.Child("schedule"), &obj.Schedule, safe.Field(oldObj, func(oldObj *batchv1beta1.CronJobSpec) *string { return &oldObj.Schedule }), oldObj != nil)...)
 
-	// field batchv1beta1.CronJobSpec.TimeZone has no validation
+	// field batchv1beta1.CronJobSpec.TimeZone
+	errs = append(errs,
+		func(fldPath *field.Path, obj, oldObj *string, oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update && (obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj)) {
+				return nil
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalPointer(ctx, op, fldPath, obj, oldObj); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			errs = append(errs, validate.MinLength(ctx, op, fldPath, obj, oldObj, 1).MarkBeta()...)
+			return
+		}(fldPath.Child("timeZone"), obj.TimeZone, safe.Field(oldObj, func(oldObj *batchv1beta1.CronJobSpec) *string { return oldObj.TimeZone }), oldObj != nil)...)
+
 	// field batchv1beta1.CronJobSpec.StartingDeadlineSeconds has no validation
 	// field batchv1beta1.CronJobSpec.ConcurrencyPolicy has no validation
 	// field batchv1beta1.CronJobSpec.Suspend has no validation
