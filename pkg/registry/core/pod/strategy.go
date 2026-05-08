@@ -22,6 +22,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -65,6 +66,13 @@ type podStrategy struct {
 // Strategy is the default logic that applies when creating and updating Pod
 // objects via the REST API.
 var Strategy = podStrategy{rest.DeclarativeValidation{Scheme: legacyscheme.Scheme}, names.SimpleNameGenerator}
+
+var podDeclarativeValidationNormalizationRules = []field.NormalizationRule{
+	{
+		Regexp:      regexp.MustCompile(`status\.podIPs\[(\d+)\]\.ip`),
+		Replacement: "status.podIPs[$1]",
+	},
+}
 
 // NamespaceScoped is true for pods.
 func (podStrategy) NamespaceScoped() bool {
@@ -145,6 +153,19 @@ func (podStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) 
 	opts := podutil.GetValidationOptionsFromPodSpecAndMeta(&pod.Spec, &oldPod.Spec, &pod.ObjectMeta, &oldPod.ObjectMeta)
 	opts.ResourceIsPod = true
 	return corevalidation.ValidatePodUpdate(obj.(*api.Pod), old.(*api.Pod), opts)
+}
+
+// DeclarativeValidationConfig implements rest.DeclarativeValidationConfigurer to supply declarative
+// validation options.
+func (podStrategy) DeclarativeValidationConfig(ctx context.Context, obj, oldObj runtime.Object) rest.DeclarativeValidationConfig {
+	var opts []string
+	if utilfeature.DefaultFeatureGate.Enabled(features.StrictIPCIDRValidation) {
+		opts = append(opts, string(features.StrictIPCIDRValidation))
+	}
+	return rest.DeclarativeValidationConfig{
+		Options:            opts,
+		NormalizationRules: podDeclarativeValidationNormalizationRules,
+	}
 }
 
 // WarningsOnUpdate returns warnings for the given update.
