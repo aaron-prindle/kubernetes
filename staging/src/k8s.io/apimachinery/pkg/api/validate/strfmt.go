@@ -23,6 +23,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/api/validate/content"
+	utilvalidation "k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
@@ -32,7 +33,31 @@ const (
 	// Default namespace prefix.
 	resourceDefaultNamespacePrefix = "kubernetes.io/"
 	resourceDeviceMaxLength        = 32
+	strictIPCIDRValidationOption   = "StrictIPCIDRValidation"
 )
+
+// IP verifies that the specified value is a valid IP address according to
+// current Kubernetes standards. This is strict and requires canonical form.
+func IP[T ~string](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	return utilvalidation.IsValidIP(fldPath, string(*value))
+}
+
+// IPSloppy verifies that the specified value is a valid IP address for a
+// legacy API field. When StrictIPCIDRValidation is enabled for the operation,
+// this rejects ambiguous legacy forms like IPv4 octets with leading zeroes and
+// IPv4-mapped IPv6 addresses, but it does not require canonical IPv6 form.
+func IPSloppy[T ~string](_ context.Context, op operation.Operation, fldPath *field.Path, value, oldValue *T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if op.Type == operation.Update && oldValue != nil && *value == *oldValue {
+		return nil
+	}
+	return utilvalidation.IsValidIPForLegacyField(fldPath, string(*value), op.HasOption(strictIPCIDRValidationOption), nil)
+}
 
 // ShortName verifies that the specified value is a valid "short name"
 // (sometimes known as a "DNS label").

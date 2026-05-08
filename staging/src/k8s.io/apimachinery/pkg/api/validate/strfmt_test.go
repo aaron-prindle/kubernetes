@@ -25,6 +25,158 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
+func TestIP(t *testing.T) {
+	ctx := context.Background()
+	fldPath := field.NewPath("test")
+
+	testCases := []struct {
+		name     string
+		input    string
+		wantErrs field.ErrorList
+	}{{
+		name:     "valid IPv4",
+		input:    "10.9.8.7",
+		wantErrs: nil,
+	}, {
+		name:     "valid IPv6",
+		input:    "2001:db8::ffff",
+		wantErrs: nil,
+	}, {
+		name:  "invalid: empty",
+		input: "",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "", "must be a valid IP address").WithOrigin("format=ip-strict"),
+		},
+	}, {
+		name:  "invalid: garbage",
+		input: "not-an-ip",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "not-an-ip", "must be a valid IP address").WithOrigin("format=ip-strict"),
+		},
+	}, {
+		name:  "invalid: IPv4 with leading zeroes",
+		input: "010.002.003.004",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "010.002.003.004", "must not have leading 0s").WithOrigin("format=ip-strict"),
+		},
+	}, {
+		name:  "invalid: IPv4-mapped IPv6 address",
+		input: "::ffff:1.2.3.4",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "::ffff:1.2.3.4", "must not be an IPv4-mapped IPv6 address").WithOrigin("format=ip-strict"),
+		},
+	}, {
+		name:  "invalid: non-canonical IPv6",
+		input: "FE80:0:0:0:0:0:0:0abc",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "FE80:0:0:0:0:0:0:0abc", "must be in canonical form").WithOrigin("format=ip-strict"),
+		},
+	}, {
+		name:     "nil value",
+		wantErrs: nil,
+	}}
+
+	matcher := field.ErrorMatcher{}.ByType().ByField().ByOrigin().ByDetailSubstring()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var value *string
+			if tc.name != "nil value" {
+				value = &tc.input
+			}
+			gotErrs := IP(ctx, operation.Operation{}, fldPath, value, nil)
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
+	}
+}
+
+func TestIPSloppy(t *testing.T) {
+	ctx := context.Background()
+	fldPath := field.NewPath("test")
+
+	testCases := []struct {
+		name     string
+		input    string
+		oldInput *string
+		options  []string
+		opType   operation.Type
+		wantErrs field.ErrorList
+	}{{
+		name:     "valid IPv4",
+		input:    "10.9.8.7",
+		wantErrs: nil,
+	}, {
+		name:     "valid IPv6",
+		input:    "2001:db8::ffff",
+		wantErrs: nil,
+	}, {
+		name:     "valid non-canonical IPv6 with strict option",
+		input:    "FE80:0:0:0:0:0:0:0abc",
+		options:  []string{strictIPCIDRValidationOption},
+		wantErrs: nil,
+	}, {
+		name:     "valid IPv4 with leading zeroes without strict option",
+		input:    "010.002.003.004",
+		wantErrs: nil,
+	}, {
+		name:  "invalid IPv4 with leading zeroes with strict option",
+		input: "010.002.003.004",
+		options: []string{
+			strictIPCIDRValidationOption,
+		},
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "010.002.003.004", "must not have leading 0s").WithOrigin("format=ip-sloppy"),
+		},
+	}, {
+		name:     "valid IPv4-mapped IPv6 address without strict option",
+		input:    "::ffff:1.2.3.4",
+		wantErrs: nil,
+	}, {
+		name:    "invalid IPv4-mapped IPv6 address with strict option",
+		input:   "::ffff:1.2.3.4",
+		options: []string{strictIPCIDRValidationOption},
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "::ffff:1.2.3.4", "must not be an IPv4-mapped IPv6 address").WithOrigin("format=ip-sloppy"),
+		},
+	}, {
+		name:  "valid update retaining old IPv4 with leading zeroes with strict option",
+		input: "010.002.003.004",
+		oldInput: func() *string {
+			old := "010.002.003.004"
+			return &old
+		}(),
+		options:  []string{strictIPCIDRValidationOption},
+		opType:   operation.Update,
+		wantErrs: nil,
+	}, {
+		name:  "invalid: empty",
+		input: "",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "", "must be a valid IP address").WithOrigin("format=ip-sloppy"),
+		},
+	}, {
+		name:  "invalid: garbage",
+		input: "not-an-ip",
+		wantErrs: field.ErrorList{
+			field.Invalid(fldPath, "not-an-ip", "must be a valid IP address").WithOrigin("format=ip-sloppy"),
+		},
+	}, {
+		name:     "nil value",
+		wantErrs: nil,
+	}}
+
+	matcher := field.ErrorMatcher{}.ByType().ByField().ByOrigin().ByDetailSubstring()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var value *string
+			if tc.name != "nil value" {
+				value = &tc.input
+			}
+			gotErrs := IPSloppy(ctx, operation.Operation{Type: tc.opType, Options: tc.options}, fldPath, value, tc.oldInput)
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
+	}
+}
+
 func TestShortName(t *testing.T) {
 	ctx := context.Background()
 	fldPath := field.NewPath("test")

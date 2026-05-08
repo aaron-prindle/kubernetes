@@ -50,10 +50,9 @@ func (formatTagValidator) ValidScopes() sets.Set[Scope] {
 
 var (
 	// Keep this list alphabetized.
-	// TODO: uncomment the following when we've done the homework
-	// to be sure it works the current state of IP manual-ratcheting
-	// ipSloppyValidator         = types.Name{Package: libValidationPkg, Name: "IPSloppy"}
 	extendedResourceNameValidator       = types.Name{Package: libValidationPkg, Name: "ExtendedResourceName"}
+	ipSloppyValidator                   = types.Name{Package: libValidationPkg, Name: "IPSloppy"}
+	ipValidator                         = types.Name{Package: libValidationPkg, Name: "IP"}
 	labelKeyValidator                   = types.Name{Package: libValidationPkg, Name: "LabelKey"}
 	labelValueValidator                 = types.Name{Package: libValidationPkg, Name: "LabelValue"}
 	longNameCaselessValidator           = types.Name{Package: libValidationPkg, Name: "LongNameCaseless"}
@@ -92,12 +91,16 @@ func getFormatValidationFunction(format string) (FunctionGen, error) {
 	case "k8s-extended-resource-name":
 		return Function(formatTagName, DefaultFlags, extendedResourceNameValidator).
 			WithEmits(Emission{field.ErrorTypeInvalid, "format=k8s-extended-resource-name", ""}), nil
-	// TODO: uncomment the following when we've done the homework
-	// to be sure it works the current state of IP manual-ratcheting
-	/*
-		case "k8s-ip":
-			return Function(formatTagName, DefaultFlags, ipSloppyValidator), nil
-	*/
+	case "k8s-ip":
+		return Function(formatTagName, DefaultFlags, ipValidator).
+			WithEmits(Emission{field.ErrorTypeInvalid, "format=ip-strict", ""}), nil
+	case "k8s-ip-sloppy":
+		// This matches legacy scalar IP validation. For list fields, use this
+		// only when validation-gen can correlate old and new values, such as a
+		// listType=map keyed by the IP value. Atomic-list old-membership
+		// ratcheting needs a separate generator primitive.
+		return Function(formatTagName, DefaultFlags, ipSloppyValidator).
+			WithEmits(Emission{field.ErrorTypeInvalid, "format=ip-sloppy", ""}), nil
 	case "k8s-label-key":
 		return Function(formatTagName, DefaultFlags, labelKeyValidator).
 			WithEmits(Emission{field.ErrorTypeInvalid, "format=k8s-label-key", ""}), nil
@@ -142,7 +145,10 @@ func (ftv formatTagValidator) Docs() TagDoc {
 			Docs:        "This field holds a Kubernetes extended resource name. This is a domain-prefixed name that must not have a `kubernetes.io` or `requests.` prefix. When `requests.` is prepended, the result must be a valid label key, as used by quota.",
 		}, {
 			Description: "k8s-ip",
-			Docs:        "This field holds an IPv4 or IPv6 address value. IPv4 octets may have leading zeros.",
+			Docs:        "This field holds an IPv4 or IPv6 address value in canonical form.",
+		}, {
+			Description: "k8s-ip-sloppy",
+			Docs:        "This field holds a legacy IPv4 or IPv6 address value. IPv4 octets may have leading zeros when StrictIPCIDRValidation is disabled.",
 		}, {
 			Description: "k8s-label-key",
 			Docs:        "This field holds a Kubernetes label key.",
