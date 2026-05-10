@@ -66,6 +66,24 @@ func TestDeclarativeValidatePodStatusUpdatePodIPs(t *testing.T) {
 			oldPodIPs:              []api.PodIP{{IP: "010.000.000.001"}},
 			newPodIPs:              []api.PodIP{{IP: "010.000.000.001"}},
 		},
+		"legacy IP can be deleted when strict validation is enabled": {
+			strictIPCIDRValidation: true,
+			oldPodIPs:              []api.PodIP{{IP: "010.000.000.001"}},
+			newPodIPs:              nil,
+		},
+		"legacy IP can be replaced by canonical equivalent when strict validation is enabled": {
+			strictIPCIDRValidation: true,
+			oldPodIPs:              []api.PodIP{{IP: "010.000.000.001"}},
+			newPodIPs:              []api.PodIP{{IP: "10.0.0.1"}},
+		},
+		"different legacy IP rejected when strict validation is enabled": {
+			strictIPCIDRValidation: true,
+			oldPodIPs:              []api.PodIP{{IP: "010.000.000.001"}},
+			newPodIPs:              []api.PodIP{{IP: "010.000.000.002"}},
+			expectedErrs: field.ErrorList{
+				field.Invalid(field.NewPath("status", "podIPs").Index(0), nil, "").WithOrigin("format=ip-sloppy").MarkAlpha(),
+			},
+		},
 		"moved legacy IP ratchets by list map key when strict validation is enabled": {
 			strictIPCIDRValidation: true,
 			oldPodIPs:              []api.PodIP{{IP: "010.000.000.001"}},
