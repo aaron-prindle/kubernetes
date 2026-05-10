@@ -30,6 +30,7 @@ import (
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
 	validate "k8s.io/apimachinery/pkg/api/validate"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -79,7 +80,41 @@ func Validate_IPAddress(
 	obj, oldObj *networkingv1beta1.IPAddress) (errs field.ErrorList) {
 
 	// field networkingv1beta1.IPAddress.TypeMeta has no validation
-	// field networkingv1beta1.IPAddress.ObjectMeta has no validation
+
+	{ // field networkingv1beta1.IPAddress.ObjectMeta
+		fn := func(
+			fldPath *field.Path,
+			obj, oldObj *v1.ObjectMeta,
+			oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update {
+				if equality.Semantic.DeepEqual(obj, oldObj) {
+					return nil
+				}
+			}
+			// call field-attached validations
+			func() { // cohort = "name"
+				earlyReturn := false
+				if e := validate.Subfield(ctx, op, fldPath, obj, oldObj, "name",
+					func(o *v1.ObjectMeta) *string { return &o.Name }, validate.DirectEqualPtr, validate.OptionalValue).MarkAlpha().MarkShortCircuit(); len(e) != 0 {
+					earlyReturn = true
+				}
+				if earlyReturn {
+					return // do not proceed
+				}
+				if e := validate.Subfield(ctx, op, fldPath, obj, oldObj, "name",
+					func(o *v1.ObjectMeta) *string { return &o.Name }, validate.DirectEqualPtr, validate.IP).MarkAlpha(); len(e) != 0 {
+					errs = append(errs, e...)
+				}
+			}()
+			return
+		}
+		oldVal := safe.Field(oldObj,
+			func(oldObj *networkingv1beta1.IPAddress) *v1.ObjectMeta {
+				return &oldObj.ObjectMeta
+			})
+		errs = append(errs, fn(fldPath.Child("metadata"), &obj.ObjectMeta, oldVal, oldObj != nil)...)
+	}
 
 	{ // field networkingv1beta1.IPAddress.Spec
 		fn := func(

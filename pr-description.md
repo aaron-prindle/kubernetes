@@ -2,7 +2,7 @@
 
 ## Summary
 
-This PR introduces declarative IP format validators and attempts a first proof migration for `PodStatus.PodIPs[*].IP`.
+This PR introduces declarative IP format validators and attempts first proof migrations for `PodStatus.PodIPs[*].IP` and `IPAddress.metadata.name`.
 
 The migration is intentionally narrow:
 
@@ -10,6 +10,21 @@ The migration is intentionally narrow:
 - `+k8s:format=k8s-ip-sloppy` maps to legacy, feature-gated IP validation.
 - `PodStatus.PodIPs[*].IP` uses `k8s-ip-sloppy` because handwritten validation uses `IsValidIPForLegacyField`.
 - `PodStatus.PodIPs` is declared as a declarative `listType=map` keyed by `ip`, so unchanged legacy IP strings can ratchet by key.
+- `IPAddress.metadata.name` uses `k8s-ip` because handwritten validation uses strict `IsValidIP` and the API docs require a canonical IP string.
+- The IPAddress handwritten name validation now uses `ValidateObjectMetaWithOpts` so the old `metadata.name` error can be marked covered by declarative validation with the same `format=ip-strict` origin.
+
+## Ratcheting Coverage
+
+`pkg/registry/core/pod/declarative_validation_test.go` has explicit update-equivalence cases for `PodStatus.PodIPs`:
+
+- new legacy IPs are rejected when `StrictIPCIDRValidation` is enabled;
+- unchanged legacy IPs are allowed;
+- legacy IPs can be deleted;
+- legacy IPs can be replaced by a canonical equivalent;
+- different new legacy IPs are rejected;
+- moved legacy IPs ratchet by the `listType=map` key, rather than by index.
+
+This does not prove atomic-list ratcheting. Atomic-list IP fields remain intentionally unmigrated until we add a projected old-value membership primitive.
 
 ## Important Caveat: Pod Subresource Scope
 
