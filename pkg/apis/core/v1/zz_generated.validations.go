@@ -40,6 +40,21 @@ func init() { localSchemeBuilder.Register(RegisterValidations) }
 // RegisterValidations adds validation functions to the given scheme.
 // Public to allow building arbitrary schemes.
 func RegisterValidations(scheme *runtime.Scheme) error {
+	// type Pod
+	scheme.AddValidationFunc(
+		(*corev1.Pod)(nil),
+		func(ctx context.Context, op operation.Operation, obj, oldObj interface{}) field.ErrorList {
+			switch op.Request.SubresourcePath() {
+			case "/", "/ephemeralcontainers", "/status":
+				return Validate_Pod(
+					ctx, op, nil, /* fldPath */
+					obj.(*corev1.Pod),
+					safe.Cast[*corev1.Pod](oldObj))
+			}
+			return field.ErrorList{
+				field.InternalError(nil, fmt.Errorf("no validation found for %T, subresource: %v", obj, op.Request.SubresourcePath())),
+			}
+		})
 	// type ReplicationController
 	scheme.AddValidationFunc(
 		(*corev1.ReplicationController)(nil),
@@ -56,6 +71,149 @@ func RegisterValidations(scheme *runtime.Scheme) error {
 			}
 		})
 	return nil
+}
+
+// Validate_Pod validates an instance of Pod according
+// to declarative validation rules in the API schema.
+func Validate_Pod(
+	ctx context.Context, op operation.Operation, fldPath *field.Path,
+	obj, oldObj *corev1.Pod) (errs field.ErrorList) {
+
+	// field corev1.Pod.TypeMeta has no validation
+	// field corev1.Pod.ObjectMeta has no validation
+	// field corev1.Pod.Spec has no validation
+
+	{ // field corev1.Pod.Status
+		fn := func(
+			fldPath *field.Path,
+			obj, oldObj *corev1.PodStatus,
+			oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update {
+				if equality.Semantic.DeepEqual(obj, oldObj) {
+					return nil
+				}
+			}
+			// call the type's validation function
+			errs = append(errs, Validate_PodStatus(ctx, op, fldPath, obj, oldObj)...)
+			return
+		}
+		oldVal := safe.Field(oldObj,
+			func(oldObj *corev1.Pod) *corev1.PodStatus {
+				return &oldObj.Status
+			})
+		errs = append(errs, fn(fldPath.Child("status"), &obj.Status, oldVal, oldObj != nil)...)
+	}
+
+	return errs
+}
+
+// Validate_PodIP validates an instance of PodIP according
+// to declarative validation rules in the API schema.
+func Validate_PodIP(
+	ctx context.Context, op operation.Operation, fldPath *field.Path,
+	obj, oldObj *corev1.PodIP) (errs field.ErrorList) {
+
+	{ // field corev1.PodIP.IP
+		fn := func(
+			fldPath *field.Path,
+			obj, oldObj *string,
+			oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update {
+				if obj == oldObj || (obj != nil && oldObj != nil && *obj == *oldObj) {
+					return nil
+				}
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalValue(ctx, op, fldPath, obj, oldObj).MarkAlpha().MarkShortCircuit(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			if e := validate.IPSloppy(ctx, op, fldPath, obj, oldObj).MarkAlpha(); len(e) != 0 {
+				errs = append(errs, e...)
+			}
+			return
+		}
+		oldVal := safe.Field(oldObj,
+			func(oldObj *corev1.PodIP) *string {
+				return &oldObj.IP
+			})
+		errs = append(errs, fn(fldPath.Child("ip"), &obj.IP, oldVal, oldObj != nil)...)
+	}
+
+	return errs
+}
+
+// Validate_PodStatus validates an instance of PodStatus according
+// to declarative validation rules in the API schema.
+func Validate_PodStatus(
+	ctx context.Context, op operation.Operation, fldPath *field.Path,
+	obj, oldObj *corev1.PodStatus) (errs field.ErrorList) {
+
+	// field corev1.PodStatus.ObservedGeneration has no validation
+	// field corev1.PodStatus.Phase has no validation
+	// field corev1.PodStatus.Conditions has no validation
+	// field corev1.PodStatus.Message has no validation
+	// field corev1.PodStatus.Reason has no validation
+	// field corev1.PodStatus.NominatedNodeName has no validation
+	// field corev1.PodStatus.HostIP has no validation
+	// field corev1.PodStatus.HostIPs has no validation
+	// field corev1.PodStatus.PodIP has no validation
+
+	{ // field corev1.PodStatus.PodIPs
+		fn := func(
+			fldPath *field.Path,
+			obj, oldObj []corev1.PodIP,
+			oldValueCorrelated bool) (errs field.ErrorList) {
+			// don't revalidate unchanged data
+			if oldValueCorrelated && op.Type == operation.Update {
+				if equality.Semantic.DeepEqual(obj, oldObj) {
+					return nil
+				}
+			}
+			// call field-attached validations
+			earlyReturn := false
+			if e := validate.OptionalSlice(ctx, op, fldPath, obj, oldObj).MarkAlpha().MarkShortCircuit(); len(e) != 0 {
+				earlyReturn = true
+			}
+			if earlyReturn {
+				return // do not proceed
+			}
+			// lists with map semantics require unique keys
+			if e := validate.Unique(ctx, op, fldPath, obj, oldObj,
+				func(a corev1.PodIP, b corev1.PodIP) bool { return a.IP == b.IP }).MarkAlpha(); len(e) != 0 {
+				errs = append(errs, e...)
+			}
+			// iterate the list and call the type's validation function
+			if e := validate.EachSliceVal(ctx, op, fldPath, obj, oldObj,
+				func(a corev1.PodIP, b corev1.PodIP) bool { return a.IP == b.IP }, validate.DirectEqual, Validate_PodIP); len(e) != 0 {
+				errs = append(errs, e...)
+			}
+			return
+		}
+		oldVal := safe.Field(oldObj,
+			func(oldObj *corev1.PodStatus) []corev1.PodIP {
+				return oldObj.PodIPs
+			})
+		errs = append(errs, fn(fldPath.Child("podIPs"), obj.PodIPs, oldVal, oldObj != nil)...)
+	}
+
+	// field corev1.PodStatus.StartTime has no validation
+	// field corev1.PodStatus.InitContainerStatuses has no validation
+	// field corev1.PodStatus.ContainerStatuses has no validation
+	// field corev1.PodStatus.QOSClass has no validation
+	// field corev1.PodStatus.EphemeralContainerStatuses has no validation
+	// field corev1.PodStatus.Resize has no validation
+	// field corev1.PodStatus.ResourceClaimStatuses has no validation
+	// field corev1.PodStatus.ExtendedResourceClaimStatus has no validation
+	// field corev1.PodStatus.AllocatedResources has no validation
+	// field corev1.PodStatus.Resources has no validation
+	// field corev1.PodStatus.NodeAllocatableResourceClaimStatuses has no validation
+	return errs
 }
 
 // Validate_ReplicationController validates an instance of ReplicationController according

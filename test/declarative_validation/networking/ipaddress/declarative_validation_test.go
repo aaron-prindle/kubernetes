@@ -48,6 +48,18 @@ func TestDeclarativeValidateIPAddress(t *testing.T) {
 				"valid": {
 					input: mkValidIPAddress(),
 				},
+				"non-canonical IPv4 name": {
+					input: mkValidIPAddress(withName("010.000.000.001")),
+					expectedErrs: field.ErrorList{
+						field.Invalid(field.NewPath("metadata", "name"), nil, "").WithOrigin("format=ip-strict").MarkAlpha(),
+					},
+				},
+				"non-canonical IPv6 name": {
+					input: mkValidIPAddress(withName("2001:db8:0:0:0::1")),
+					expectedErrs: field.ErrorList{
+						field.Invalid(field.NewPath("metadata", "name"), nil, "").WithOrigin("format=ip-strict").MarkAlpha(),
+					},
+				},
 				"missing parentRef": {
 					input: mkValidIPAddress(withNilParentRef),
 					expectedErrs: field.ErrorList{
@@ -217,5 +229,11 @@ func withResourceVersion(rv string) func(*networking.IPAddress) {
 func withParentRefName(name string) func(*networking.IPAddress) {
 	return func(obj *networking.IPAddress) {
 		obj.Spec.ParentRef.Name = name
+	}
+}
+
+func withName(name string) func(*networking.IPAddress) {
+	return func(obj *networking.IPAddress) {
+		obj.Name = name
 	}
 }

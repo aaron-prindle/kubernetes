@@ -5096,6 +5096,8 @@ type PodDNSConfigOption struct {
 type PodIP struct {
 	// IP is the IP address assigned to the pod
 	// +required
+	// +k8s:alpha(since: "1.36")=+k8s:optional
+	// +k8s:alpha(since: "1.36")=+k8s:format=k8s-ip-sloppy
 	IP string `json:"ip" protobuf:"bytes,1,opt,name=ip"`
 }
 
@@ -5378,10 +5380,13 @@ type PodStatus struct {
 	// match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list
 	// is empty if no IPs have been allocated yet.
 	// +optional
+	// +k8s:alpha(since: "1.36")=+k8s:optional
 	// +patchStrategy=merge
 	// +patchMergeKey=ip
 	// +listType=map
 	// +listMapKey=ip
+	// +k8s:alpha(since: "1.36")=+k8s:listType=map
+	// +k8s:alpha(since: "1.36")=+k8s:listMapKey=ip
 	PodIPs []PodIP `json:"podIPs,omitempty" protobuf:"bytes,12,rep,name=podIPs" patchStrategy:"merge" patchMergeKey:"ip"`
 
 	// RFC 3339 date and time at which the object was acknowledged by the Kubelet.

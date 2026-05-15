@@ -4552,7 +4552,7 @@ func validatePodIPs(pod, oldPod *core.Pod) field.ErrorList {
 		}
 	}
 	for i, podIP := range pod.Status.PodIPs {
-		allErrs = append(allErrs, IsValidIPForLegacyField(podIPsField.Index(i), podIP.IP, existingPodIPs)...)
+		allErrs = append(allErrs, IsValidIPForLegacyField(podIPsField.Index(i), podIP.IP, existingPodIPs).MarkCoveredByDeclarative()...)
 	}
 
 	// if we have more than one Pod.PodIP then we must have a dual-stack pair

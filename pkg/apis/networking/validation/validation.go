@@ -17,9 +17,12 @@ limitations under the License.
 package validation
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/operation"
+	apimachineryvalidate "k8s.io/apimachinery/pkg/api/validate"
 	"k8s.io/apimachinery/pkg/api/validate/content"
 	apimachineryvalidation "k8s.io/apimachinery/pkg/api/validation"
 	unversionedvalidation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
@@ -773,7 +776,10 @@ func ValidateIPAddressName(name string, prefix bool) []string {
 }
 
 func ValidateIPAddress(ipAddress *networking.IPAddress) field.ErrorList {
-	allErrs := apivalidation.ValidateObjectMeta(&ipAddress.ObjectMeta, false, ValidateIPAddressName, field.NewPath("metadata"))
+	validateIPAddressName := func(fldPath *field.Path, name string) field.ErrorList {
+		return apimachineryvalidate.IP(context.Background(), operation.Operation{}, fldPath, &name, nil).MarkCoveredByDeclarative()
+	}
+	allErrs := apivalidation.ValidateObjectMetaWithOpts(&ipAddress.ObjectMeta, false, validateIPAddressName, field.NewPath("metadata"))
 	errs := validateIPAddressParentReference(ipAddress.Spec.ParentRef, field.NewPath("spec"))
 	allErrs = append(allErrs, errs...)
 	return allErrs
